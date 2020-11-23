@@ -1,0 +1,9 @@
+[submodule "extern/ana_parflow-diagnostics_pythonheat"]
+	path = extern/ana_parflow-diagnostics_pythonheat
+	url = https://icg4geo.icg.kfa-juelich.de/SoftwareTools/ana_parflow-diagnostics_pythonheat.git
+[submodule "extern/parflow"]
+	path = extern/parflow
+	url = https://WagnerNiklas@bitbucket.org/CtUbgp9YfRh/parflow.git
+[submodule "extern/general"]
+	path = extern/general
+	url = https://WagnerNiklas@bitbucket.org/CtUbgp9YfRh/general.git
