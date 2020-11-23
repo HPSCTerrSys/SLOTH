@@ -1,0 +1,8 @@
+# ignore .pyc
+*.pyc
+
+# ignore data
+data/*
+
+# keep all .gitkeep files
+!*.gitkeep
