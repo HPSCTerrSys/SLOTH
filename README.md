@@ -1,6 +1,6 @@
 # postpro_genericVAlidationTool
 This repo is aimed to holed different **monitoring**, **analysing**, and 
-**validation** scripts for simulaitons based on [TSMP](https://www.terrsysmp.org/).
+**validation** scripts for simulaitons based on [TSMP](https://www.terrsysmp.org/). More details can be found in the related [Wiki](https://icg4geo.icg.kfa-juelich.de/SoftwareTools/postpro_genericVAlidationTool/wikis/home)
 
 
 ## Getting Started
