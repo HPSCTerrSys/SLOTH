@@ -1,3 +1,28 @@
+"""
+author: Nikals WAGNER
+e-mail: n.wagner@fz-juelich.de
+version: 2021-03-05
+
+Description:
+SanityCheck.py is aimed to quickly proof if data show valid results or not.
+
+Often it is required, to quick inspect data (e.g. modeloutput) to validate if
+the modelresults are reasonable or not. No nice plots are required, simple
+some stats showing as much information as possible about the inspected data
+without getting confused.
+This script is aimed to handle whatever data it gets and is adjusting
+at some upper and lower percentile (default 2% adn 98%) of the passed data
+to prevent outliers destroing the colorbar or histogram (check number with the
+colorbar! Those do change from plot to plot!).
+One usecase of this script could be to run automatically after each individual 
+simulation of a long-term climate simulation to easily check if the simulation
+results stay reasonable or if some problmes (time shift, instable simualtion, ) 
+show up.
+Another usecase would be to run manually for some specific data-set, using this
+script standalone passing data via command line arguments.
+
+Check examples/ to see how this works.
+"""
 import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -37,7 +62,7 @@ def get_infostr(data, lowerP=2, upperP=98):
         ]
     return '\n'.join(tmp_infostr)
 
-def plot_SanityCheck_3D(data, kind='sum', data_mask=None, figname='./SanityCheck.pdf', 
+def plot_SanityCheck_3D(data, data_mask=None, kind='sum',figname='./SanityCheck.pdf', 
     lowerP=2, upperP=98, interactive=False, **kwargs):
     if not isinstance(data, np.ndarray):
         print(f'data is of type {type(data)} but <class "numpy.ndarray"> is required!')
