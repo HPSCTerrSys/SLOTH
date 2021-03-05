@@ -1,5 +1,11 @@
 # ignore .pyc
 *.pyc
+# ignore all kind of images
+*.png
+*.jpg
+*.jpeg
+*.eps
+*.pdf
 
 # ignore data
 data/*
