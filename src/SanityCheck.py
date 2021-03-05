@@ -21,7 +21,7 @@ show up.
 Another usecase would be to run manually for some specific data-set, using this
 script standalone passing data via command line arguments.
 
-Check examples/ to see how this works.
+Check examples/ to see how this works. 
 """
 import numpy as np
 import matplotlib as mpl
