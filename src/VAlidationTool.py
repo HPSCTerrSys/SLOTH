@@ -750,11 +750,13 @@ class GRDCdataset(coreDataset):
 
             # catch different GRDC time-stamps
             try:
-                sliceStart = (start.year - dt.datetime.strptime(station[start_idx], '%Y').year) *12
-                sliceEnd   = end   - dt.datetime.strptime(station[end_idx], '%Y')
+                start_station = dt.datetime.strptime(station[start_idx], '%Y')
+                # calculating month between start and start_staion
+                sliceStart = (start.year - start_station.year) * 12 + start.month - start_station.month
+                #sliceEnd   = end   - dt.datetime.strptime(station[end_idx], '%Y')
             except ValueError:
                 sliceStart = (start - dt.datetime.strptime(station[start_idx], '%Y-%m')).days
-                sliceEnd   = end   - dt.datetime.strptime(station[end_idx], '%Y-%m')
+                #sliceEnd   = end   - dt.datetime.strptime(station[end_idx], '%Y-%m')
             print(sliceStart)
 
             #print(f'sliceStart: {sliceStart}')

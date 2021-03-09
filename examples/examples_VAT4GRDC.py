@@ -39,14 +39,14 @@ GRDC_example.create_indexFile(force=True)
 #    Via default settings the internal index of GRDC_example is updated
 #    with this filter-functions, meaning you can apply multiple filters to
 #    your dataset which are all added.
-#    To be some clear, you can e.g. first filter for a country:
+#    To be some clear, you can e.g.first filter for a country:
 GRDC_example.filter_index(key='Country', value='FR')
 #    and after this filter for a time-period - BUT DIFFERENT AS YOU THINK
 #    Note here the difference between 'filter-index' and 'filter_index_date':
 #    While 'filter_index' filters according to key-values pair straight forward
 #    'filter_index_date' does filter those stations not fully covering the 
 #    provided time-period. 
-GRDC_example.filter_index_date(start='1980-01', end='1980-12', form='%Y-%m')
+GRDC_example.filter_index_date(start='1979-01', end='1980-12', form='%Y-%m')
 #    At the end 'GRDC_example' does contain stations locate in France and
 #    holding data for the period 1980-08 to 1980-12.
 
@@ -58,7 +58,7 @@ GRDC_example.filter_index_date(start='1980-01', end='1980-12', form='%Y-%m')
 #    As 'filter_index_date' do remove those stations without data in given 
 #    time-period, here you can really define which time period you want to
 #    store with you final data-set
-GRDC_example.read_files(start='1980-08-01', end='1980-12-31', form='%Y-%m-%d')
+GRDC_example.read_files(start='1979-12-01', end='1980-12-31', form='%Y-%m-%d')
 
 # 6) inspect your data
 #    The read in data 
