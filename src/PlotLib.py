@@ -46,6 +46,31 @@ def plot_XY_2VarMean_TwinX(x, y1, y2, ax, **kwargs):
         [ax_twin.axhline(hline, ls='--', lw=0.5, color='grey') for hline in y2_hlines]
     ax_twin.legend(loc='lower right')
 
+def get_PlotMinMaxMid_Percentil(data2plot, lower=2, upper=98):
+    vmin = np.nanpercentile(data2plot, lower)
+    vmax = np.nanpercentile(data2plot, upper)
+    #vmid = np.nanpercentile(data2plot, 50)
+    vmid = (vmax+vmin) / 2.
+    '''
+    tmp_scalFac = 1.5
+    vmin = tmp_mean - (tmp_scalFac*tmp_std)
+    vmax = tmp_mean + (tmp_scalFac*tmp_std)
+    '''
+    return vmin, vmax, vmid
+
+
+def get_infostr(data, lowerP=2, upperP=98):
+    tmp_infostr = [
+        f'min: {np.nanmin(data):.2e}',
+        f'max: {np.nanmax(data):.2e}',
+        f'mean: {np.nanmean(data):.2e}',
+        f'std: {np.nanstd(data):.2e}',
+        f'q_{lowerP}: {np.nanpercentile(data, lowerP):.2e}',
+        f'q_50: {np.nanpercentile(data, 50):.2e}',
+        f'q_{upperP}: {np.nanpercentile(data, upperP):.2e}',
+        ]
+    return '\n'.join(tmp_infostr)
+
 def plot_imshow2PDiff(v1, v2, **kwargs):
     '''
     generates 3 imshows in a rwo
@@ -55,8 +80,8 @@ def plot_imshow2PDiff(v1, v2, **kwargs):
     infostr     = kwargs.pop('infostr', False)
     v1_name     = kwargs.pop('v1_name', 'Variable 1')
     v2_name     = kwargs.pop('v2_name', 'Variable 2')
-    var_vmin    = kwargs.pop('var_vmin', np.nanmin(v1))
-    var_vmax    = kwargs.pop('var_vmax', np.nanmax(v1))
+    var_vmin    = kwargs.pop('var_vmin', get_PlotMinMaxMid_Percentil(v1)[0])
+    var_vmax    = kwargs.pop('var_vmax', get_PlotMinMaxMid_Percentil(v1)[1])
     diff_vmin   = kwargs.pop('diff_vmin', None)
     diff_vmax   = kwargs.pop('diff_vmax', None)
     # a bit more special default handling
@@ -98,13 +123,7 @@ def plot_imshow2PDiff(v1, v2, **kwargs):
 
     var1_ax.set_title(fr'{v1_name}')
     if infostr:
-        tmp_infostr = [
-                f'min: {np.nanmin(v1):.2e}',
-                f'max: {np.nanmax(v1):.2e}',
-                f'mean: {np.nanmean(v1):.2e}',
-                f'median: {np.nanmedian(v1):.2e}',
-                ]
-        var1_ax.text(0.01, 0.99, '\n'.join(tmp_infostr),
+        var1_ax.text(0.01, 0.99, get_infostr(v1),
                      verticalalignment='top', transform=var1_ax.transAxes,
                      fontsize=8)
     im = var1_ax.imshow(v1, origin='lower', vmin=var_vmin, vmax=var_vmax,
@@ -113,13 +132,7 @@ def plot_imshow2PDiff(v1, v2, **kwargs):
     var2_ax.set_title(fr'{v2_name}')
     var2_ax.get_yaxis().set_visible(False)
     if infostr:
-        tmp_infostr = [
-                f'min: {np.nanmin(v2):.2e}',
-                f'max: {np.nanmax(v2):.2e}',
-                f'mean: {np.nanmean(v2):.2e}',
-                f'median: {np.nanmedian(v2):.2e}',
-                ]
-        var2_ax.text(0.01, 0.99, '\n'.join(tmp_infostr),
+        var2_ax.text(0.01, 0.99, get_infostr(v2),
                      verticalalignment='top', transform=var2_ax.transAxes,
                      fontsize=8)
     im = var2_ax.imshow(v2, origin='lower', vmin=var_vmin, vmax=var_vmax,
@@ -130,13 +143,7 @@ def plot_imshow2PDiff(v1, v2, **kwargs):
     diff_ax.set_title(fr'Diff: {v1_name} - {v2_name}')
     diff_ax.get_yaxis().set_visible(False)
     if infostr:
-        tmp_infostr = [
-                f'min: {np.nanmin(v1-v2):.2e}',
-                f'max: {np.nanmax(v1-v2):.2e}',
-                f'mean: {np.nanmean(v1-v2):.2e}',
-                f'median: {np.nanmedian(v1-v2):.2e}',
-                ]
-        diff_ax.text(0.01, 0.99, '\n'.join(tmp_infostr),
+        diff_ax.text(0.01, 0.99, get_infostr(v1-v2),
                      verticalalignment='top', transform=diff_ax.transAxes,
                      fontsize=8)
     im = diff_ax.imshow(v1 - v2, origin='lower',
