@@ -528,7 +528,7 @@ class GRDCdataset(coreDataset):
         super().__init__(data)
         print('after')
         self.GRDCfiles          = GRDCfiles if not GRDCfiles is None else None
-        self.GRDCindexFile      = GRDCindexFile if not GRDCindexFile is None else '../data/index_GRDC_USER.csv'
+        self.GRDCindexFile      = GRDCindexFile if not GRDCindexFile is None else './index_GRDC_USER.csv'
         self.GRDCindexObj       = None 
 
         self.id                 = None
@@ -789,8 +789,10 @@ class GRDCdataset(coreDataset):
                         tmp_date = row[time_idx].split('-')
                         tmp_date = '-'.join(tmp_date[:-1])
                         tmp = dt.datetime.strptime(tmp_date, '%Y-%m')
+                        end = end.replace(day=1)
                     tmp_time.append(tmp)
                     tmp_data.append(row[data_idx].strip())
+                    print(f'tmp: {tmp} vs end: {end}')
                     if tmp >= end:
                         break
                     # print(tmp_time)

@@ -18,34 +18,28 @@ files     = sorted(glob.glob(f'{file_path}/*.mon'))
 #files     = sorted(glob.glob(f'{file_path}/*.day'))
 
 # 2) initialize GRDC dataset-object
-#    This instance of the VAT-class holds the data and provides some useful 
-#    functions to process the data-set
-GRDC_example = vat.GRDCdataset(GRDCfiles=files, GRDCindexFile='../data/example_GRDC/index_GRDC_USER.csv')
+#    Below step creates a GRDCdataset instance defined with VAT, holding 
+#    the data and provides some useful functions to process the data-set.
+GRDC_example = vat.GRDCdataset(GRDCfiles=files)
 
-# 3) create a index files if not already exist
+# 3) create a index file if not already exist
 #    One of above mentioned useful functions is 'create_indexFile()'. 
 #    This function create a easy to read overview of all via 'files' defined
-#    GRDC files. 
-#    The index-file is names according to 'GRDCindexFile' and written in csv
-#    format, no matter what you name the file. 
-#    Try out and open this file via any text editor or Excel.
-#    NOTE: 
-#    even if this is a useful function to get an overview, this is also
-#    mandatory for all following functions of VAT, so run this function!
-#    'force=True' simply forces the function to overwrite already existing
-#    index-files. This is easier for the beginning.
+#    GRDC files. The index-file is placed next to this examples_VAT4GRDC.py 
+#    script and stored as csv-file. 
+#    To get a feeling for the index file, open the index file once it is 
+#    created with any text editor or Excel.
 GRDC_example.create_indexFile(force=True)
 
 # 4) filter your data
 #    As you can see in the index-file, full GRDC datasets contains many 
 #    stations all for different time-periods.
 #    So some filter functions are provided. In principle you can filter 
-#    for any keyword you can find in the header of the index-file, but some
-#    keys are more useful than other...
-#    Via default settings the index stored with vat.GRDCdataset() is updated
+#    for any keyword you can find in the header of the index-file.
+#    Via default settings the internal index of GRDC_example is updated
 #    with this filter-functions, meaning you can apply multiple filters to
 #    your dataset which are all added.
-#    To be some clear, you can first filter for a country:
+#    To be some clear, you can e.g. first filter for a country:
 GRDC_example.filter_index(key='Country', value='FR')
 #    and after this filter for a time-period - BUT DIFFERENT AS YOU THINK
 #    Note here the difference between 'filter-index' and 'filter_index_date':
