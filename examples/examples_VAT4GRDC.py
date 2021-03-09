@@ -4,6 +4,9 @@ import glob
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import netCDF4 as nc
+
+src_path='../src/'
+sys.path.append(src_path)
 import VAlidationTool as vat
 
 
@@ -65,6 +68,7 @@ GRDC_example.read_files(start='1980-08-01', end='1980-12-31', form='%Y-%m-%d')
 
 # 6) inspect your data
 #    The read in data 
+print(f'############################################################################')
 print(f'GRDC_example.id.shape: {GRDC_example.id.shape} ({type(GRDC_example.id)})')
 print(f'GRDC_example.id: {GRDC_example.id}')
 print(f'GRDC_example.data.shape: {GRDC_example.data.shape} ({type(GRDC_example.data)})')

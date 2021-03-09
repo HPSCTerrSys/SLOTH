@@ -757,7 +757,7 @@ class GRDCdataset(coreDataset):
                 sliceEnd   = end   - dt.datetime.strptime(station[end_idx], '%Y-%m')
             print(sliceStart)
 
-            print(f'sliceStart: {sliceStart}')
+            #print(f'sliceStart: {sliceStart}')
             with open(station[file_idx], "r", encoding="utf8", errors='ignore') as f:
                 # skip meta data
                 _ = [next(f) for x in range(metaLines)]
@@ -779,7 +779,7 @@ class GRDCdataset(coreDataset):
                 tmp_time = []
                 tmp_data = []
                 for row in reader:
-                    print(f'row: {row}')
+                    #print(f'row: {row}')
                     # print(row)
                     try:
                         tmp = dt.datetime.strptime(row[time_idx], '%Y-%m-%d')
