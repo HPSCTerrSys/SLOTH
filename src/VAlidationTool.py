@@ -577,7 +577,7 @@ class GRDCdataset(coreDataset):
                          header_lines=1, meta_lines=40,
                          force=False):
 
-        if os.path.isfile(self.GRDCindexFile): 
+        if os.path.isfile(self.GRDCindexFile) and force == False: 
             print(f'self.GRDCindexFile ({self.GRDCindexFile}) already exist -- read in the existing file instead. Use "force=True" to overwrite')
             self.GRDCindexObj = self.read_indexFile(indexFile=self.GRDCindexFile)
             return None
@@ -660,17 +660,34 @@ class GRDCdataset(coreDataset):
         # use self.GRDCindexObj is nothing is passed
         indexObj = indexObj if not indexObj is None else self.GRDCindexObj
         if not isinstance(start, dt.datetime):
-            start = dt.datetime.strptime(start, form)
+            print(f'start: {start}')
+            try:
+                start = dt.datetime.strptime(start, form)
+            except ValueError:
+                print('####################################################################')
+                print('ERROR in filter_index_date()')
+                print(f'-- passed start-date {start} does not match passed date-form {form}')
+                print('-- Forget to pass a form at all?')
+                print('####################################################################')
+                raise
+
         if not isinstance(end, dt.datetime):
+            print(f'end: {end}')
             end = dt.datetime.strptime(end, form)
 
         header      = indexObj[0]
         start_idx   = header.index('Date start')
         end_idx     = header.index('Date end')
         data        = indexObj[1]
-        
-        data_filtered = [row for row in data if dt.datetime.strptime(row[start_idx], form) <= start]
-        data_filtered = [row for row in data_filtered if dt.datetime.strptime(row[end_idx], form) >= end]
+
+        try: 
+            tmp_form = '%Y-%m'
+            data_filtered = [row for row in data if dt.datetime.strptime(row[start_idx], tmp_form) <= start]
+            data_filtered = [row for row in data_filtered if dt.datetime.strptime(row[end_idx], tmp_form) >= end]
+        except ValueError:
+            tmp_form = '%Y'
+            data_filtered = [row for row in data if dt.datetime.strptime(row[start_idx], tmp_form) <= start]
+            data_filtered = [row for row in data_filtered if dt.datetime.strptime(row[end_idx], tmp_form) >= end]
 
         # only store result in current object if wanted.
         # true is default but to keep the option to say no
@@ -698,7 +715,7 @@ class GRDCdataset(coreDataset):
 
     def read_files(self, start, end, indexObj=None,
                          metaLines=40, delimiter=';',
-                         form='%Y-%m-%d'):
+                         form='%Y-%m-%d', dischargeKey='Calculated'):
         """reads the date and 'original' data only!
         """
         if not isinstance(start, dt.datetime):
@@ -731,9 +748,16 @@ class GRDCdataset(coreDataset):
         for station in indexList:
             print(f'start reading GRDC_no: {station[id_idx]}')
 
-            sliceStart = (start - dt.datetime.strptime(station[start_idx], '%Y-%m')).days
+            # catch different GRDC time-stamps
+            try:
+                sliceStart = (start.year - dt.datetime.strptime(station[start_idx], '%Y').year) *12
+                sliceEnd   = end   - dt.datetime.strptime(station[end_idx], '%Y')
+            except ValueError:
+                sliceStart = (start - dt.datetime.strptime(station[start_idx], '%Y-%m')).days
+                sliceEnd   = end   - dt.datetime.strptime(station[end_idx], '%Y-%m')
             print(sliceStart)
-            sliceEnd   = end   - dt.datetime.strptime(station[end_idx], '%Y-%m')
+
+            print(f'sliceStart: {sliceStart}')
             with open(station[file_idx], "r", encoding="utf8", errors='ignore') as f:
                 # skip meta data
                 _ = [next(f) for x in range(metaLines)]
@@ -749,14 +773,22 @@ class GRDCdataset(coreDataset):
                 # get needed /  wanted index
                 time_idx = tmp_header.index('YYYY-MM-DD')
                 # print('time_idx:', time_idx)
-                data_idx = tmp_header.index('Original')
+                data_idx = tmp_header.index(f'{dischargeKey}')
                 # print('data_idx:', data_idx)
                 # loop over all data
                 tmp_time = []
                 tmp_data = []
                 for row in reader:
+                    print(f'row: {row}')
                     # print(row)
-                    tmp = dt.datetime.strptime(row[time_idx], '%Y-%m-%d')
+                    try:
+                        tmp = dt.datetime.strptime(row[time_idx], '%Y-%m-%d')
+                    except ValueError:
+                        # monthly files does contain date format as: YYYY-mm-00
+                        # but datetime cannot handle day=00, so cut it 
+                        tmp_date = row[time_idx].split('-')
+                        tmp_date = '-'.join(tmp_date[:-1])
+                        tmp = dt.datetime.strptime(tmp_date, '%Y-%m')
                     tmp_time.append(tmp)
                     tmp_data.append(row[data_idx].strip())
                     if tmp >= end:
@@ -765,8 +797,9 @@ class GRDCdataset(coreDataset):
                 print(f' --- len of file: {len(tmp_time)} rows')
                 # tmp_time = np.asarray(tmp_time)
                 # tmp_data = np.asarray(tmp_data, dtype=float)
-                tmp_data[tmp_data==-999] = np.nan
-                tmp_data[tmp_data==-99] = np.nan
+                ## mask missing values
+                #tmp_data[tmp_data==-999] = np.nan
+                #tmp_data[tmp_data==-99] = np.nan
 
                 tmp_out_id.append(station[id_idx])
                 tmp_out_data.append(np.asarray(tmp_data, dtype=float))
