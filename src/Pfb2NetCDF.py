@@ -36,8 +36,9 @@ def Pfb2NetCDF(infiles, varname, outfile):
 
     # handle default outfile behavior
     if outfile is None:
-        outFileName = os.path.splitext(f'{infile[0]}')[0]
-        outFile = f'{outFileName}.nc'
+        outFileName = os.path.splitext(f'{infiles[0]}')[0]
+        outfile = f'{outFileName}.nc'
+        print(f'outfile: {outfile}')
     else:
         outFile = f'{outfile}'
     
