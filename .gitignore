@@ -9,6 +9,7 @@
 
 # ignore data
 data/*
+*.npy
 
 # keep all .gitkeep files
 !*.gitkeep
