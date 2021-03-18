@@ -211,7 +211,7 @@ except FileNotFoundError:
     anomalyDomain = np.empty(monthlyMean.shape[0])
     for n, month in enumerate(monthlyMean):
         idx_month = n%NoM
-        anomalyDomain[n] = np.nanmean(clima[idx_month], dtype=float) - np.nanmean(month, dtype=float)
+        anomalyDomain[n] = np.nanmean(month, dtype=float) - np.nanmean(clima[idx_month], dtype=float)
     # dump anomalies
     with open('Anomalies_TestDump.npy', 'wb') as f:
         np.save(f, anomalyDomain)
