@@ -83,8 +83,8 @@ def prep_monthMean(data, dates, dumpIntervall, calendar):
         # I decided to go for the solution checking current month and next month
         # to catch the case if the dateset contains one month only!
         #print(f'BE LOW IS AH ACK') # the hack for LPOs COSMO output
-        #nextMonth = (dates[t] + 2*dumpIntervall).month
-        nextMonth = (dates[t] + dumpIntervall).month
+        nextMonth = (dates[t] + 2*dumpIntervall).month
+        #nextMonth = (dates[t] + dumpIntervall).month
         if nextMonth != currMonth:
             Slices.append(slice(t_lower,t+1,None))
             t_lower = t+1
@@ -101,17 +101,17 @@ dumpIntervall = dt.timedelta(hours=3)
 # set the root dir of your data
 dataRootDir = f'/p/scratch/cjibg35/poshyvailo1/HiCam-CORDEX_EUR-11_MPI-ESM-LR_histo_r1i1p1_FZJ-IBG3-TSMP120EC_v00aJuwelsCpuProdTt-1949_2005/postpro/'
 # set the variable name of your data
-varName = 'TSA'
+varName = 'T_2M'
 # set you file name
 # for our postpor you have to distinguish between COSMO and CLM/PFL only. COSMO does contain a '_ts' in it filename
-fileName = f'{varName}.nc' # CLM/PFL style
+fileName = f'{varName}_ts.nc' # CLM/PFL style
 #fileName = f'{varName}_ts.nc' # COSMO style
 
 # use wildcats here as for Linux terminal
 # e.g. 1997_?? does contain every month of 1997
 # e.g. 199*    does contain every month of every year starting with 199
 # etc.
-files = sorted(glob.glob(f'{dataRootDir}/197?_??/{fileName}'))
+files = sorted(glob.glob(f'{dataRootDir}/1971_??/{fileName}'))
 
 #### you have to adjust things above only
 ###############################################################################
@@ -125,7 +125,10 @@ files = sorted(glob.glob(f'{dataRootDir}/197?_??/{fileName}'))
 ###############################################################################
 try:
     monthlyMean = np.load(f'MonthlyMeans_TestDump.npy')
+    print(f'monthlyMean.shape: {monthlyMean.shape}')
+    print(f'monthlyMean.dtype: {monthlyMean.dtype}')
     monthlyTime = np.load(f'MonthlyTime_TestDump.npy', allow_pickle=True)
+    print(f'monthlyTime.shape: {monthlyTime.shape}')
 except FileNotFoundError:
     monthlyMean = None
     monthlyTime = None
@@ -157,7 +160,7 @@ except FileNotFoundError:
 
             tmp_timeMean  = np.nanmean(tmp_time, axis=0, keepdims=True)
             tmp_timeMean  = nc.num2date(tmp_timeMean, units=timeUnits,calendar=timeCalendar)
-            tmp_monthMean = np.nanmean(tmp_var, axis=0, keepdims=True)
+            tmp_monthMean = np.nanmean(tmp_var, axis=0, keepdims=True, dtype=float)
             if monthlyMean is None:
                 monthlyMean = tmp_monthMean
                 monthlyTime = tmp_timeMean
@@ -181,12 +184,14 @@ except FileNotFoundError:
 NoM = 12
 try:
     clima = np.load(f'clima_TestDump.npy')
+    print(f'clima.shape: {clima.shape}')
+    print(f'clima.dtype: {clima.dtype}')
 except FileNotFoundError:
     climaDim = [NoM]
     climaDim = climaDim + [dim for dim in monthlyMean[0].shape]
     clima = np.empty(climaDim)
     for month in range(NoM):
-        clima[month] = np.nanmean(monthlyMean[month::NoM], axis=0)
+        clima[month] = np.nanmean(monthlyMean[month::NoM], axis=0, dtype=float)
     # dump clima
     with open('clima_TestDump.npy', 'wb') as f:
         np.save(f, clima)
@@ -200,11 +205,13 @@ except FileNotFoundError:
 ###############################################################################
 try:
     anomalyDomain = np.load(f'Anomalies_TestDump.npy')
+    print(f'anomalyDomain.shape: {anomalyDomain.shape}')
+    print(f'anomalyDomain.dtype: {anomalyDomain.dtype}')
 except FileNotFoundError:
     anomalyDomain = np.empty(monthlyMean.shape[0])
     for n, month in enumerate(monthlyMean):
         idx_month = n%NoM
-        anomalyDomain[n] = np.nanmean(clima[idx_month]) - np.nanmean(month)
+        anomalyDomain[n] = np.nanmean(clima[idx_month], dtype=float) - np.nanmean(month, dtype=float)
     # dump anomalies
     with open('Anomalies_TestDump.npy', 'wb') as f:
         np.save(f, anomalyDomain)
