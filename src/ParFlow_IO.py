@@ -69,7 +69,7 @@ def create_pfb(filename, var, delta=(1, 1, 1), subgrids=(1, 1, 1)):
 
 def read_pfb(filename):
 	with open(filename, "rb") as f:
-		f = open(filename, "rb")
+		#f = open(filename, "rb")
 
 		# read meta informations of datafile
 		meta_inf = np.fromfile(f, dtype='>f8', count = 3)
