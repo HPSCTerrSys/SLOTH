@@ -1,10 +1,8 @@
 import numpy as np
-
 import argparse
 
 def vanGenuchten(refP, sSat, sRes, nVanG, aVanG):
     """  Calculates the degree of saturation as a function of the pressure head.
-
 
     The degree of saturation is calculated as a function of the pressure head
     according to M. Th. van Genuchten.
@@ -38,33 +36,33 @@ def invers_vanGnuchten(vanG, sSat, sRes, nVanG, aVanG):
 
     return refP
 
-
-parser = argparse.ArgumentParser(description='Tell me what this script can do!.')
-parser.add_argument('--refX', type=float,
+if __name__=='__main__':
+    parser = argparse.ArgumentParser(description='Tell me what this script can do!.')
+    parser.add_argument('--refX', type=float,
                     help='refP or vanG')
-parser.add_argument('--sRes', type=float, default=0,
+    parser.add_argument('--sRes', type=float, default=0,
                     help='sRes')
-parser.add_argument('--sSat', type=float, default=1,
+    parser.add_argument('--sSat', type=float, default=1,
                     help='sSat')
-parser.add_argument('--aVanG', type=float,
+    parser.add_argument('--aVanG', type=float,
                     help='aVanG')
-parser.add_argument('--nVanG', type=float,
+    parser.add_argument('--nVanG', type=float,
                     help='nVanG')
-parser.add_argument('--invers', type=int, default=0,
+    parser.add_argument('--invers', type=int, default=0,
                     help='invers-function')
-args = parser.parse_args()
+    args = parser.parse_args()
 
 
-refX = args.refX
-sRes = args.sRes
-sSat = args.sSat
-aVanG = args.aVanG
-nVanG = args.nVanG
-invers = args.invers
+    refX = args.refX
+    sRes = args.sRes
+    sSat = args.sSat
+    aVanG = args.aVanG
+    nVanG = args.nVanG
+    invers = args.invers
 
-if not invers:
-    vanG = vanGenuchten(refX, sSat, sRes, nVanG, aVanG)
-    print(f'vanG: {vanG}')
-if invers:
-    refP = invers_vanGnuchten(refX, sSat, sRes, nVanG, aVanG)
-    print(f'refP: {refP}')
+    if not invers:
+        vanG = vanGenuchten(refX, sSat, sRes, nVanG, aVanG)
+        print(f'vanG: {vanG}')
+    if invers:
+        refP = invers_vanGnuchten(refX, sSat, sRes, nVanG, aVanG)
+        print(f'refP: {refP}')
