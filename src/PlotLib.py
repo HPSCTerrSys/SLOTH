@@ -123,18 +123,20 @@ def plot_imshow2PDiff(v1, v2, **kwargs):
 
     var1_ax.set_title(fr'{v1_name}')
     if infostr:
-        var1_ax.text(0.01, 0.99, get_infostr(v1),
-                     verticalalignment='top', transform=var1_ax.transAxes,
-                     fontsize=8)
+        t = var1_ax.text(0.01, 0.99, get_infostr(v1),
+                        verticalalignment='top', transform=var1_ax.transAxes,
+                        fontsize=8)
+        t.set_bbox(dict(facecolor='white', alpha=0.5, edgecolor='grey'))
     im = var1_ax.imshow(v1, origin='lower', vmin=var_vmin, vmax=var_vmax,
             cmap=var_cmap, interpolation='none')
 
     var2_ax.set_title(fr'{v2_name}')
     var2_ax.get_yaxis().set_visible(False)
     if infostr:
-        var2_ax.text(0.01, 0.99, get_infostr(v2),
-                     verticalalignment='top', transform=var2_ax.transAxes,
-                     fontsize=8)
+        t = var2_ax.text(0.01, 0.99, get_infostr(v2),
+                        verticalalignment='top', transform=var2_ax.transAxes,
+                        fontsize=8)
+        t.set_bbox(dict(facecolor='white', alpha=0.5, edgecolor='grey'))
     im = var2_ax.imshow(v2, origin='lower', vmin=var_vmin, vmax=var_vmax,
             cmap=var_cmap, interpolation='none')
     cb = plt.colorbar(im, cax=var_cax, orientation='vertical',
@@ -143,9 +145,10 @@ def plot_imshow2PDiff(v1, v2, **kwargs):
     diff_ax.set_title(fr'Diff: {v1_name} - {v2_name}')
     diff_ax.get_yaxis().set_visible(False)
     if infostr:
-        diff_ax.text(0.01, 0.99, get_infostr(v1-v2),
-                     verticalalignment='top', transform=diff_ax.transAxes,
-                     fontsize=8)
+        t = diff_ax.text(0.01, 0.99, get_infostr(v1-v2),
+                        verticalalignment='top', transform=diff_ax.transAxes,
+                        fontsize=8)
+        t.set_bbox(dict(facecolor='white', alpha=0.5, edgecolor='grey'))
     im = diff_ax.imshow(v1 - v2, origin='lower',
             vmin=diff_vmin, vmax=diff_vmax, 
             cmap=diff_cmap, interpolation='none')
