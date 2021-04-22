@@ -60,69 +60,89 @@ def parse_TCLLine(line, prefix='pfset'):
         #tmp[0] is allways the 'key' and the rest the 'value'
         return (tmp[0], tmp[1])
 
+def pars_ParFlowNamelist(file):
+    with open(file,'r') as f:
+        #return tcl content as list of lines
+        tcl_content = f.read().splitlines()
+        # do not keep empty lines
+        # Note: filtered objects are iterables and not lists
+        tcl_content = filter(None, tcl_content)
+        # remove commented out lines
+        tcl_content = filter(filter_blacklist, tcl_content)
+        # keep lines started with 'pfset' only (constrain of parser function)
+        tcl_content = filter(filter_whitelist, tcl_content)
+        # convert to list
+        tcl_content = list(tcl_content)
+
+    # parse each line of TCL script and save as dict
+    PFNamelistDict = {}
+    PFNamelistDict.update({parse_TCLLine(line)[0]:parse_TCLLine(line)[1] for line in tcl_content})
+    
+    return PFNamelistDict
+
+if __name__=='__main__':
+
+    file = './coup_oas.tcl'
+    with open(file,'r') as f:
+        #return tcl content as list of lines
+        tcl_content = f.read().splitlines()
+        # do not keep empty lines
+        # Note: filtered objects are iterables and not lists
+        tcl_content = filter(None, tcl_content)
+        # remove commented out lines
+        tcl_content = filter(filter_blacklist, tcl_content)
+        # keep lines started with 'pfset' only (constrain of parser function)
+        tcl_content = filter(filter_whitelist, tcl_content)
+        # convert to list
+        tcl_content = list(tcl_content)
+
+    # parse each line of TCL script and save as dict
+    PFNamelistDict = {}
+    PFNamelistDict.update({parse_TCLLine(line)[0]:parse_TCLLine(line)[1] for line in tcl_content})
+
+    # ------------------------------------------------------------------------------
 
 
-file = './coup_oas.tcl'
-with open(file,'r') as f:
-    #return tcl content as list of lines
-    tcl_content = f.read().splitlines()
-    # do not keep empty lines
-    # Note: filtered objects are iterables and not lists
-    tcl_content = filter(None, tcl_content)
-    # remove commented out lines
-    tcl_content = filter(filter_blacklist, tcl_content)
-    # keep lines started with 'pfset' only (constrain of parser function)
-    tcl_content = filter(filter_whitelist, tcl_content)
-    # convert to list
-    tcl_content = list(tcl_content)
+    # for key in PFNamelistDict:
+    #     print(key)
+    nz = int(PFNamelistDict['dzScale.nzListNumber'])
+    tcl_dz_keys = [f'Cell.{i}.dzScale.Value' for i in range(nz)]
+    dz_mult = [float(PFNamelistDict[tcl_dz_key]) for tcl_dz_key in tcl_dz_keys]
+    print('dz_mult')
+    print(dz_mult)
 
-# parse eah line of TCL script and save as dict
-PFNamelistDict = {}
-PFNamelistDict.update({parse_TCLLine(line)[0]:parse_TCLLine(line)[1] for line in tcl_content})
+    perm_patch_names = PFNamelistDict['Geom.Perm.Names']
+    tcl_perm_keys = [ ]
+    Perm = {perm_patch_name:float(PFNamelistDict[f'Geom.{perm_patch_name}.Perm.Value']) for perm_patch_name in perm_patch_names}
+    print('Perm')
+    print(Perm)
 
-# ------------------------------------------------------------------------------
+    poro_patch_names = PFNamelistDict['Geom.Porosity.GeomNames']
+    tcl_poro_keys = [ ]
+    Poro = {poro_patch_name:float(PFNamelistDict[f'Geom.{poro_patch_name}.Porosity.Value']) for poro_patch_name in poro_patch_names}
+    print('Poro')
+    print(Poro)
 
+    vanGA_patch_names = PFNamelistDict['Phase.RelPerm.GeomNames']
+    tcl_vanGA_keys = [ ]
+    vanG_RelPerm_a = {vanGA_patch_name:float(PFNamelistDict[f'Geom.{vanGA_patch_name}.RelPerm.Alpha']) for vanGA_patch_name in vanGA_patch_names}
+    print('vanG_RelPerm_a')
+    print(vanG_RelPerm_a)
 
-# for key in PFNamelistDict:
-#     print(key)
-nz = int(PFNamelistDict['dzScale.nzListNumber'])
-tcl_dz_keys = [f'Cell.{i}.dzScale.Value' for i in range(nz)]
-dz_mult = [float(PFNamelistDict[tcl_dz_key]) for tcl_dz_key in tcl_dz_keys]
-print('dz_mult')
-print(dz_mult)
+    vanGn_patch_names = PFNamelistDict['Phase.RelPerm.GeomNames']
+    tcl_vanGn_keys = [ ]
+    vanG_RelPerm_n = {vanGn_patch_name:float(PFNamelistDict[f'Geom.{vanGn_patch_name}.RelPerm.N']) for vanGn_patch_name in vanGn_patch_names}
+    print('vanG_RelPerm_n')
+    print(vanG_RelPerm_n)
 
-perm_patch_names = PFNamelistDict['Geom.Perm.Names']
-tcl_perm_keys = [ ]
-Perm = {perm_patch_name:float(PFNamelistDict[f'Geom.{perm_patch_name}.Perm.Value']) for perm_patch_name in perm_patch_names}
-print('Perm')
-print(Perm)
+    vanGA_patch_names = PFNamelistDict['Phase.Saturation.GeomNames']
+    tcl_vanGA_keys = [ ]
+    vanG_Saturation_a = {vanGA_patch_name:float(PFNamelistDict[f'Geom.{vanGA_patch_name}.Saturation.Alpha']) for vanGA_patch_name in vanGA_patch_names}
+    print('vanG_Saturation_a')
+    print(vanG_Saturation_a)
 
-poro_patch_names = PFNamelistDict['Geom.Porosity.GeomNames']
-tcl_poro_keys = [ ]
-Poro = {poro_patch_name:float(PFNamelistDict[f'Geom.{poro_patch_name}.Porosity.Value']) for poro_patch_name in poro_patch_names}
-print('Poro')
-print(Poro)
-
-vanGA_patch_names = PFNamelistDict['Phase.RelPerm.GeomNames']
-tcl_vanGA_keys = [ ]
-vanG_RelPerm_a = {vanGA_patch_name:float(PFNamelistDict[f'Geom.{vanGA_patch_name}.RelPerm.Alpha']) for vanGA_patch_name in vanGA_patch_names}
-print('vanG_RelPerm_a')
-print(vanG_RelPerm_a)
-
-vanGn_patch_names = PFNamelistDict['Phase.RelPerm.GeomNames']
-tcl_vanGn_keys = [ ]
-vanG_RelPerm_n = {vanGn_patch_name:float(PFNamelistDict[f'Geom.{vanGn_patch_name}.RelPerm.N']) for vanGn_patch_name in vanGn_patch_names}
-print('vanG_RelPerm_n')
-print(vanG_RelPerm_n)
-
-vanGA_patch_names = PFNamelistDict['Phase.Saturation.GeomNames']
-tcl_vanGA_keys = [ ]
-vanG_Saturation_a = {vanGA_patch_name:float(PFNamelistDict[f'Geom.{vanGA_patch_name}.Saturation.Alpha']) for vanGA_patch_name in vanGA_patch_names}
-print('vanG_Saturation_a')
-print(vanG_Saturation_a)
-
-vanGn_patch_names = PFNamelistDict['Phase.Saturation.GeomNames']
-tcl_vanGn_keys = [ ]
-vanG_Saturation_n = {vanGn_patch_name:float(PFNamelistDict[f'Geom.{vanGn_patch_name}.Saturation.N']) for vanGn_patch_name in vanGn_patch_names}
-print('vanG_Saturation_n')
-print(vanG_Saturation_n)
+    vanGn_patch_names = PFNamelistDict['Phase.Saturation.GeomNames']
+    tcl_vanGn_keys = [ ]
+    vanG_Saturation_n = {vanGn_patch_name:float(PFNamelistDict[f'Geom.{vanGn_patch_name}.Saturation.N']) for vanGn_patch_name in vanGn_patch_names}
+    print('vanG_Saturation_n')
+    print(vanG_Saturation_n)

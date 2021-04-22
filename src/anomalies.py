@@ -14,7 +14,7 @@ import cftime
 assuming time axis is first axis! (t,z,y,x) or (t,y,x)!
 '''
 
-def prep_monthMean(data, dates, dumpIntervall, calendar):
+def slice_months(data, dates, dumpIntervall, calendar):
     ''' 
     assuming at least monthly data!
     assuming at leas hourly steps / dumpIntervalls! 
@@ -145,7 +145,7 @@ except FileNotFoundError:
             timeCalendar = nc_time.calendar
             timeUnits    = nc_time.units
 
-        monthlySlices = prep_monthMean(data=data, dates=dates, calendar=calendar, dumpIntervall=dumpIntervall)
+        monthlySlices = slice_months(data=data, dates=dates, calendar=calendar, dumpIntervall=dumpIntervall)
         print(monthlySlices)
         # this loop is needed if there are more than one month in data and 
         # therefore monthlySlices contains more than one entry...

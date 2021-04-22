@@ -268,7 +268,7 @@ if __name__=='__main__':
             help='in case netCDF file does not proper set fillValue / maskValue (default: None)')
     parser.add_argument('--ND', '-d', type=str, default='3D',
             help='2D or 3D data, hmm? jsut set --ND 2D or --ND 3D (default: 3D)')
-    parser.add_argument('--Slices', type=str, nargs='+',  default=[],
+    parser.add_argument('--Slices', type=str, nargs='+',  default=[0, -1],
     help='In case you pass data with dim not matching ND pass indexing here (default: 0 -1)')
 
     args           = parser.parse_args()
