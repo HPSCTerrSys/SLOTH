@@ -18,7 +18,7 @@ date_final_clim = cftime.datetime(1986, 1, 1, calendar='noleap')
 
 # Year to investigate for HeatWaves (HW)
 # currently only one year possible!
-hwYears = [1973]#, 1973]
+hwYears = [1972]#, 1973]
 
 # HW investigation performed with this script is based on percentile 
 # calculation. To 'smooth' the calculation the percentiles are calculated not
