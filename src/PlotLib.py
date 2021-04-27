@@ -6,6 +6,7 @@ import matplotlib.ticker as ticker
 import matplotlib.gridspec as gridspec
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 import datetime as dt
+import cftime
 import sys
 
 def plot_XY_2VarMean_TwinX(x, y1, y2, ax, **kwargs):
@@ -154,3 +155,136 @@ def plot_imshow2PDiff(v1, v2, **kwargs):
 
     plt.savefig(f'{saveFile}', bbox_inches='tight', pad_inches=0)
 
+def plot_ClimateYearMonth(climateData, **kwargs):
+    '''
+    generates 3 imshows in a rwo
+    plot 2 vars and difference of both
+    '''
+    title       = kwargs.pop('title', None)
+    infostr     = kwargs.pop('infostr', False)
+    var_vmin    = kwargs.pop('var_vmin', get_PlotMinMaxMid_Percentil(climateData)[0])
+    var_vmax    = kwargs.pop('var_vmax', get_PlotMinMaxMid_Percentil(climateData)[1])
+    # a bit more special default handling
+    if 'var_cmap' in kwargs:
+        var_cmap    = kwargs.pop('var_cmap')
+    else:
+        var_cmap = copy.copy(mpl.cm.get_cmap('Reds'))
+        var_cmap.set_under('blue')
+        var_cmap.set_over('magenta')
+    saveFile    = kwargs.pop('saveFile', './DefaultSaveName_plot_ClimateYearMonth.png')
+    dpi         = kwargs.pop('dpi', 300)
+    figsize     = kwargs.pop('figsize', (9.0, 11.69))
+
+
+    fig = plt.figure(figsize=figsize, dpi=dpi)
+    if title is not None:
+        fig.suptitle(f'{title}')
+    gs  = fig.add_gridspec(nrows=3,ncols=5)
+    gs.update(wspace=0.1, hspace=0.1)
+
+    for month in range(climateData.shape[0]):
+        month_data = climateData[month]
+        ax = fig.add_subplot(gs[month//4,month%4])
+
+        if infostr:
+            ax.text(0.01, 0.99, get_infostr(month_data),
+                    verticalalignment='top', transform=ax.transAxes,
+                    fontsize=3)
+        im = ax.imshow(month_data, origin='lower', vmin=var_vmin, vmax=var_vmax,
+                cmap=var_cmap, interpolation='none')
+
+    cbar_ax = fig.add_axes([0.85, 0.15, 0.05, 0.7])
+    fig.colorbar(im, cax=cbar_ax)
+
+    plt.savefig(f'{saveFile}', bbox_inches='tight', pad_inches=0)
+
+def plot_HeatWaveInvest(abs_intensity_array, dailyTime_hw, varName, pixel_x, pixel_y, hwYear,
+    rel_intensity_array, dailyMean_hw, clima_smooth, date_start_clim, date_final_clim, clima_90p,
+    clima, vmin, vmax):
+    ###############################################################################
+    #### Plot stuff
+    ###############################################################################
+    fig, ax = plt.subplots(figsize=(8,6))
+    # makes a grid on the background
+    ax.grid()
+    dailyMean_hw_celsius=dailyMean_hw[:,pixel_y,pixel_x]-273.15        
+    ax.plot(dailyMean_hw_celsius, color='black', label='daily '+str(varName), linewidth=2)
+
+    ################### filtering the noise in daily climatological data ##########
+    #b, a = signal.butter(3, 0.1, btype='lowpass', analog=False) #https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.butter.html
+    #low_passed = signal.filtfilt(b, a, noisy_signal)
+    ##b, a = ellip(4, 0.01, 120, 0.125)  # Filter to be applied.
+    #clima_smooth=signal.filtfilt(b, a, clima[:,pixel_y,pixel_x], padlen=30)
+    clima_smooth_celsius=clima_smooth-273.15
+    #clima_smooth=savgol_filter(clima[:,pixel_y,pixel_x], 11, 3) #savitzky_golay(clima[:,pixel_y,pixel_x], 51, 3) # window size 51, polynomial order 3
+    ax.plot(clima_smooth_celsius, color='green', label=f'daily clim. {varName}: {date_start_clim.year}-{date_final_clim.year} (smoothed)',  linewidth=2)
+    ax.plot(clima[:,pixel_y,pixel_x]-273.15, color='green', linestyle='dashed', label=f'daily clim. {varName}: {date_start_clim.year}-{date_final_clim.year} (original)',  linewidth=2)
+
+    clima_90p_plot_celsius=clima_90p[:,pixel_y,pixel_x]-273.15
+    #clima_smooth=savgol_filter(clima[:,pixel_y,pixel_x], 11, 3) #savitzky_golay(clima[:,pixel_y,pixel_x], 51, 3) # window size 51, polynomial order 3
+    ax.plot(clima_90p_plot_celsius, color='darkviolet', linewidth=2, label=f'daily 5-day window 90th percentile from {date_start_clim.year}-{date_final_clim.year}')
+
+
+    labels_idx = np.arange(0,dailyTime_hw.shape[0], 15) #NoI) #15
+    ax.set_xticks(labels_idx)
+    labels = [cftime.datetime.strftime(item, '%Y-%m-%d') for item in dailyTime_hw[labels_idx] ]
+    ax.set_xticklabels(labels)
+    x = np.arange(dailyTime_hw.shape[0])
+      
+    #ax.legend()  
+    #ax.legend(loc='lower left',fancybox=True, shadow=True) # ncol=4)
+    ax.legend(loc='upper center', fancybox=True, shadow=True, ncol=2)
+
+    plt.title(f'TSMP {varName} [X={pixel_x}, Y={pixel_y} heat waves investigation: {hwYear}',fontsize=12,fontweight='bold')                
+    plt.ylabel(f'Daily mean temperatures ({varName}), K', fontsize=11)
+    plt.ylim(vmin, vmax)
+    #plt.xlabel('Days',fontsize=11)  
+
+    ax.fill_between(x, clima_smooth_celsius, dailyMean_hw_celsius, where=dailyMean_hw_celsius>clima_smooth_celsius, facecolor='lightcoral', interpolate=True, alpha=1.0) #lightsalmon
+    ax.fill_between(x, clima_smooth_celsius, dailyMean_hw_celsius, where=dailyMean_hw_celsius<clima_smooth_celsius, facecolor='deepskyblue', interpolate=True, alpha=1.0) 
+    ax.fill_between(x, clima_90p_plot_celsius, dailyMean_hw_celsius, where=dailyMean_hw_celsius>clima_90p_plot_celsius, facecolor='darkred', interpolate=True, alpha=1.0)
+
+    plt.savefig(f'Daily_{varName}_diff_hwYear{hwYear}.png', dpi=380)
+    plt.close('all')
+
+    fig, ax = plt.subplots(figsize=(8,3))
+    # makes a grid on the background
+    ax.grid()
+    ax.plot(abs_intensity_array, color='blue', label='Absolute intensity', linewidth=2)
+
+    labels_idx = np.arange(0,dailyTime_hw.shape[0], 15) #NoI) #15
+    ax.set_xticks(labels_idx)
+    labels = [cftime.datetime.strftime(item, '%Y-%m-%d') for item in dailyTime_hw[labels_idx] ]
+    ax.set_xticklabels(labels)
+    x = np.arange(dailyTime_hw.shape[0])
+      
+    #ax.legend()  
+    #ax.legend(loc='lower left',fancybox=True, shadow=True) # ncol=4)
+    ax.legend(loc='upper center', fancybox=True, shadow=True, ncol=2)
+
+    plt.title(f'TSMP {varName} [X={pixel_x} Y={pixel_y}] heat waves investigation: {hwYear}',fontsize=12,fontweight='bold')                
+    plt.ylabel('Abs. intensity of heat wave, K', fontsize=11)
+    plt.savefig(f'Absolute intensity_{varName}_diff_hwYear{hwYear}.png', dpi=380) 
+
+
+    ###############################################################################
+    #### Plot stuff +1
+    ###############################################################################
+    fig, ax = plt.subplots(figsize=(8,3))
+    # makes a grid on the background
+    ax.grid()
+    ax.plot(rel_intensity_array, color='blue', linestyle = 'dashed', label='Relative intensity', linewidth=2)
+
+    labels_idx = np.arange(0,dailyTime_hw.shape[0], 15) #NoI) #15
+    ax.set_xticks(labels_idx)
+    labels = [cftime.datetime.strftime(item, '%Y-%m-%d') for item in dailyTime_hw[labels_idx] ]
+    ax.set_xticklabels(labels)
+    x = np.arange(dailyTime_hw.shape[0])
+      
+    #ax.legend()  
+    #ax.legend(loc='lower left',fancybox=True, shadow=True) # ncol=4)
+    ax.legend(loc='upper center', fancybox=True, shadow=True, ncol=2)
+
+    plt.title('TSMP '+str(varName) +' [X=' + str(pixel_x) +', Y=' + str(pixel_y) +']' +' heat waves investigation: '+str(hwYear),fontsize=12,fontweight='bold')                
+    plt.ylabel('Rel. intensity of heat wave', fontsize=11)
+    plt.savefig(f'Relative intensity_{varName}_diff_hwYear{hwYear}.png', dpi=380) 
