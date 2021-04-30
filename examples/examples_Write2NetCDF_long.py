@@ -30,13 +30,14 @@ urc_Y = 5.60725   # upper right corner of grid in [deg] (r_latitude)
 rotatedpole_X = -162.0 # rotated pole in geographical coordinates in [deg] (longitude)
 rotatedpole_Y = 39.25  # rotated pole in geographical coordinates in [deg] (latitude)
 
-saveFile = '../data/TestNetCDFfile.nc'
+saveFile = '../data/examples_Write2NetCDF_long.nc'
 
 ###############################################################################
 #### Data to store in netCDF file
 ###############################################################################
 # create example data to store with the netCDF file:
 # using 5 time steps, and nx, ny of DE05 grid
+np.random.seed(42)
 data = np.random.rand(5,ny,nx)
 
 ###############################################################################
@@ -47,11 +48,12 @@ data = np.random.rand(5,ny,nx)
 nc_file = nc.Dataset(saveFile, 'w', format='NETCDF4')
 # Add some global attributes to provide the user with some basic information 
 # what is store with the netCDF file while inspection with e.g. ncdump.
-nc_file.description = 'Write a short description of your data to ship with the netCDF files!'
-nc_file.history     = f'Created: {dt.datetime.now().strftime("%Y-%m-%d %H:%M")}'
-nc_file.institution = 'FZJ - IBG-3'
 nc_file.author      = 'Niklas WAGNER'
 nc_file.contact     = 'n.wagner@fz-juelich.de'
+nc_file.institution = 'FZJ - IBG-3'
+nc_file.description = 'Write a short description of your data to ship with the netCDF files!'
+nc_file.history     = f'Created: {dt.datetime.now().strftime("%Y-%m-%d %H:%M")}'
+nc_file.source      = 'add source here'
 
 # Create dimensions
 # Dimensions are mandatory for netCDF files, as every variable has to be 

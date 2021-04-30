@@ -136,9 +136,9 @@ class toolBox:
         return Slices 
 
 
-    def createNetCDF(fileName, domain=None, fillValue=None, nz=None, author=None, 
-        description=None, source=None, contact=None, institution=None,
-        timeCalendar=None, timeUnit=None, NBOUNDCUT=0):
+    def createNetCDF(fileName, domain=None, nz=None, author=None, 
+        description=None, source=None, contact=None, institution=None, 
+        history=None, timeCalendar=None, timeUnit=None, NBOUNDCUT=0):
 
         #######################################################################
         #### Default definitions for domain
@@ -197,8 +197,9 @@ class toolBox:
         # Add basic information
         nc_file.author      = f'{author}'
         nc_file.contact     = f'{contact}'
-        nc_file.institution = f'{institution}'
+        nc_file.institution = f'{institution}' 
         nc_file.description = f'{description}'
+        nc_file.history     = f'{history}'
         nc_file.source      = f'{source}'
 
         # Create dimensions
@@ -210,7 +211,6 @@ class toolBox:
         dtime = nc_file.createDimension('time',None)
 
         rlon = nc_file.createVariable('rlon', 'f4', ('rlon',),
-                                    fill_value=fillValue,
                                     zlib=True)
         rlon.standard_name = "grid_longitude"
         rlon.long_name = "rotated longitude"
@@ -221,7 +221,6 @@ class toolBox:
         rlon[...] = rlon_values[...]
 
         rlat = nc_file.createVariable('rlat', 'f4', ('rlat',),
-                                        fill_value=fillValue,
                                         zlib=True)
         rlat.standard_name = "grid_latitude"
         rlat.long_name = "rotated latitude"
@@ -233,7 +232,6 @@ class toolBox:
 
         if withZlvl:
             lvl = nc_file.createVariable('lvl', 'f4', ('lvl',),
-                          fill_value=fillValue,
                           zlib=True)
             lvl.standard_name = "level"
             lvl.long_name = "ParFlow layers"
