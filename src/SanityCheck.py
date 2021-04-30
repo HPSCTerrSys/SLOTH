@@ -112,10 +112,11 @@ def plot_SanityCheck_3D(data, data_mask=None, kind='sum',figname='./SanityCheck.
     else:
         tmp_norm = mcolors.TwoSlopeNorm(vmin=tmp_vmin, vcenter=tmp_vmid, vmax=tmp_vmax)
     tmp_infostr = get_infostr(data_min_T, lowerP=lowerP, upperP=upperP)
-    min_ax.text(0.01, 0.99, tmp_infostr,
+    t = min_ax.text(0.01, 0.99, tmp_infostr,
                  verticalalignment='top', transform=min_ax.transAxes,
                  fontsize=8)
-    img_min = min_ax.imshow(data_min_T, origin='lower', vmin=tmp_vmin, vmax=tmp_vmax,
+    t.set_bbox(dict(facecolor='white', alpha=0.5, edgecolor='grey'))
+    img_min = min_ax.imshow(data_min_T, origin='lower', #vmin=tmp_vmin, vmax=tmp_vmax,
                             interpolation='none', cmap=cmap, norm=tmp_norm)
     fig.colorbar(img_min, ax=min_ax, extend='both')
 
@@ -131,10 +132,11 @@ def plot_SanityCheck_3D(data, data_mask=None, kind='sum',figname='./SanityCheck.
     else:
         tmp_norm = mcolors.TwoSlopeNorm(vmin=tmp_vmin, vcenter=tmp_vmid, vmax=tmp_vmax)
     tmp_infostr = get_infostr(data_max_T, lowerP=lowerP, upperP=upperP)
-    max_ax.text(0.01, 0.99, tmp_infostr,
+    t = max_ax.text(0.01, 0.99, tmp_infostr,
                  verticalalignment='top', transform=max_ax.transAxes,
                  fontsize=8)
-    img_max = max_ax.imshow(data_max_T, origin='lower', vmin=tmp_vmin, vmax=tmp_vmax,
+    t.set_bbox(dict(facecolor='white', alpha=0.5, edgecolor='grey'))
+    img_max = max_ax.imshow(data_max_T, origin='lower', #vmin=tmp_vmin, vmax=tmp_vmax,
                             interpolation='none', cmap=cmap, norm=tmp_norm)
     fig.colorbar(img_max, ax=max_ax, extend='both')
 
@@ -150,10 +152,11 @@ def plot_SanityCheck_3D(data, data_mask=None, kind='sum',figname='./SanityCheck.
     else:
         tmp_norm = mcolors.TwoSlopeNorm(vmin=tmp_vmin, vcenter=tmp_vmid, vmax=tmp_vmax)
     tmp_infostr = get_infostr(data_kin_T, lowerP=lowerP, upperP=upperP)
-    kin_ax.text(0.01, 0.99, tmp_infostr,
+    t = kin_ax.text(0.01, 0.99, tmp_infostr,
                  verticalalignment='top', transform=kin_ax.transAxes,
                  fontsize=8)
-    img_kin = kin_ax.imshow(data_kin_T, origin='lower', vmin=tmp_vmin, vmax=tmp_vmax,
+    t.set_bbox(dict(facecolor='white', alpha=0.5, edgecolor='grey'))
+    img_kin = kin_ax.imshow(data_kin_T, origin='lower', #vmin=tmp_vmin, vmax=tmp_vmax,
                             interpolation='none', cmap=cmap, norm=tmp_norm)
     fig.colorbar(img_kin, ax=kin_ax, extend='both')
 

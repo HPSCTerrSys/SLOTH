@@ -1,3 +1,8 @@
+""" Example script to apply SanityCheck().
+
+In many cases it is needed to quickly inspect some data-sets. 
+[ADD SOME DESCRIPTION HERE]
+"""
 import numpy as np
 import netCDF4 as nc
 import sys
@@ -7,17 +12,16 @@ src_path='../src/'
 sys.path.append(src_path)
 import SanityCheck
 
-"""
-some preamble which needs to be filled...
-"""
-
 ###############################################################################
-### Define some paths, filenames, etc and generate list of all files
+### Define some paths, filenames, etc
 ###############################################################################
 
-dataRootDir = f'/p/scratch/cjibg35/tsmpforecast/ERA5Climat_EUR11_ECMWF-ERA5_analysis_FZJ-IBG3/postpro/1997_09'
-varName     = f'T_S'
-fileName    = f'{dataRootDir}/{varName}_ts.nc'
+dataRootDir = '/p/scratch/cslts/shared_data/tmp_TestDataSet/samples'
+datasetName = 'ERA5Climat_EUR11_ECMWF-ERA5_analysis_FZJ-IBG3'
+procType    = 'postpro'
+dataYear    = '1979_01'
+varName     = 'T_S'
+fileName    = f'{dataRootDir}/{datasetName}/{procType}/{dataYear}/{varName}_ts.nc'
 
 ###############################################################################
 ### read in data and save as ndarray
@@ -36,7 +40,7 @@ with nc.Dataset(f'{fileName}', 'r') as nc_file:
     # missing values via np.nan...
     if not var_mask.any():
         var_mask  = np.zeros(var.shape, dtype=bool)
-        var       = var.filled(fill_value=np.nan)
+    var = var.filled(fill_value=np.nan)
 
 
 ###############################################################################
@@ -44,11 +48,7 @@ with nc.Dataset(f'{fileName}', 'r') as nc_file:
 ###############################################################################
 # define some title for plot, which can be passed via functionarguments
 # see funciton definition for full potential
-tmp_title_str = [
-    f'Sanity-Check for {fileName.split("/")[-1]}',
-    f'Var: {varName}',
-    ]
-fig_title    = '\n'.join(tmp_title_str)
+fig_title    = f'Sanity-Check for {varName} --- {dataYear}'
 figname      = f'./examples_SanityCheck.pdf'
 minax_title  = f'{varName} min'
 maxax_title  = f'{varName} max'

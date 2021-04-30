@@ -1,13 +1,13 @@
 """ Example script to calculate climatology means.
 
 Calculating means with python is not a difficult task and even the choice  
-of the interval we are handling (e.g. daily- or monthly means) does not really 
+of the interval we are handling (e.g. daily or monthly means) does not really 
 matter. At the end we do simply have to apply e.g. np.mean() to our data and
 we are done!
 However, extracting the correct slices or intervals out of a given data set to 
 apply the mean-function to, could be very nasty. 
 The correct slicing depends on the actual data we are facing as e.g. the 
-starting time steps and the time resolution (hours, daily, monthly, or even 
+starting time step and the time resolution (hours, daily, monthly, or even 
 yearly data?). Individual datasets need individual treatment.
 
 This example make use of the function 'get_intervalSlice()' which aims to 
@@ -16,8 +16,8 @@ Mandatory for this purpose is, the handled data does contain the correct
 time information, as e.g. the correct time-variables with netCDF files.
 If this is the case the function does loop over all your dates and returns
 a list of slices to extract the correct intervals out of your data. If you 
-data-set does consist out of individual files or is one big files does not
-matter.
+data-set does consist out of individual files or is represented by one big 
+file does not matter.
 """
 import numpy as np
 import datetime as dt
@@ -29,24 +29,26 @@ import glob
 import cftime
 src_path='../src/'
 sys.path.append(src_path)
-# ANalysisTool does contain the named function 'get_intervalSlice()'
+# ANalysisTool does contain the function 'get_intervalSlice()'
 import ANalysisTool as ANT
+# PlotLib does contain the pre-defined plot-function used at the very end.
 import PlotLib 
 
 
 ###############################################################################
-#### Some settings
+### Define some paths, filenames, options, etc
 ###############################################################################
-# You have to define the dumpinterval of your mode-output. 
-dumpIntervall = dt.timedelta(hours=3)
+dataRootDir = '/p/scratch/cslts/shared_data/tmp_TestDataSet/samples'
+datasetName = 'ERA5Climat_EUR11_ECMWF-ERA5_analysis_FZJ-IBG3'
+procType    = 'postpro'
+# CLM style
+varName = 'TSA'
+fileName = f'{varName}.nc'
+# COSMO style
+#varName = 'T_2M'
+#fileName = f'{varName}_ts.nc'
+files = sorted(glob.glob(f'{dataRootDir}/{datasetName}/{procType}/*/{fileName}'))
 
-# You have to define the interval you are interested in. Currently supported:
-# 'day', 'month' 
-meanInterval = 'month'
-
-###############################################################################
-#### CALCULATE CLIMATOLOGY
-###############################################################################
 # Climatology calculations are always based on comparisons of individual 
 # intervals between different years. 
 # If the interval we are interested in is 'month', we do compare the same 
@@ -54,47 +56,32 @@ meanInterval = 'month'
 # If the interval we are interested in is 'day', we do compare the same 
 # day between different years.
 # etc.
-# IN any case we do have to know how many intervals a year does cover. 
-# For daily based calculation this usually is NoI=365, for monthly based 
-# calculations this usually is NoI=12.
+# In any case we do have to know how the Number of Intervals (NoI) a year does 
+# contain. For daily based calculation this usually is NoI=365 (365 days a 
+# year), for monthly based calculations this usually is NoI=12 (12 month a 
+# year).
 # However we could also handle summer months (JJA) only and do a monthly based
-# calculation, in which case NoI=3 etc.!
-NoI = 12
-
-# set the root dir of your data
-dataRootDir = f'/p/scratch/cjibg35/poshyvailo1/HiCam-CORDEX_EUR-11_MPI-ESM-LR_histo_r1i1p1_FZJ-IBG3-TSMP120EC_v00aJuwelsCpuProdTt-1949_2005/postpro/postpro_before_18032021'
-# set the variable name of your data
-varName = 'TSA' # T_2M
-# set you file name
-# for our postpor you have to distinguish between COSMO and CLM/PFL only. COSMO does contain a '_ts' in it filename
-fileName = f'{varName}.nc' # CLM/PFL style
-#fileName = f'{varName}_ts.nc' # COSMO style
-
-# use wildcats here as for Linux terminal
-# e.g. 1997_?? does contain every month of 1997
-# e.g. 199*    does contain every month of every year starting with 199
-# etc.
-#files = sorted(glob.glob(f'{dataRootDir}/199?_??/{fileName}'))
-date_start_clim = cftime.datetime(1965, 6, 1, calendar='noleap')
-date_final_clim = cftime.datetime(1986, 1, 1, calendar='noleap')
-files = []
-for year in range(date_start_clim.year,date_final_clim.year+1):
-     tmp_files = sorted(glob.glob(f'{dataRootDir}/{year}_??/{fileName}')) #all month within the year
-     files += tmp_files
-     print(tmp_files)
+# calculation, in which case the Number of Intervals is NoI=3, as we do 
+# investigate 3 months only.
+meanInterval = 'day'
+NoI = 365
 
 
 ###############################################################################
-#### READ IN ALL DATA AND CALCULATE DAILY MEAN and relate middle time-step
+#### Read in data and calculate interval mean and calculate center time-step
 ###############################################################################
-# Already create variables we want to store our data at
-intervalMean = None
+# Create a tmp lists to append data at. Append data to a list and convert this 
+# list into a ndarray once at the end is much faster than appending to ndarray 
+# (np.append()) at each iteration step.
+# I guess this is because list contains pointers and appending a 
+# pointer is quiet fast, while np.append() open and restructure the
+# entire array which is getting bigger and bigger while reading in more
+# and more data / files.
 tmp_IntervalMean = []
-intervalTime = None
 tmp_IntervalTime = []
 # Loop over all files of our data-set.
 for file in files:
-    # Open the file
+    # Open the file and read in data and time
     with nc.Dataset(file, 'r') as nc_file:
         data  = nc_file.variables[varName]
         print(f'data.shape: {data.shape}')
@@ -108,8 +95,8 @@ for file in files:
         timeCalendar = nc_time.calendar
         timeUnits    = nc_time.units
 
-    # Calculate the slices for the current file based on the passed meanInterval
-    dailySlices = ANT.toolBox.get_intervalSlice(dates=dates, dumpIntervall=dumpIntervall, sliceInterval=meanInterval)
+    # Calculate the slices for the current file based on the choose meanInterval
+    dailySlices = ANT.toolBox.get_intervalSlice(dates=dates, sliceInterval=meanInterval)
     # Loop over all slices, mask 'missing' values with np.nan, and calculate 
     # related mean. The averaged data gets appended for each file and slice.
     for Slice in dailySlices:
@@ -122,30 +109,15 @@ for file in files:
         tmp_var       = tmp_var.filled(fill_value=np.nan)
 
         tmp_timeMean  = np.nanmean(tmp_time, axis=0, keepdims=True)
+        # tmp_timeMean  = np.ma.mean(tmp_time, axis=0, keepdims=True)
         tmp_timeMean  = nc.num2date(tmp_timeMean, units=timeUnits,calendar=timeCalendar)
         tmp_monthMean = np.nanmean(tmp_var, axis=0, keepdims=True, dtype=float)
+        # tmp_monthMean = np.ma.mean(tmp_var, axis=0, keepdims=True, dtype=float)
 
-        #######################################################################
-        # START -- IMPORTANT NOTE FROM AND FOR NWR:
-        # appending individual intervals to list is MUCH faster than appending 
-        # to ndarray (np.append) directly!
-        # I guess this is because list contains pointers and appending a 
-        # pointer is quiet fast, while np.append() open and restructure the
-        # entire array which is getting slower and slower while reading in more
-        # and more data / files.
         tmp_IntervalMean.append(tmp_monthMean)
         tmp_IntervalTime.append(tmp_timeMean)
         print(f'len(tmp_IntervalMean): {len(tmp_IntervalMean)}')
 
-        # if intervalMean is None:
-        #     intervalMean = tmp_monthMean
-        #     intervalTime = tmp_timeMean
-        # else:
-        #     intervalMean = np.append(intervalMean, tmp_monthMean, axis=0)
-        #     intervalTime = np.append(intervalTime, tmp_timeMean, axis=0)
-        # print(f'intervalMean.shape: {intervalMean.shape}')
-        # END -- IMPORTANT NOTE FROM AND FOR NWR:
-        #######################################################################
 
     print('##################')
     print('##################')
@@ -169,13 +141,13 @@ for curr_day in range(NoI):
     # The climat mean is simple the mean of all entries with NoI in distance.
     clima[curr_day] = np.nanmean(intervalMean[curr_day::NoI], axis=0, dtype=float)        
 # dump climate data
-with open(f'../data/example_ClimateMeans/climate_{meanInterval}_{date_start_clim.strftime("%Y_%m")}_{date_final_clim.strftime("%Y_%m")}.npy', 'wb') as f:
+with open(f'../data/example_ClimateMeans/climate_{meanInterval}.npy', 'wb') as f:
     np.save(f, clima)
 
 # plot if meanInterval='month'
 if meanInterval == 'month':
     kwargs = {
-            'title': 'Test Clima plot',
+            'title': 'Test climate plot',
             #'title': '\n'.join(tmp_titlesubstr),
             'infostr': True,
             #'var_vmax': 1,

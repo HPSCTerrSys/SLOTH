@@ -524,11 +524,11 @@ class GRDCdataset(coreDataset):
     ###########################################################################
     def __init__(self, data=None, GRDCfiles=None, GRDCindexFile=None,
                        GRDCindexObj=None):
-        print('before')
+        # print('before')
         super().__init__(data)
-        print('after')
-        self.GRDCfiles          = GRDCfiles if not GRDCfiles is None else None
-        self.GRDCindexFile      = GRDCindexFile if not GRDCindexFile is None else './index_GRDC_USER.csv'
+        # print('after')
+        self.GRDCfiles          = GRDCfiles if GRDCfiles is not None else None
+        self.GRDCindexFile      = GRDCindexFile if GRDCindexFile is not None else './index_GRDC_DEFAULT.csv'
         self.GRDCindexObj       = None 
 
         self.id                 = None
@@ -541,6 +541,10 @@ class GRDCdataset(coreDataset):
         # 'Time series' is handled special what is what is why keywords are handled special
         self.GRDCkeywords       = ['GRDC-No', 'River', 'Station', 'Country', 'Latitude', 'Longitude', 'Catchment area', 'Time series']
         self.GRDCheader_out     = ['GRDC-No', 'River', 'Station', 'Country', 'Latitude', 'Longitude', 'Catchment area', 'Date start', 'Date end', 'File']
+
+        # force create index-file if GRDCindexFile not passed but GRDCfiles.
+        if GRDCfiles is not None and GRDCindexFile is None:
+            self.create_indexFile(force=True)
 
     @property
     def GRDCindexObj(self):
@@ -660,7 +664,7 @@ class GRDCdataset(coreDataset):
         # use self.GRDCindexObj is nothing is passed
         indexObj = indexObj if not indexObj is None else self.GRDCindexObj
         if not isinstance(start, dt.datetime):
-            print(f'start: {start}')
+            #print(f'start: {start}')
             try:
                 start = dt.datetime.strptime(start, form)
             except ValueError:
@@ -672,7 +676,7 @@ class GRDCdataset(coreDataset):
                 raise
 
         if not isinstance(end, dt.datetime):
-            print(f'end: {end}')
+            #print(f'end: {end}')
             end = dt.datetime.strptime(end, form)
 
         header      = indexObj[0]
@@ -746,7 +750,7 @@ class GRDCdataset(coreDataset):
         tmp_out_time = []
         tmp_out_meanArea = []
         for station in indexList:
-            print(f'start reading GRDC_no: {station[id_idx]}')
+            #print(f'start reading GRDC_no: {station[id_idx]}')
 
             # catch different GRDC time-stamps
             try:
@@ -757,7 +761,7 @@ class GRDCdataset(coreDataset):
             except ValueError:
                 sliceStart = (start - dt.datetime.strptime(station[start_idx], '%Y-%m')).days
                 #sliceEnd   = end   - dt.datetime.strptime(station[end_idx], '%Y-%m')
-            print(sliceStart)
+            #print(sliceStart)
 
             #print(f'sliceStart: {sliceStart}')
             with open(station[file_idx], "r", encoding="utf8", errors='ignore') as f:
@@ -794,11 +798,11 @@ class GRDCdataset(coreDataset):
                         end = end.replace(day=1)
                     tmp_time.append(tmp)
                     tmp_data.append(row[data_idx].strip())
-                    print(f'tmp: {tmp} vs end: {end}')
+                    #print(f'tmp: {tmp} vs end: {end}')
                     if tmp >= end:
                         break
                     # print(tmp_time)
-                print(f' --- len of file: {len(tmp_time)} rows')
+                #print(f'-- found {len(tmp_time)} data-points')
                 # tmp_time = np.asarray(tmp_time)
                 # tmp_data = np.asarray(tmp_data, dtype=float)
                 ## mask missing values

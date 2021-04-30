@@ -12,7 +12,8 @@ class toolBox:
     def __init__(self):
         pass
 
-    def get_intervalSlice(dates, dumpIntervall, sliceInterval='month'):
+    def get_intervalSlice(dates, sliceInterval='month'):
+    # def get_intervalSlice(dates, dumpInterval, sliceInterval='month'):
         ''' This functions calculates interval slices of a given time-series
 
         This function calculates interval slices of a given time-series, 
@@ -37,36 +38,39 @@ class toolBox:
         This function assumes:
         ----------------------
         -) The passed time-series covers at least on intervall!
-        -) At least hourly steps / dumpIntervalls! 
+        -) At least hourly steps / dumpIntervals! 
         -) No seconds in dates - model output is at least on full minutes!
 
         Parameters
         ----------
         dates : NDarray 
             the time-series as datetime-object. 
-        dumpIntervall : datetime-object
-            time-delta object holding the dumpIntervall value.
         sliceInterval: str
             defining the interval. Supported are: 'day', 'month'
         '''
 
-        # Small check if passed dumpintervall does match the time difference of each 
-        # time-step in passed time-series.
+        # Check is passed sliceInterval is supported and exit if not.
+        supportedSliceInterval = ['day', 'month']
+        if sliceInterval not in supportedSliceInterval:
+            print(f'ERROR: sliceInterval "{sliceInterval}" is not supported.')
+            print(f'---    supported values are: {supportedSliceInterval}')
+            print(f'---    EXIT program')
+            return False
+
         print(f'########################################################################')
-        print(f'#### checking dt == dumpIntervall for all data-points')
+        print(f'#### calculate dumpInterval and check if equal for all data-points')
         print(f'########################################################################')
-        # checking if dt is equal to dumpInterval
-        tmp_dates1   = dates.copy()
-        tmp_dates2   = np.roll(dates, 1, axis=0)
-        allEqualDump = (tmp_dates1 - tmp_dates2) == dumpIntervall
-        # set first entry to True, as first step is always False due to roll()
-        allEqualDump[0] = True
-        if not allEqualDump.all():
-            print('ERROR: calculated dt does not match passed dumpIntervall for all steps')
+        # Calculating dumpInterval
+        tmp_dumpInterval = np.diff(dates, n=1)
+        # Check if dumpInterval equal for all data-points
+        # and if so define set dumpInterval 
+        if not np.all(tmp_dumpInterval == tmp_dumpInterval[0]):
+            print('ERROR: calculated dumpInterval is not equal for all data-points')
             # In case of error: break function
             return False
         else:
-            print(f'DONE')
+            dumpInterval = tmp_dumpInterval[0]
+            print(f'DONE')        
         
         # Finding the first time-step of a interval, by looping over the time-series and 
         # check for each time-step if this is the first of the interval (break loop if found).
@@ -77,8 +81,8 @@ class toolBox:
         while True:
             # verify first date is first of interval.
             # idea explained with sliceInterval='month': 
-            # first step - dumpIntervall (or 0.5*dumpIntervall) is first of month 00UTC
-            # By checking 1*dumpIntervall and 0.5*dumpIntervall we do take into account, that
+            # first step - dumpInterval (or 0.5*dumpInterval) is first of month 00UTC
+            # By checking 1*dumpInterval and 0.5*dumpInterval we do take into account, that
             # the time-axis of averaged model output might got shifted in between the 
             # time-bounds.
             print(f'Offset: {Offset}')
@@ -90,10 +94,10 @@ class toolBox:
                 # using the first of current month at midnight as reference
                 tmp_first_ref = tmp_first.replace(day=1, hour=0, minute=0, second=0)
 
-            if (tmp_first - dumpIntervall) == tmp_first_ref:
+            if (tmp_first - dumpInterval) == tmp_first_ref:
                 print(f'check step {Offset} is first of a month at midnight')
                 break
-            elif (tmp_first - (0.5*dumpIntervall)) == tmp_first_ref:
+            elif (tmp_first - (0.5*dumpInterval)) == tmp_first_ref:
                 print(f'check step {Offset} is first of a month at midnight')
                 break
             else:
@@ -106,10 +110,10 @@ class toolBox:
                 continue
 
         # Calculating the slices by looping over all time-steps and check if the 
-        # next time-step belong to the next month.
+        # next time-step belong to the next interval.
         # NWR 20210422:
         # there should be some clever and short solution for below loop ...!
-        # now that we know dt=dumpIntervall and first step is first of month, loop over all data
+        # now that we know the dumpInterval and first step is first of month...
         print(f'########################################################################')
         print(f'#### getting month series / slices')
         print(f'########################################################################')

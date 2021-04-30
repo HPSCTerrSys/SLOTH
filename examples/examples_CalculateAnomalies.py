@@ -12,17 +12,27 @@ import PlotLib
 ###############################################################################
 ##### Read in climate means
 ###############################################################################
+# Climatology calculations are always based on comparisons of individual 
+# intervals between different years. 
+# If the interval we are interested in is 'month', we do compare the same 
+# month between different years.
+# If the interval we are interested in is 'day', we do compare the same 
+# day between different years.
+# etc.
+# IN any case we do have to know how many intervals a year does cover. 
+# For daily based calculation this usually is NoI=365, for monthly based 
+# calculations this usually is NoI=12.
+# However we could also handle summer months (JJA) only and do a monthly based
+# calculation, in which case NoI=3 etc.!
 meanInterval = 'month'
-varName = 'TSA'
 NoI = 12
-date_start_clim = cftime.datetime(1965, 6, 1, calendar='noleap')
-date_final_clim = cftime.datetime(1986, 1, 1, calendar='noleap')
+
 try:
     intervalMean = np.load(f'../data/example_ClimateMeans/intervalMean_{meanInterval}.npy')
     print(f'intervalMean.shape: {intervalMean.shape}')
     intervalTime = np.load(f'../data/example_ClimateMeans/intervalTime_{meanInterval}.npy', allow_pickle=True)
     print(f'intervalTime.dtype: {intervalTime.dtype}')
-    clima = np.load(f'../data/example_ClimateMeans/climate_{meanInterval}_{date_start_clim.strftime("%Y_%m")}_{date_final_clim.strftime("%Y_%m")}.npy')
+    clima = np.load(f'../data/example_ClimateMeans/climate_{meanInterval}.npy')
 except FileNotFoundError:
     print(f'needed climateMeans files were not found: EXIT')
     sys.exit()
@@ -31,7 +41,7 @@ except FileNotFoundError:
 ##### CALCULATE ANOMALIES
 ###############################################################################
 try:
-    dailyAnomalyDomain = np.load(f'IntervalAnomalies_TestDump.npy')
+    dailyAnomalyDomain = np.load(f'../data/example_ClimateMeans/IntervalyAnomalies_{meanInterval}.npy')
     print(f'dailyAnomalyDomain.shape: {dailyAnomalyDomain.shape}')
     print(f'dailyAnomalyDomain.dtype: {dailyAnomalyDomain.dtype}')
 except FileNotFoundError:
@@ -40,7 +50,7 @@ except FileNotFoundError:
         idx_interval = n%NoI
         intervalAnomalyDomain[n] = np.nanmean(interval, dtype=float) - np.nanmean(clima[idx_interval], dtype=float)
     # dump anomalies
-    with open(f'IntervalyAnomalies_{meanInterval}.npy', 'wb') as f:
+    with open(f'../data/example_ClimateMeans/IntervalyAnomalies_{meanInterval}.npy', 'wb') as f:
         np.save(f, intervalAnomalyDomain)
 
 ###############################################################################

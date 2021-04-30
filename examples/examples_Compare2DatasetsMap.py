@@ -1,3 +1,7 @@
+""" Example script to show how to use different methods of this repo.
+
+Test-Case: compare tow datasets, as e.g. modifed run vs referenz run.
+"""
 import numpy as np
 import matplotlib as mpl
 import netCDF4 as nc
@@ -10,38 +14,27 @@ src_path='../src/'
 sys.path.append(src_path)
 import PlotLib 
 
-"""
-Example script to show how to use different methods of this repo.
-
-Test-Case: compare tow datasets, as e.g. modifed run vs referenz run.
-
-"""
 
 ###############################################################################
-### Define some paths, filenames, etc and generate list of all files
+### Define some paths, filenames, etc
 ###############################################################################
-print(f'Define some paths, filenames, etc and generate list of all files')
 
-rootdir_D1 = f'/p/scratch/cjibg35/tsmpforecast/ERA5Climat_EUR11_ECMWF-ERA5_analysis_FZJ-IBG3/postpro'
-rootdir_D2 = f'/p/scratch/cjibg35/tsmpforecast/ERA5Climat_EUR11_ECMWF-ERA5_analysis_FZJ-IBG3/postpro'
+dataRootDir = '/p/scratch/cslts/shared_data/tmp_TestDataSet/samples'
+datasetName_D1 = 'ERA5Climat_EUR11_ECMWF-ERA5_analysis_FZJ-IBG3'
+datasetName_D2 = 'HiCam-CORDEX_EUR-11_MPI-ESM-LR_histo_r1i1p1_FZJ-IBG3'
+procType    = 'postpro'
+varName     = 'satur'
+fileName    = f'{varName}.nc'
 
-varName = f'satur'
-filename = f'{varName}.nc'
-
-#namepattern_D1 = f'1997_0[6:8]_ORIG'
-#namepattern_D2 = f'1997_0[6-8]'
-#files_D1 = sorted(glob.glob(f'{rootdir_D1}/{namepattern_D1}/{filename}'))
-#files_D2 = sorted(glob.glob(f'{rootdir_D2}/{namepattern_D2}/{filename}'))
-# or
 files_D1 = [
-        f'{rootdir_D1}/1997_09_ORIG/{filename}',
-        f'{rootdir_D1}/1997_10_ORIG/{filename}',
-        f'{rootdir_D1}/1997_11_ORIG/{filename}',
+        f'{dataRootDir}/{datasetName_D1}/{procType}/1979_09/{fileName}',
+        f'{dataRootDir}/{datasetName_D1}/{procType}/1979_10/{fileName}',
+        f'{dataRootDir}/{datasetName_D1}/{procType}/1979_11/{fileName}',
         ]
 files_D2 = [
-        f'{rootdir_D2}/1997_09/{filename}',
-        f'{rootdir_D2}/1997_10/{filename}',
-        f'{rootdir_D2}/1997_11/{filename}',
+        f'{dataRootDir}/{datasetName_D2}/{procType}/1979_09/{fileName}',
+        f'{dataRootDir}/{datasetName_D2}/{procType}/1979_10/{fileName}',
+        f'{dataRootDir}/{datasetName_D2}/{procType}/1979_11/{fileName}',
         ]
 
 
@@ -122,8 +115,8 @@ kwargs_imshow2PDiff = {
         'title': None,
         #'title': '\n'.join(tmp_titlesubstr),
         'infostr': True,
-        'v1_name': 'ORIG',
-        'v2_name': 'NEW_SLOPE',
+        'v1_name': 'ERA5',
+        'v2_name': 'HiCam',
         'var_vmax': 1,
         'var_vmin': 0,
         'diff_vmax': 0.4,
