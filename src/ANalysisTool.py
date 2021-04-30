@@ -1,6 +1,7 @@
 import sys
 import os
 import numpy as np
+import netCDF4 as nc
 import datetime as dt
 
 class toolBox:
@@ -124,12 +125,135 @@ class toolBox:
             # to catch the case if the dateset contains one month only!
             if sliceInterval == 'day':
                 currInterval = dates[t].day
-                nextInterval = (dates[t] + dumpIntervall).day
+                nextInterval = (dates[t] + dumpInterval).day
             elif sliceInterval == 'month':
                 currInterval = dates[t].month
-                nextInterval = (dates[t] + dumpIntervall).month
+                nextInterval = (dates[t] + dumpInterval).month
             if nextInterval != currInterval:
                 Slices.append(slice(t_lower,t+1,None))
                 t_lower = t+1
 
         return Slices 
+
+
+    def createNetCDF(fileName, domain=None, fillValue=None, nz=None, author=None, 
+        description=None, source=None, contact=None, institution=None,
+        timeCalendar=None, timeUnit=None, NBOUNDCUT=0):
+
+        #######################################################################
+        #### Default definitions for domain
+        #######################################################################
+        if domain == 'DE05':
+            # https://icg4geo.icg.kfa-juelich.de/SoftwareTools/prepro_parflowclm_de05_static_fields/blob/master/doc/content/Grid.rst
+            ny = nx = 2000     # [-]
+            dy = dx = 0.0055   # [deg]
+            # Rotated pole geographical coordinates
+            rpol_Y  = 39.25    # [deg]
+            rpol_X  = -162.0   # [deg]
+            # South-West Corner of domain in rotated coordinates
+            SWC_Y = -5.38725   # [deg]
+            SWC_X = -10.82725  # [deg]
+        elif domain == 'EU11':
+            ny = 432           # [-]
+            nx = 444           # [-]
+            dy = dx = 0.110    # [deg]
+            # Rotated pole geographical coordinates
+            rpol_Y  = 39.25    # [deg]
+            rpol_X  = -162.0   # [deg]
+            # South-West Corner of domain in rotated coordinates
+            SWC_Y = -24.4720   # [deg]
+            SWC_X = -29.4713   # [deg]
+        else:
+            print(f'ERROR: passed domain is not supported. domain={domain} --> Exit')
+            return False
+
+        #######################################################################
+        #### Checking is time- and / or z-axis is used
+        #######################################################################
+        withTime = False
+        if timeUnit is not None and timeCalendar is not None:
+            withTime = True
+        else:
+            print('NOT creating time-axis')
+            print(f'--  timeUnit = {timeUnit}; timeCalendar = {timeCalendar}') 
+
+        withZlvl = False
+        if nz is not None:
+            withZlvl = True
+        else:
+            print('NOT creating z-axis')
+
+        #######################################################################
+        #### Create netCDF file (overwrite if exist)
+        #######################################################################
+        # If no file-extension is passed, add '.nc' as default
+        fileRoot, fileExt = os.path.splitext(fileName)
+        if not fileExt:
+           fileExt = '.nc'
+        fileName = f'{fileRoot}{fileExt}'
+
+        # Create netCDF file
+        nc_file = nc.Dataset(f'{fileName}', 'w', format='NETCDF4')
+        # Add basic information
+        nc_file.author      = f'{author}'
+        nc_file.contact     = f'{contact}'
+        nc_file.institution = f'{institution}'
+        nc_file.description = f'{description}'
+        nc_file.source      = f'{source}'
+
+        # Create dimensions
+        # Take into account to 'cut' pixel at domain border (NBOUNDCUT)
+        drlon = nc_file.createDimension('rlon',nx-2*NBOUNDCUT)
+        drlat = nc_file.createDimension('rlat',ny-2*NBOUNDCUT)
+        if withZlvl:
+            dlvl = nc_file.createDimension('lvl',nz)
+        dtime = nc_file.createDimension('time',None)
+
+        rlon = nc_file.createVariable('rlon', 'f4', ('rlon',),
+                                    fill_value=fillValue,
+                                    zlib=True)
+        rlon.standard_name = "grid_longitude"
+        rlon.long_name = "rotated longitude"
+        rlon.units = "degrees"
+        rlon.axis = "X"
+        # Take into account to 'cut' pixel at domain border (NBOUNDCUT)
+        rlon_values = np.array([SWC_X + (i*dx) for i in range(NBOUNDCUT, nx-NBOUNDCUT)])
+        rlon[...] = rlon_values[...]
+
+        rlat = nc_file.createVariable('rlat', 'f4', ('rlat',),
+                                        fill_value=fillValue,
+                                        zlib=True)
+        rlat.standard_name = "grid_latitude"
+        rlat.long_name = "rotated latitude"
+        rlat.units = "degrees"
+        rlat.axis = "Y"
+        # Take into account to 'cut' pixel at domain border (NBOUNDCUT)
+        rlat_values = np.array([SWC_Y + (i*dy) for i in range(NBOUNDCUT, ny-NBOUNDCUT)])
+        rlat[...] = rlat_values[...]
+
+        if withZlvl:
+            lvl = nc_file.createVariable('lvl', 'f4', ('lvl',),
+                          fill_value=fillValue,
+                          zlib=True)
+            lvl.standard_name = "level"
+            lvl.long_name = "ParFlow layers"
+            lvl.units = "-"
+            lvl.axis = "Z"
+            lvl_values = np.arange(nz)
+            lvl[...] = lvl_values[...]
+
+        if withTime:
+            ncTime = nc_file.createVariable('time', 'i2', ('time',), zlib=True)
+            ncTime.units = f'{timeUnit}'
+            ncTime.calendar = f'{timeCalendar}'
+
+        # Create grid-mapping for rotated-pole grid
+        rotated_pole = nc_file.createVariable('rotated_pole', 'i2', zlib=True)
+        rotated_pole.long_name = "coordinates of the rotated North Pole"
+        rotated_pole.grid_mapping_name = "rotated_latitude_longitude"
+        rotated_pole.grid_north_pole_latitude = rpol_Y
+        rotated_pole.grid_north_pole_longitude = rpol_X
+
+        # Close netCDF file for save and return
+        nc_file.close()
+        return fileName
