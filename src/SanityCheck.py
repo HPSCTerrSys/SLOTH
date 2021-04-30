@@ -41,13 +41,8 @@ import cftime
 def get_PlotMinMaxMid_Percentil(data2plot, lower=5, upper=95):
     vmin = np.nanpercentile(data2plot, lower)
     vmax = np.nanpercentile(data2plot, upper)
-    #vmid = np.nanpercentile(data2plot, 50)
     vmid = (vmax+vmin) / 2.
-    '''
-    tmp_scalFac = 1.5
-    vmin = tmp_mean - (tmp_scalFac*tmp_std)
-    vmax = tmp_mean + (tmp_scalFac*tmp_std)
-    '''
+
     return vmin, vmax, vmid
 
 def get_infostr(data, lowerP=2, upperP=98):
@@ -62,8 +57,14 @@ def get_infostr(data, lowerP=2, upperP=98):
         ]
     return '\n'.join(tmp_infostr)
 
-def plot_SanityCheck_3D(data, data_mask=None, kind='sum',figname='./SanityCheck.pdf', 
-    lowerP=2, upperP=98, interactive=False, **kwargs):
+def plot_SanityCheck_3D(data, data_mask=None, kind='sum', 
+    figname='./SanityCheck_3D.pdf', fig_title=None, minax_title=None, 
+    maxax_title=None, kinax_title=None, hisax_title=None,
+    lowerP=2, upperP=98, interactive=False, cmapName='Spectral'):
+
+    ###########################################################################
+    #### Small check if data fits requirements
+    ###########################################################################
     if not isinstance(data, np.ndarray):
         print(f'data is of type {type(data)} but <class "numpy.ndarray"> is required!')
         return None
@@ -71,14 +72,10 @@ def plot_SanityCheck_3D(data, data_mask=None, kind='sum',figname='./SanityCheck.
         print(f'data is of dimension {data.ndim} but dimension 3 is required!')
         return None
 
-    # get / handle kwargs
-    fig_title       = kwargs.pop('fig_title', None)
-    minax_title     = kwargs.pop('minax_title', None)
-    maxax_title     = kwargs.pop('maxax_title', None)
-    kinax_title     = kwargs.pop('kinax_title', None)
-    hisax_title     = kwargs.pop('hisax_title', None)
 
-
+    ###########################################################################
+    #### Calculate Min, Max, and Kind (sum or mean) for data
+    ###########################################################################
     data_min_T = np.nanmin(data, axis=0)
     data_max_T = np.nanmax(data, axis=0)
     if kind=='sum':
@@ -88,10 +85,16 @@ def plot_SanityCheck_3D(data, data_mask=None, kind='sum',figname='./SanityCheck.
         data_kin_T = np.nanmean(data, axis=0)
         data_kin_T[data_mask[0]] = np.nan
 
-    cmap = copy.copy(mpl.cm.get_cmap('Spectral'))
+    ###########################################################################
+    #### Defining cmap extend (values below min and above max)
+    ###########################################################################
+    cmap = copy.copy(mpl.cm.get_cmap(f'{cmapName}'))
     cmap.set_under('black')
     cmap.set_over('magenta')
 
+    ###########################################################################
+    #### Create figure
+    ###########################################################################
     fig = plt.figure(figsize=(11,8))
     fig.suptitle(fig_title)
     gs  = fig.add_gridspec(nrows=2,ncols=2)
@@ -101,6 +104,9 @@ def plot_SanityCheck_3D(data, data_mask=None, kind='sum',figname='./SanityCheck.
     kin_ax = fig.add_subplot(gs[1,0])
     his_ax = fig.add_subplot(gs[1,1])
 
+    ###########################################################################
+    #### Handling min-plot
+    ###########################################################################
     min_ax.set_title(minax_title)
     tmp_vmin, tmp_vmax, tmp_vmid = get_PlotMinMaxMid_Percentil(data_min_T, lower=lowerP, upper=upperP)
     if tmp_vmin == tmp_vmax:
@@ -120,7 +126,9 @@ def plot_SanityCheck_3D(data, data_mask=None, kind='sum',figname='./SanityCheck.
                             interpolation='none', cmap=cmap, norm=tmp_norm)
     fig.colorbar(img_min, ax=min_ax, extend='both')
 
-
+    ###########################################################################
+    #### Handling max-plot
+    ###########################################################################
     max_ax.set_title(maxax_title)
     tmp_vmin, tmp_vmax, tmp_vmid = get_PlotMinMaxMid_Percentil(data_max_T, lower=lowerP, upper=upperP)
     if tmp_vmin == tmp_vmax:
@@ -141,6 +149,9 @@ def plot_SanityCheck_3D(data, data_mask=None, kind='sum',figname='./SanityCheck.
     fig.colorbar(img_max, ax=max_ax, extend='both')
 
 
+    ###########################################################################
+    #### Handling kind-plot (mean or sum)
+    ###########################################################################
     kin_ax.set_title(kinax_title)
     tmp_vmin, tmp_vmax, tmp_vmid = get_PlotMinMaxMid_Percentil(data_kin_T, lower=lowerP, upper=upperP)
     if tmp_vmin == tmp_vmax:
@@ -160,6 +171,9 @@ def plot_SanityCheck_3D(data, data_mask=None, kind='sum',figname='./SanityCheck.
                             interpolation='none', cmap=cmap, norm=tmp_norm)
     fig.colorbar(img_kin, ax=kin_ax, extend='both')
 
+    ###########################################################################
+    #### Handling histogram of kind-plot
+    ###########################################################################
     his_ax.set_title(hisax_title)
     his_ax.set_ylabel(f'# of occurrence')
     hist_data = data_kin_T[~np.isnan(data_kin_T)].flatten()
@@ -173,6 +187,9 @@ def plot_SanityCheck_3D(data, data_mask=None, kind='sum',figname='./SanityCheck.
     print(f'BINS: {bins}')
     his_ax.hist(hist_data, log=True, range=(range_min, range_max), bins=bins)
 
+    ###########################################################################
+    #### If interactive --> show plot now
+    ###########################################################################
     if interactive is True:
         plt.show()
     else:
