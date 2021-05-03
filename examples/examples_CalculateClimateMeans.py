@@ -124,7 +124,9 @@ for file in files:
 intervalMean = np.concatenate(tmp_IntervalMean, axis=0)
 print(f'intervalMean.shape: {intervalMean.shape}')
 intervalTime = np.concatenate(tmp_IntervalTime, axis=0)
-# save everything for later use 
+# save everything for later use         
+if not os.path.exists(f'../data/example_ClimateMeans/'):
+            os.makedirs(f'../data/example_ClimateMeans/')
 with open(f'../data/example_ClimateMeans/intervalMean_{meanInterval}.npy', 'wb') as f:
     np.save(f, intervalMean)
 with open(f'../data/example_ClimateMeans/intervalTime_{meanInterval}.npy', 'wb') as f:
