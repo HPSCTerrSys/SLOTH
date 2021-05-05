@@ -80,9 +80,10 @@ def plot_SanityCheck_3D(data, data_mask=None, kind='sum',
     data_max_T = np.nanmax(data, axis=0)
     if kind=='sum':
         data_kin_T = np.nansum(data, axis=0)
-        data_kin_T[data_mask[0]] = np.nan
     elif kind=='mean':
         data_kin_T = np.nanmean(data, axis=0)
+    
+    if data_mask is not None:
         data_kin_T[data_mask[0]] = np.nan
 
     ###########################################################################
@@ -214,7 +215,8 @@ def plot_SanityCheck_2D(data, data_mask=None, figname='./SanityCheck.pdf',
     hisax_title     = kwargs.pop('hisax_title', None)
 
     data_kin_T = data
-    data_kin_T[data_mask] = np.nan
+    if data_mask is not None:
+        data_kin_T[data_mask] = np.nan
 
     cmap = copy.copy(mpl.cm.get_cmap('Spectral'))
     cmap.set_under('black')
