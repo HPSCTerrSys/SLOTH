@@ -13,6 +13,7 @@ import VAlidationTool as vat
 
 # 1) define where your GRDC dataset is located
 file_path = '/p/scratch/cslts/shared_data/tmp_TestDataSet/samples/GRDC'
+# provide list of individual GRDC files
 files     = sorted(glob.glob(f'{file_path}/*.mon'))
 # daily files are also possible
 #files     = sorted(glob.glob(f'{file_path}/*.day'))
@@ -30,13 +31,13 @@ GRDC_example = vat.GRDCdataset(GRDCfiles=files)
 #    for any keyword you can find in the header of the index-file.
 #    Via default settings the internal index of GRDC_example is updated
 #    with this filter-functions, meaning you can apply multiple filters to
-#    your dataset which are all added.
+#    your dataset which are all added up.
 #    To be some clear, you can e.g.first filter for a country:
 GRDC_example.filter_index(key='Country', value='DE')
 #    and after this filter for a time-period - BUT DIFFERENT AS YOU THINK
 #    Note here the difference between 'filter-index' and 'filter_index_date':
 #    While 'filter_index' filters according to key-values pair straight forward
-#    'filter_index_date' does filter those stations not fully covering the 
+#    'filter_index_date' does filter out those stations not fully covering the 
 #    provided time-period. 
 GRDC_example.filter_index_date(start='1979-01', end='1980-12', form='%Y-%m')
 #    At the end 'GRDC_example' does contain stations locate in Germany and
