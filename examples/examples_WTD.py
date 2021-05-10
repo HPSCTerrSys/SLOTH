@@ -6,6 +6,7 @@ import os
 import sys
 import heat as ht
 import matplotlib.pyplot as plt
+import datetime as dt
 
 src_path='../src/'
 sys.path.append(src_path)
@@ -109,3 +110,33 @@ SanityCheck.plot_SanityCheck_3D(data=wtd_numpy,
     kind='mean', figname='./examples_WTD.pdf',
     fig_title='WTD [m] (t,y,x)', minax_title='min', maxax_title='max', 
     kinax_title='mean', cmapName='seismic')
+
+###############################################################################
+#### Create netCDF file and fill with basic attributes
+###############################################################################
+netCDFFileName = ANT.toolBox.createNetCDF('./WTD_testFile.nc', domain='EU11', 
+    author='Niklas WAGNER', contact='n.wagner@fz-juelich.de',
+    institution='FZJ - IBG-3', history=f'Created: {dt.datetime.now().strftime("%Y-%m-%d %H:%M")}',
+    description='I want tot est and more interactivly check WTD calculation!',
+    source='add source here',NBOUNDCUT=4)
+
+###############################################################################
+#### Create the actual variable we want to store the data at.
+###############################################################################
+with nc.Dataset(netCDFFileName, 'a') as nc_file:
+    # Name of the variable: 'TestData'
+    ncVar = nc_file.createVariable('wtd', 'f8', ('time', 'rlat', 'rlon',),
+                                    fill_value=-9999,
+                                    zlib=True)
+    ncVar.standard_name = 'wtd'
+    ncVar.long_name = 'water table depth'
+    ncVar.units ='m'
+    ncVar.grid_mapping = 'rotated_pole'
+
+    ncTime = nc_file.createVariable('time', 'i2', ('time',))
+    ncTime.standard_name = 'time'
+    ncTime.units = 'days since 1984-01-01 00:00:00'
+    ncTime.calendar = '365_day'
+
+    ncVar[...] = wtd_numpy[...]
+    ncTime[...] = np.arange(wtd_numpy.shape[0])
