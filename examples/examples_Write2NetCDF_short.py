@@ -11,10 +11,10 @@ import netCDF4 as nc
 import numpy as np
 import datetime as dt
 import sys
-src_path='../src/'
-sys.path.append(src_path)
-# ANalysisTool does contain the function 'get_intervalSlice()'
-import ANalysisTool as ANT
+
+catchyNAME_path='../'
+sys.path.append(catchyNAME_path)
+import catchyNAME
 
 
 ###############################################################################
@@ -33,7 +33,7 @@ data = np.random.rand(5,2000,2000)
 ###############################################################################
 #### Create netCDF file and fill with basic attributes
 ###############################################################################
-netCDFFileName = ANT.toolBox.createNetCDF(saveFile, domain='DE05', 
+netCDFFileName = catchyNAME.toolBox.createNetCDF(saveFile, domain='DE05', 
 	author='Niklas WAGNER', contact='n.wagner@fz-juelich.de',
 	institution='FZJ - IBG-3', history=f'Created: {dt.datetime.now().strftime("%Y-%m-%d %H:%M")}',
 	description='Write a short description of your data to ship with the netCDF files!',

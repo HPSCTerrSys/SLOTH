@@ -4,10 +4,10 @@ import netCDF4 as nc
 from struct import pack, unpack
 import sys
 
-# Import different IO-routines for ParFlow output
-src_path='../src/'
-sys.path.append(src_path)
-import ParFlow_IO as pio
+catchyNAME_path='../'
+sys.path.append(catchyNAME_path)
+import catchyNAME.ParFlow_IO as pio
+
 ext_path='../extern/ana_parflow-diagnostics_pythonheat/'
 sys.path.append(ext_path)
 import IO as htIO

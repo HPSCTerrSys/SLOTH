@@ -3,10 +3,10 @@ import netCDF4 as nc
 import matplotlib as mpl
 import sys
 import os
-src_path='../src/'
-sys.path.append(src_path)
-# ANalysisTool does contain the function 'get_intervalSlice()'
-import ANalysisTool as ANT
+
+catchyNAME_path='../'
+sys.path.append(catchyNAME_path)
+import catchyNAME
 
 dataRootDir = '/p/scratch/cslts/shared_data/tmp_TestDataSet/samples'
 datasetName = 'ERA5Climat_EUR11_ECMWF-ERA5_analysis_FZJ-IBG3'
@@ -20,7 +20,7 @@ fileNameA = f'{dataRootDir}/{datasetName}/{procType}/{dataDate}/{varName}_ts.nc'
 
 fileNameB = '../data/example_WriteNetCDF/example_netCDF_EU11'
 
-fileNameB = ANT.toolBox.createNetCDF(fileNameB, domain='EU11', fillValue=-123456, NBOUNDCUT=4)
+fileNameB = catchyNAME.toolBox.createNetCDF(fileNameB, domain='EU11', fillValue=-123456, NBOUNDCUT=4)
 
 with nc.Dataset(fileNameA, 'r') as nc_fileA:
 	rlonA = nc_fileA.variables['rlon'][...]

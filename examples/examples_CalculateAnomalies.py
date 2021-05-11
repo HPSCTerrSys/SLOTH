@@ -5,9 +5,7 @@ import sys
 import os
 import glob
 import cftime
-src_path='../src/'
-sys.path.append(src_path)
-import PlotLib 
+
 
 ###############################################################################
 ##### Read in climate means

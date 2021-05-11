@@ -27,12 +27,10 @@ import sys
 import os
 import glob
 import cftime
-src_path='../src/'
-sys.path.append(src_path)
-# ANalysisTool does contain the function 'get_intervalSlice()'
-import ANalysisTool as ANT
-# PlotLib does contain the pre-defined plot-function used at the very end.
-import PlotLib 
+
+catchyNAME_path='../'
+sys.path.append(catchyNAME_path)
+import catchyNAME
 
 
 ###############################################################################
@@ -96,7 +94,7 @@ for file in files:
         timeUnits    = nc_time.units
 
     # Calculate the slices for the current file based on the choose meanInterval
-    dailySlices = ANT.toolBox.get_intervalSlice(dates=dates, sliceInterval=meanInterval)
+    dailySlices = catchyNAME.toolBox.get_intervalSlice(dates=dates, sliceInterval=meanInterval)
     # Loop over all slices, mask 'missing' values with np.nan, and calculate 
     # related mean. The averaged data gets appended for each file and slice.
     for Slice in dailySlices:
@@ -159,4 +157,4 @@ if meanInterval == 'month':
             #'dpi': 100,
             'figsize': (10, 4),
             }
-    PlotLib.plot_ClimateYearMonth(clima, **kwargs)
+    catchyNAME.PlotLib.plot_ClimateYearMonth(clima, **kwargs)

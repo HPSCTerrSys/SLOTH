@@ -10,10 +10,9 @@ import sys
 import glob
 import copy
 
-src_path='../src/'
-sys.path.append(src_path)
-import PlotLib 
-
+catchyNAME_path='../'
+sys.path.append(catchyNAME_path)
+import catchyNAME
 
 ###############################################################################
 ### Define some paths, filenames, etc
@@ -133,5 +132,5 @@ kwargs_imshow2PDiff = {
 ### Start plotting
 ###############################################################################
 print(f'Start plotting')
-PlotLib.plot_imshow2PDiff(v1=var_D1_ave, v2=var_D2_ave,
+catchyNAME.PlotLib.plot_imshow2PDiff(v1=var_D1_ave, v2=var_D2_ave,
         **kwargs_imshow2PDiff)

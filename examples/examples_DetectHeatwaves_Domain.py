@@ -11,9 +11,9 @@ import cftime
 from scipy import signal
 import scipy.ndimage as ndimage
 
-src_path='../src/'
-sys.path.append(src_path)
-import PlotLib 
+catchyNAME_path='../'
+sys.path.append(catchyNAME_path)
+import catchyNAME
 
 ###############################################################################
 #### Define some paths, filenames, options, etc

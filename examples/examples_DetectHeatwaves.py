@@ -9,9 +9,10 @@ import cftime
 from scipy import signal
 import scipy.ndimage as ndimage
 
-src_path='../src/'
-sys.path.append(src_path)
-import PlotLib 
+catchyNAME_path='../'
+sys.path.append(catchyNAME_path)
+import catchyNAME
+
 
 ###############################################################################
 #### Define some paths, filenames, options, etc
@@ -229,7 +230,7 @@ for hwYear in hwYears:
     vmax = 24
     # why needed?
     varName = 'TSA'
-    PlotLib.plot_HeatWaveInvest(abs_intensity_array=abs_intensity_array, dailyTime_hw=dailyTime_hw, 
+    catchyNAME.PlotLib.plot_HeatWaveInvest(abs_intensity_array=abs_intensity_array, dailyTime_hw=dailyTime_hw, 
         varName=varName, pixel_x=pixel_x, pixel_y=pixel_y, hwYear=hwYear,
         rel_intensity_array=rel_intensity_array, dailyMean_hw=dailyMean_hw, clima_smooth=clima_smooth, 
         # date_start_clim=date_start_clim, date_final_clim=date_final_clim, 

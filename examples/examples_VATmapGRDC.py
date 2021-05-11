@@ -6,10 +6,10 @@ import matplotlib.pyplot as plt
 import netCDF4 as nc
 import heat as ht
 
-src_path='../src/'
-sys.path.append(src_path)
-import VAlidationTool as VAT
-import ANalysisTool as ANT
+catchyNAME_path='../'
+sys.path.append(catchyNAME_path)
+import catchyNAME
+
 ext_src='../extern/ana_parflow-diagnostics_pythonheat'
 sys.path.append(ext_src)
 import Diagnostics
@@ -78,7 +78,7 @@ print(f'slopey.shape: {slopey.shape}')
 ###############################################################################
 ### Initialize Diagnostics and calculate discharge (Q)
 ###############################################################################
-indicatorMap = ANT.toolBox.mappIndicator(ParFlowNamelist=pflname, IndicatorFile=indicatorfile)
+indicatorMap = catchyNAME.toolBox.mappIndicator(ParFlowNamelist=pflname, IndicatorFile=indicatorfile)
 alpha   = ht.array(indicatorMap['alpha'], is_split=0, comm=ht.MPI_WORLD)
 nvg     = ht.array(indicatorMap['nvg'], is_split=0, comm=ht.MPI_WORLD)
 sres    = ht.array(indicatorMap['sres'], is_split=0, comm=ht.MPI_WORLD)
@@ -124,7 +124,7 @@ SimMeanQ = np.mean(Q, axis=0)
 ###############################################################################
 # provide list of individual GRDC files
 GRDCfiles    = sorted(glob.glob(f'{dataRootDir}/{GRDCdataset}/*.mon'))
-GRDC_example = VAT.GRDCdataset(GRDCfiles=GRDCfiles)
+GRDC_example = catchyNAME.GRDCdataset.GRDCdataset(GRDCfiles=GRDCfiles)
 # GRDC_example.filter_index(key='Country', value='DE')
 GRDC_example.filter_index(key='GRDC-No', value='6122110')
 # GRDC_example.filter_index_date(start='1979-01', end='1980-12', form='%Y-%m')
@@ -152,13 +152,13 @@ print(f'########################################################################
 ###############################################################################
 ### Initialize Mapper-Object and map data on SimGrid
 ###############################################################################
-# convert from HeAT to numpy, as Diagnostics are based on HeAT but VAT is based 
-# on numpy
+# convert from HeAT to numpy, as Diagnostics are based on HeAT but mapper is 
+# based on numpy
 SimLons = SimLons.numpy()
 SimLats = SimLats.numpy()
 slopex  = slopex.numpy()
 slopey  = slopey.numpy()
-Mapper = VAT.mapper(SimLons=SimLons, SimLats=SimLats,
+Mapper  = catchyNAME.mapper.mapper(SimLons=SimLons, SimLats=SimLats,
 	                ObsLons=GRDC_example.lons, ObsLats=GRDC_example.lats,
 	                ObsIDs=GRDC_example.id, 
 	                SimMeanQ=SimMeanQ, ObsMeanQ=np.nanmean(GRDC_example.data, axis=1))
