@@ -2,8 +2,15 @@ import numpy as np
 import csv
 import sys
 import os
+from . import toolBox
 
 class mapper:
+    ''' [...]
+        Due to several reasons (e.g. coarse resolutions) the river corridors
+        within TSMP (as all other models) does not have to match the real corridor
+        for all pixels along the river. 
+        [...]
+    '''
 
     ###########################################################################
     ############################# Definition ##################################
@@ -13,6 +20,39 @@ class mapper:
                        ObsIDs=None, 
                        SimMeanQ=None, ObsMeanQ=None,
                        SimMeanArea=None, ObsMeanArea=None):
+        ''' Default constructor of mapper-class
+
+        Object-variables:
+        -----------------
+        SimLons: 2D ndarray
+            Two dimensional ndarray containing the lon value for each point of 
+            SimGrid
+        SimLats: 2D ndarray
+            Two dimensional ndarray containing the lat value for each point of 
+            SimGrid
+        ObsLons: 1D ndarray
+            One dimensional ndarray containing the lon values for each individual 
+            GRDC station stored with the object
+        ObsLats: 1D ndarray
+            One dimensional ndarray containing the lat values for each individual 
+            GRDC station stored with the object
+        ObsID: 1D ndarray
+            One dimensional ndarray containing the station ID for each individual 
+            GRDC station stored with the object
+        SimMeanQ: 2D ndarray
+            Two dimensional ndarray containing the mean discharge for each point
+            of SimGrid (mean Q for entire period or ref period) 
+        ObsMeanQ: 1D ndarray
+            One dimensional ndarray containing the mean discharge for each individual 
+            GRDC station stored with the object
+        SimMeanArea: 1D ndarray
+            One dimensional ndarray containing the best fitting catchment area
+            for each individual GRDC station stored with the object (calculation 
+            based on Sim data)
+        ObsMeanArea: 1D ndarray
+            One dimensional ndarray containing the mean catchment area of each individual 
+            GRDC station stored with the object
+        '''
         # input
         self.SimLons        = SimLons
         self.SimLats        = SimLats
@@ -198,7 +238,7 @@ class mapper:
             self.__ObsMeanQ = None
             return None
         if not ObsMeanQ.ndim == 1:
-            print(f'ObsMeanQ is of dimension {ObsMeanQ.ndim} but dimension 2 is required!')
+            print(f'ObsMeanQ is of dimension {ObsMeanQ.ndim} but dimension 1 is required!')
             self.__ObsMeanQ = None
             return None
         self.__ObsMeanQ     = ObsMeanQ
@@ -257,9 +297,19 @@ class mapper:
     ########################################################################### 
 
     def checkt4MapRaw(self):
-        """
-        This is a separate function to keep MapRaw readable
-        """
+        ''' This is a separate function to keep MapRaw() functions readable.
+
+        This function checks if the passed data fulfills some basic 
+        requirements as e.g. if all needed data are defined and if 
+        SimMeanQ and SimLons are of same shape.
+        This is basically to avoid trivial errors while using this class.
+
+        Return value:
+        -------------
+        __: boolean 
+            True if check is passed, False if some errors are detected.
+
+        '''
         # are all variables defined?
         if self.SimLons is None:
             print('self.SimLons is not defined yet, but required by function self.MapRaw()!')
@@ -290,41 +340,65 @@ class mapper:
         return True
 
     def MapRaw(self):
-        """Map the passed OBS data on the SimGrid
-        """
+        ''' This functions straight forward maps OBS on SimGrid.
+
+        This function maps OBS data according to its Lat/Lon values 
+        to SimGrid, by calculating the 'real' distance between OBS location
+        and all points in SimGrid. The point with the smallest distance is 
+        choose as the correct location of OBS on SimGrid. 
+        The 'real' distance is hereby the distance in [m] between OBS and SimGrind 
+        calculated on a sphere.
+
+        Return value:
+        -------------
+        No return value!
+        This function sets / updates the object variables self.MapYIdx_fit, 
+        and self.MapXIdx_fit directly
+
+        '''
+
         #check if all needed data are already defined
         if not self.checkt4MapRaw():
             print('checkt4MapRaw() failed --> self.MapRaw() canceled!')
             return None
 
+        # Create empty lists for results
         tmp_MapXIdx_raw = []
         tmp_MapYIdx_raw = []
-        # loop over ObsCoords via ObsIDs
+        # Loop over all ObsIDs stored with the object
         for idx, ObsID in enumerate(self.ObsIDs):
             ObsLon = self.ObsLons[idx]
             ObsLat = self.ObsLats[idx]
-            # calculate distance between Obs and SimGrid on Earth surface
+            # Calculate distance between Obs and SimGrid on Earth surface
             dist = self.spher_dist_v1(np.deg2rad(self.SimLons),
                                       np.deg2rad(self.SimLats),
                                       np.deg2rad(ObsLon),
                                       np.deg2rad(ObsLat))
-            # find index of smallest distance
+            # Find index of smallest distance
             mapped_idx = np.unravel_index(np.argmin(dist, axis=None),dist.shape)
-            # temporally store found idx in list
+            # Temporally store found idx in list
             tmp_MapYIdx_raw.append(mapped_idx[0])
             tmp_MapXIdx_raw.append(mapped_idx[1])
 
-        # store found idx in class variable
+        # update object-variables with found information
         self.MapYIdx_raw = np.array(tmp_MapYIdx_raw)
         self.MapXIdx_raw = np.array(tmp_MapXIdx_raw)
 
-    def check4MapBestQ(self):
-        """
-        This is a separate function to keep MapBestQ readable
+    def check4MapXXX(self):
+        ''' This is a separate function to keep MapXXX functions readable.
 
-        Because self.MapRaw() is called as part of self.MapBestQ(), 
-        this function only checks additional requirements
-        """
+        This function checks if the passed data fulfills some basic 
+        requirements as e.g. SimMeanQ and SimLons are of same shape.
+        This is basically to avoid trivial errors while using this class.
+        Because self.MapRaw() is called as part of all self.MapBestXXX() 
+        functions, this function only checks additional requirements
+
+        Return value:
+        -------------
+        __: boolean 
+            True if check is passed, False if some errors are detected.
+
+        '''
         # are all variables defined?
         if self.SimMeanQ is None:
             print('self.SimMeanQ is not defined yet, but required by function self.MapBestQ()!')
@@ -342,135 +416,233 @@ class mapper:
         return True
 
     def MapBestQ(self, search_rad=1):
-        """Map the passed OBS on the SimGrid by choosing best fitting Q
+        ''' This functions maps OBS on SimGrid by choosing that pixel with best 
+        fitting discharge (Q) within given radius.
 
-        First MapRaw, than adjust according to Q
-        """
+        The best fitting Q is found by calculating the discharge of
+        each pixel within a given radius around the origin pixel.
+        The origin pixel is hereby defined by MapRaw().
+        That pixel with Q closes to GRDC data is than set.
+
+        Return value:
+        -------------
+        No return value!
+        This function sets / updates the object variables self.MapYIdx_fit, 
+        and self.MapXIdx_fit directly
+
+        Parameters
+        ----------
+        search_rad : int 
+            defining the radius around the origin pixel to search for best fitting Q. 
+        '''
+
+        # First MapRaw(), than adjust according to best fitting Q
         self.MapRaw()
         #check if all needed data are already defined
-        if not self.check4MapBestQ():
-            print('check4MapBestQ() failed --> self.MapBestQ() canceled!')
+        if not self.check4MapXXX():
+            print('check4MapXXX() failed --> self.MapBestQ() canceled!')
             return None
 
+        # Create empty lists for results
         tmp_MapXIdx_fit = []
         tmp_MapYIdx_fit = []
-        #for i,j in zip(self.MapXIdx_raw, self.MapYIdx_raw):
+        # Loop over all ObsIDs stored with the object
         for idx, ObsID in enumerate(self.ObsIDs):
+            # Set the original pixel around which to search
             y = self.MapYIdx_raw[idx]
             x = self.MapXIdx_raw[idx]
-            # extract sub area of self.SimMeanQ according to current ObsID
+            # extract subset of self.SimMeanQ around origin pixel
             # and search radius search_rad (+1 cause last is exclusive)
             sub_SimMeanQ = self.SimMeanQ[y-search_rad:y+search_rad+1, x-search_rad:x+search_rad+1]
             sub_ObsMeanQ = self.ObsMeanQ[idx]
-            # distance between SimMeanQ and ObsMeanQ within search_rad
+            # Calculate difference between SimMeanQ and ObsMeanQ (GRDC) within subset
             dist = np.abs(sub_SimMeanQ - sub_ObsMeanQ)
+            # Get index of best fitting Q (min(dist)) within subset
             mapped_idx = np.unravel_index(np.argmin(dist, axis=None),dist.shape)
 
+            # Convert subset-index to global index and
+            # store (x|y) of best fitting Q in results list
             tmp_realYidx = (y - search_rad) + mapped_idx[0]
             tmp_realXidx = (x - search_rad) + mapped_idx[1]
-
             tmp_MapYIdx_fit.append(tmp_realYidx)
             tmp_MapXIdx_fit.append(tmp_realXidx)
 
+        # update object-variables with found information
         self.MapYIdx_fit = np.array(tmp_MapYIdx_fit)
         self.MapXIdx_fit = np.array(tmp_MapXIdx_fit)
 
     def MapHighQ(self, search_rad=1):
-        """Map the passed OBS on the SimGrid by choosing the highes Q value
+        ''' This functions maps OBS on SimGrid by choosing that pixel with highest 
+        discharge (Q) within given radius.
 
-        First MapRaw, than adjust according to Q
-        """
+        The highest discharge (Q) is simply found by applying np.argmax() to 
+        the subset (search_rad around origin pixel) of SimMeanQ.
+        The origin pixel is hereby defined by MapRaw()
+        SimMeanQ is part of the objects-variables
+
+        Return value:
+        -------------
+        No return value!
+        This function sets / updates the object variables self.MapYIdx_fit, 
+        and self.MapXIdx_fit directly
+
+        Parameters
+        ----------
+        search_rad : int 
+            defining the radius around the origin pixel to search for highest Q. 
+        '''
+        # First MapRaw(), than adjust according to highest Q
         self.MapRaw()
         #check if all needed data are already defined
-        if not self.check4MapBestQ():
-            print('check4MapBestQ() failed --> self.MapBestQ() canceled!')
+        if not self.check4MapXXX():
+            print('check4MapXXX() failed --> self.MapBestQ() canceled!')
             return None
 
+        # Create empty lists for results
         tmp_MapXIdx_fit = []
         tmp_MapYIdx_fit = []
-        #for i,j in zip(self.MapXIdx_raw, self.MapYIdx_raw):
+        # Loop over all ObsIDs stored with the object
         for idx, ObsID in enumerate(self.ObsIDs):
+            # Set the original pixel around which to search
             y = self.MapYIdx_raw[idx]
             x = self.MapXIdx_raw[idx]
             # extract sub area of self.SimMeanQ according to current ObsID
-            # and search radius search_rad (+1 cause last is exclusive)
+            # and search radius search_rad (+1 because last is exclusive)
             sub_SimMeanQ = self.SimMeanQ[y-search_rad:y+search_rad+1, x-search_rad:x+search_rad+1]
-            sub_ObsMeanQ = self.ObsMeanQ[idx]
-            # get index of max Q in search_rad
+            # sub_ObsMeanQ = self.ObsMeanQ[idx] # REMOVE
+            # Get index of Q within subset
             mapped_idx = np.unravel_index(np.argmax(sub_SimMeanQ, axis=None),sub_SimMeanQ.shape)
 
+            # Convert subset-index to global index and
+            # store (x|y) of highest Q in results list
             tmp_realYidx = (y - search_rad) + mapped_idx[0]
             tmp_realXidx = (x - search_rad) + mapped_idx[1]
-
             tmp_MapYIdx_fit.append(tmp_realYidx)
             tmp_MapXIdx_fit.append(tmp_realXidx)
 
+        # update object-variables with found information
         self.MapYIdx_fit = np.array(tmp_MapYIdx_fit)
         self.MapXIdx_fit = np.array(tmp_MapXIdx_fit)
 
-    def MapBestCatchment(self, search_rad=1, slopey=None, slopex=None):#, meanArea=None):
-        """Map the passed OBS on the SimGrid by choosing that pixel within the search_rad
-        which related catchment area fits best.
+    def MapBestCatchment(self, search_rad=1, dx=12500., dy=12500., slopey=None, slopex=None):
+        ''' This functions maps OBS on SimGrid by choosing that pixel which related 
+        catchment area fits best to GRDC.
 
-        First MapRaw, than adjust according to Q
-        """
+        The best fitting catchment is found by calculating the catchment of
+        each pixel within a given radius around the origin pixel.
+        The origin pixel is hereby defined by MapRaw().
+        That pixel with catchment area closes to GRDC data is than set.
+
+        Return value:
+        -------------
+        No return value!
+        This function sets / updates the object variables self.MapYIdx_fit, 
+        self.MapXIdx_fit, and self.SimMeanArea directly
+
+        Parameters
+        ----------
+        search_rad : int 
+            defining the radius around the origin pixel to search for best fitting catchment. 
+        dy: float
+            defining the y-resolution of slope-grid
+        dx: float
+            defining the x-resolution of slope-grid
+        slopey: 2D ndarray
+            defining the ParFlow slopes in y-direction used to calculate the catchment
+        slopex: 2D ndarray
+            defining the ParFlow slopes in x-direction used to calculate the catchment
+        '''
+
+        # First MapRaw(), than adjust according to best fitting catchment-size
         self.MapRaw()
         #check if all needed data are already defined
-        if not self.check4MapBestQ():
-            print('check4MapBestQ() failed --> self.MapBestQ() canceled!')
+        if not self.check4MapXXX():
+            print('check4MapXXX() failed --> self.MapBestQ() canceled!')
             return None
 
+        # Create empty lists for results
         tmp_MapXIdx_fit = []
         tmp_MapYIdx_fit = []
         tmp_SimManArea = []
-        #for i,j in zip(self.MapXIdx_raw, self.MapYIdx_raw):
+        # Loop over all ObsIDs stored with the object
         for idx, ObsID in enumerate(self.ObsIDs):
-            y           = self.MapYIdx_raw[idx]
-            x           = self.MapXIdx_raw[idx]
-            meanArea    = self.ObsMeanArea[idx]
+            # Set the original pixel around which to search
+            y        = self.MapYIdx_raw[idx]
+            x        = self.MapXIdx_raw[idx]
+            # Set catchment area defined by GRDC to compare with
+            meanArea = self.ObsMeanArea[idx]
 
+            # Create lists for temporary results
             tmp_catchmentAreaList = []
             tmp_catchmentXList = []
             tmp_catchmentYList = []
+            # Loop over all pixel within given search-radius around the 
+            # origin pixel, including the original pixel.
             for x_inc in range(-search_rad, search_rad+1):
                 for y_inc in range(-search_rad, search_rad+1):
                     tmp_x = x + x_inc
                     tmp_y = y + y_inc
+                    # find catchment for (tmp_x|tmp_y) 
+                    # for more information on calculation of catchment see:
+                    # catcyNAME/toolBox.py --> calc_catchment()
                     tmp_catchmentMask = toolBox.calc_catchment(slopex, slopey, tmp_x, tmp_y)
-                    tmp_catchmentMask *= 12.5*12.5
+                    # Calculate area of catchment by multiplying with dx and dy
+                    # Than change units from [m^2] to [km^2] to stay compatible to GRDC
+                    tmp_catchmentMask *= dx*dy
+                    tmp_catchmentMask += 1./(1000.*1000.)
                     tmp_catchmentArea= np.nansum(tmp_catchmentMask)
+                    # Add information for current inspected pixel in 
+                    # temporary results list
                     tmp_catchmentAreaList.append(tmp_catchmentArea)
                     tmp_catchmentXList.append(tmp_x)
                     tmp_catchmentYList.append(tmp_y)
 
+            # Convert temporary results list to ndarray
             tmp_catchmentArea = np.asarray(tmp_catchmentAreaList)
             tmp_catchmentX = np.asarray(tmp_catchmentXList)
             tmp_catchmentY = np.asarray(tmp_catchmentYList)
-            # now tmp_catchmentArea is a numpy.ndarray holding the catchmentsize of the pixel
-            # related to X and Y values stored in tmp_catchmentX and tmp_catchmentY
-            # X and Y are absolute pixels and NOT of a subset.
+            # Now tmp_catchmentArea is a numpy.ndarray holding the catchment-size
+            # of the pixel related to X and Y values stored in tmp_catchmentX 
+            # and tmp_catchmentY;
+            # X and Y are absolute pixels of passed slopex and slopey and NOT of 
+            # a subset.
 
+            # Calculate difference between calculated catchment areas and GRDC data
             dist = np.abs( tmp_catchmentArea - meanArea )
+            # Get index of best fitting catchment (min(dist)) within temporary 
+            # result list
             mapped_idx = np.unravel_index(np.argmin(dist, axis=None),dist.shape)
-            # print(f'mapped_idx best catchment {mapped_idx}')
-
+            # Store information of best fitting pixel with results list 
             tmp_best_fitting_area_x = tmp_catchmentX[mapped_idx[0]]
             tmp_best_fitting_area_y = tmp_catchmentY[mapped_idx[0]]
             tmp_best_fitting_area   = tmp_catchmentArea[mapped_idx[0]]
-
             tmp_MapYIdx_fit.append(tmp_best_fitting_area_y)
             tmp_MapXIdx_fit.append(tmp_best_fitting_area_x)
             tmp_SimManArea.append(tmp_best_fitting_area)
 
+        # update object-variables with found information
         self.MapYIdx_fit = np.array(tmp_MapYIdx_fit)
         self.MapXIdx_fit = np.array(tmp_MapXIdx_fit)
         self.SimMeanArea = np.array(tmp_SimManArea)
 
     def writeMap2File(self, file):
-        """ write the mapped coordinates to a given file
+        ''' Write mapped coordinates to a given file.
 
-        currently only csv-format
-        """
+        To save mapped coordinates for later use or better comparison, 
+        one can write / dump those to a file.
+        Currently this function does only write data t CSV-format.
+        Currently already existing files are overwritten.
+
+        Return value:
+        -------------
+        No return value!
+
+        Parameters
+        ----------
+        file : str 
+            defining the file-path to which data should be written.
+
+        '''
         with open(file,'w', newline='') as outFile:
             writer = csv.writer(outFile, delimiter=',')
             header=['ObsID', 

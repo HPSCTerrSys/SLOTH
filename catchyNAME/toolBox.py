@@ -1,3 +1,16 @@
+""" toolBox - submodule of cathyNAME
+
+author: Nikals WAGNER
+e-mail: n.wagner@fz-juelich.de
+version: 2021-05-11
+
+Description:
+tooBox.py is aimed to hold standalone functions used / developed / found
+within the realm of cathyNAME development.
+[...]
+
+Check examples/ to see how this works. 
+"""
 import sys
 import os
 import numpy as np

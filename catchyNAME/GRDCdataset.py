@@ -4,14 +4,72 @@ import sys
 import os
 import datetime as dt
 
-class coreDataset():
+
+class GRDCdataset():
+    ''' Class aimed to easy handle GRDC datasets.
+
+    This class (GRDCdataset()) is aimed to easily handle GRDC datasets, 
+    which are usually stored in individual files per station and therefore
+    are not really easy to insect / to get an overview.
+
+    Therefore this class offers functions to:
+    -) read in entire GRC datasets
+    -) create and store index-files in CSV-format of the dataset
+    -) filter the dataset according to different keys
+    -) read in (filtered) datasets in ndarrays 
+
+    The overall principle of this class is to store a index-file like
+    variable with each instance of this class -- GRDCindexObj.
+    [...]
+    '''
     ###########################################################################
     ############################# Definition ##################################
     ###########################################################################
-    def __init__(self, data=None):
+    def __init__(self, data=None, GRDCfiles=None, GRDCindexFile=None,
+                       GRDCindexObj=None):
+        ''' Default constructor of GRDCdataset-class
+
+        Object-variables:
+        -----------------
+        data: 2D ndarray
+            Two dimensional ndarray containing the lon value for each point of 
+            SimGrid
+        GRDCfiles: 2D ndarray
+            Two dimensional ndarray containing the lat value for each point of 
+            SimGrid
+        GRDCindexFile: 1D ndarray
+            One dimensional ndarray containing the lon values for each individual 
+            GRDC station stored with the object
+        GRDCindexObj: 1D ndarray
+            One dimensional ndarray containing the lat values for each individual 
+        
+        '''
         self.data               = data
         self.dataDim            = None
-        pass
+        self.GRDCfiles          = GRDCfiles
+        self.GRDCindexFile      = GRDCindexFile if GRDCindexFile is not None else './index_GRDC_DEFAULT.csv'
+        self.GRDCindexObj       = GRDCindexObj 
+
+        self.id                 = None
+        self.data               = None
+        self.lats               = None
+        self.lons               = None
+        self.time               = None
+        self.meanArea           = None
+
+        # 'Time series' is handled special what is what is why keywords are handled special
+        # GRDCkeywords: list
+        #    list of keywords which the preamble of individual GRDC files should 
+        #    be searched
+        # GRDCheader_out: list
+        #    list of keywords which should be used as header information in 
+        #    GRDCindexFile.
+        self.GRDCkeywords       = ['GRDC-No', 'River', 'Station', 'Country', 'Latitude', 'Longitude', 'Catchment area', 'Time series']
+        self.GRDCheader_out     = ['GRDC-No', 'River', 'Station', 'Country', 'Latitude', 'Longitude', 'Catchment area', 'Date start', 'Date end', 'File']
+
+        # force create index-file if GRDCindexFile not passed but GRDCfiles.
+        if GRDCfiles is not None and GRDCindexFile is None:
+            self.create_indexFile(force=True)
 
     @property
     def data(self):
@@ -30,35 +88,6 @@ class coreDataset():
 
         self.__data         = data
         self.dataDim        = data.ndim
-
-
-class GRDCdataset(coreDataset):
-    ###########################################################################
-    ############################# Definition ##################################
-    ###########################################################################
-    def __init__(self, data=None, GRDCfiles=None, GRDCindexFile=None,
-                       GRDCindexObj=None):
-        # print('before')
-        super().__init__(data)
-        # print('after')
-        self.GRDCfiles          = GRDCfiles if GRDCfiles is not None else None
-        self.GRDCindexFile      = GRDCindexFile if GRDCindexFile is not None else './index_GRDC_DEFAULT.csv'
-        self.GRDCindexObj       = None 
-
-        self.id                 = None
-        self.data               = None
-        self.lats               = None
-        self.lons               = None
-        self.time               = None
-        self.meanArea           = None
-
-        # 'Time series' is handled special what is what is why keywords are handled special
-        self.GRDCkeywords       = ['GRDC-No', 'River', 'Station', 'Country', 'Latitude', 'Longitude', 'Catchment area', 'Time series']
-        self.GRDCheader_out     = ['GRDC-No', 'River', 'Station', 'Country', 'Latitude', 'Longitude', 'Catchment area', 'Date start', 'Date end', 'File']
-
-        # force create index-file if GRDCindexFile not passed but GRDCfiles.
-        if GRDCfiles is not None and GRDCindexFile is None:
-            self.create_indexFile(force=True)
 
     @property
     def GRDCindexObj(self):
@@ -90,40 +119,90 @@ class GRDCdataset(coreDataset):
     ########################## Auxiliary tools ################################
     ###########################################################################
 
-    def create_indexFile(self, files=None, 
-                         keywords=None, header_out=None,
-                         header_lines=1, meta_lines=40,
+    def create_indexFile(self, #files=None, # REMOVE 
+                         #keywords=None, header_out=None, # REMOVE
+                         meta_lines=40,#header_lines=1, # REMOVE
                          force=False):
+        ''' This function indicates a GRDC data set
 
+        GRDC data-sets are usually stored in individual files per station, what
+        makes those hard to browse for humans, especially if one wants to get 
+        an overview of the entire dataset.
+        This functions indicates all GRDC files passed to related 
+        object-constructor, and dumps those to a indexFile in CSV-format. 
+        In addition the same index is kept as an object-variable to easy filter
+        the data-set in later use. 
+
+        Return value:
+        -------------
+        No return value!
+            This function sets / updates the object variables GRDCindexObj
+            directly and does store information to CSV-file
+
+        Parameters
+        ----------
+        meta_lines: int
+            number of line in GRDC files belonging to meta-data (need to extract 
+            data itself)
+        force: boolean
+            True:  force to indicates GRDCfiles again, even if GRDCindexFile 
+                   does already exist
+            False: force to read GRDCindexFile if already exist
+
+        '''
+
+        # Check if GRDCindexFile does already exist
+        # Check if the user does not force to indicate GRDC data-set again
+        # If both matches: read in existing GRDCindexFile instead of 
+        # indicating again
         if os.path.isfile(self.GRDCindexFile) and force == False: 
             print(f'self.GRDCindexFile ({self.GRDCindexFile}) already exist -- read in the existing file instead. Use "force=True" to overwrite')
-            self.GRDCindexObj = self.read_indexFile(indexFile=self.GRDCindexFile)
+            self.read_indexFile()
+            # Return None to exit function here
             return None
 
-        files       = files if not files is None else self.GRDCfiles
-        keywords    = keywords if not keywords is None else self.GRDCkeywords
-        header_out  = header_out if not header_out is None else self.GRDCheader_out
-        # 'Time series' is handled special what is what is why keywords are handled special
-        # keywords = ['GRDC-No', 'River', 'Station', 'Country', 'Latitude', 'Longitude', 'Catchment area', 'Time series']
-        # header_out  = ['GRDC-No', 'River', 'Station', 'Country', 'Latitude', 'Longitude', 'Catchment area', 'Date start', 'Date end', 'File']
+        # Create list to store results (individual station ID, name, area etc.)
         list_out    = []
-        # delete index file if already exist to not append same list at the end of file
+        # Open GRDCindexFile and overwrite if already exist to not append same 
+        # list at the end of file
         with open(self.GRDCindexFile, "w") as fout:
             wr = csv.writer(fout)
-            # write also location where files was found for later usage
-            wr.writerow(header_out)
+            # Write header to file
+            wr.writerow(self.GRDCheader_out)
 
-        for single_file in files:
+        # Loop over all individual GRDC-files
+        for single_file in self.GRDCfiles:
+            # Create dict for tmp-results
             write2csv = {}
-
+            # Open individual GRDC file
             with open(single_file, 'r', encoding="utf8", errors='ignore') as f:
+                # Save only metadata lines 
+                # -> better for performance and storage compared
+                #    to save entire file
                 metadata = [next(f) for x in range(meta_lines)]
+                # Loop over all metadata-lines
                 for line in metadata:
+                    # Apply some filter
                     tmp_line = line
                     tmp_line = tmp_line.rstrip("\n")
                     tmp_line = ' '.join(tmp_line.split())
                     tmp_line = tmp_line.split(':')
-                    for key in keywords:
+                    # Go through all GRDCkeywords and check if those are
+                    # part of metadata lien. If so store related information
+                    '''
+                    E.g metadata contains:
+                    # Station:               KVEMO NATANEBI
+                    # Country:               GE
+                    # Latitude (dec. °):       41.929444
+                    # Longitude (de. °):       41.803889
+                    than write2csv could look like:
+                    write2csv['Station']   = KVEMO NATANEBI
+                    write2csv['Country']   = GE
+                    write2csv['Latitude']  = 41.929444
+                    write2csv['Longitude'] = 41.803889
+                    etc.
+                    '''
+                    for key in self.GRDCkeywords:
                         if any(key in x for x in tmp_line):
                             tmp_data2write = (tmp_line[-1].strip())
                             if not key == 'Time series':
@@ -132,49 +211,136 @@ class GRDCdataset(coreDataset):
                                 tmp_data2write = tmp_data2write.split(' - ')
                                 write2csv['Date start'] = tmp_data2write[0]
                                 write2csv['Date end'] = tmp_data2write[1]
-
                 # write also location where files was found for later usage
                 write2csv['File'] = f'{single_file}'
 
-
+            # Write found metadata to GRDCindexFile (append at end)
             with open(self.GRDCindexFile, "a") as fout:
                 wr = csv.writer(fout)
                 row_out = [write2csv[key] for key in write2csv.keys() ]
+                # remember found metadata also for GRDCindexObj
                 list_out.append(row_out)
                 wr.writerow(row_out)
-        self.GRDCindexObj = (header_out, list_out)
 
-    def read_indexFile(self, indexFile=None):
-        indexFile = indexFile if not indexFile is None else self.GRDCindexFiled
-        with open(indexFile, "r", encoding="utf8", errors='ignore') as fin:
-            reader = csv.reader(fin)
-            header = next(reader, None)
-            data = [list(row) for row in reader]
+        # set / update GRDCindexObj with found information 
+        self.GRDCindexObj = (self.GRDCheader_out, list_out)
 
-        self.GRDCindexObj = (header, data)
-        return header, data
+    def read_indexFile(self):
+        ''' This function reads a GRDCindexFile as created by create_indexFile()
+
+        As we can write GRDCindexFiles with create_indexFile(), we also need a
+        function to read in those files.
+
+        Return value:
+        -------------
+        No return value!
+            This function sets / updates the object variables GRDCindexObj
+            directly
+
+        Parameters
+        ----------
+        No parameters needed!
+
+        '''
+        # Open GRDCindexFile and read in with csv-lib straight forward.
+        with open(self.GRDCindexFile, "r", encoding="utf8", errors='ignore') as fin:
+            reader  = csv.reader(fin)
+            header  = next(reader, None)
+            entries = [list(row) for row in reader]
+
+        self.GRDCindexObj = (header, entries)
 
     def filter_index(self, key, value, indexObj=None, store=True):
-        """ this function is filtering an index from indexObj
-        """
+        ''' This function filters a GRDCindexObj
+
+        To access individual entries of a GRDC data-set one need to filter 
+        the GRDCindexObj accordingly. This is archived with the following 
+        function where one can pass a key and a value to filter out every
+        entry not matching. E.g. key=country and value=DE filters out 
+        every station outside of Germany, that the GRDCindexObj does hold
+        stations inside Germany only. The key has to be part of the 
+        GRDCindexFile-header and therefore of self.GRDCheader_out.
+
+        As the usual behavior of this function is to update / overwrite 
+        self.GRDCindexObj with the outcome of the filtering, one might 
+        not be able to apply multiple key-value pairs, if those exclude 
+        each other. E.g. if one want to filter for two station names 
+        separately. Therefore this function does return an GRDCindexObj
+        like tuple, which could be saved for intermediate results. An 
+        example and more explanation need to be provided...
+
+        Return value:
+        -------------
+        filtered GRDCindexObj: tuple
+            Tuple of two lists, where first entry is the index header, and second entry is the index body
+        __ : __
+            This function sets / updates the object variables GRDCindexObj
+            directly
+
+        Parameters
+        ----------
+        key: list
+            List of string of GRDCindexFile header to filter
+        value: list
+            List of values (str) which to keep after filtering
+        indexObj: tuple
+            Tuple of two lists, where first entry is the index header, and second entry is the index body
+            This parameter is reserved for more complex filtering
+        store: boolean
+            True: set / update self.GRDCindexObj with filtered index
+            This parameter is reserved for more complex filtering
+
+        '''
         # use self.GRDCindexObj is nothing is passed
         indexObj = indexObj if not indexObj is None else self.GRDCindexObj
 
         header  = indexObj[0]
         key_idx = header.index(key)
-        data    = indexObj[1]
-        data_filtered = [row for row in data if row[key_idx] == value]
+        entries = indexObj[1]
+        entries_filtered = [row for row in entries if row[key_idx] in value]
 
         # only store result in current object if wanted.
         # true is default but to keep the option to say no
         if store:
-            self.GRDCindexObj = (header, data_filtered)
+            self.GRDCindexObj = (header, entries_filtered)
 
-        return (header, data_filtered)
+        return (header, entries_filtered)
 
     def filter_index_date(self, start, end, indexObj=None, store=True, form='%Y-%m'):
-        """ this function is filtering an index from indexObj
-        """
+        ''' This function filters a GRDCindexObj for time-periods
+
+        To access individual time periods of a GRDC data-set one need to filter 
+        the GRDCindexObj accordingly. This is archived with the following
+        function, where one can pass a start and end date to filter out
+        every entry not matching the defined time-period. E.g. 
+        start='1980-01-01' and end='1980-01-31' would filter out every entry 
+        not matching this time-period, that only measurements between 
+        1980-01-01 and 1980-01-31 are kept.
+        This function acts different compared to filter_index only in the 
+        way, that now dates have to be compared, which is different to 
+        other keys.
+
+        Return value:
+        -------------
+        filtered GRDCindexObj: tuple
+            Tuple of two lists, where first entry is the index header, and second entry is the index body
+        __ : __
+            This function sets / updates the object variables GRDCindexObj
+            directly
+
+        Parameters
+        ----------
+        start: 
+        end: 
+        indexObj: tuple
+            Tuple of two lists, where first entry is the index header, and second entry is the index body
+            This parameter is reserved for more complex filtering
+        store: boolean
+            True: set / update self.GRDCindexObj with filtered index
+            This parameter is reserved for more complex filtering
+        form:
+
+        '''
         # use self.GRDCindexObj is nothing is passed
         indexObj = indexObj if not indexObj is None else self.GRDCindexObj
         if not isinstance(start, dt.datetime):
@@ -216,34 +382,100 @@ class GRDCdataset(coreDataset):
 
     def dump_index(self, keys2dump=['GRDC-No', 'River', 'Country',
                                     'Date start', 'Date end']):
-        header  = self.GRDCindexObj[0]
-        data    = self.GRDCindexObj[1]
+        ''' This function dumps / prints the GRDCindexObj to std-out
 
+        To inspect the current GRDCindexObj it might be useful to easily
+        inspect its content. Therefore this functions was written.
+        This function prints out all keys of the GRDCindexObj the user 
+        wants to, defined by 'keys2dump' to the std-out (terminal).
+
+        Return value:
+        -------------
+        No return value!
+
+        Parameters
+        ----------
+        keys2dump: list
+            List of GRDCindexObj header keys (e.g. defined in GRDCheader_out)
+
+        '''
+        header  = self.GRDCindexObj[0]
+        entries = self.GRDCindexObj[1]
+
+        # Find Header-indexes of keys which should be printed
         key_idx = [header.index(idx) for idx in keys2dump]
 
+        # Find header-values of keys which should be printed ...
         out_header  = [header[idx] for idx in key_idx]
+        # ... and print those header-values
         print('\t'.join(out_header))
         
-        for n, row in enumerate(data):
+        # Print the body of GRDCindexObj belonging to header-values
+        for n, row in enumerate(entries):
             tmp_out = [row[idx] for idx in key_idx]
-            # truncate long str
+            # Truncate output if string is too long
             tmp_out = [(item[:10] + '..') if len(item) > 10 else item for item in tmp_out]
 
             print(f'{n:03}', '\t'.join(tmp_out))
 
-    def read_files(self, start, end, indexObj=None,
+    def read_files(self, start, end,# indexObj=None, # REMOVE
                          metaLines=40, delimiter=';',
                          form='%Y-%m-%d', dischargeKey='Calculated'):
-        """reads the date and 'original' data only!
-        """
+        ''' This function reads GRDC data into a ndarray
+
+        This is the key function of the GRDCdataset-class, which reads in 
+        GRDC-data to ndarrays. 
+        This function reads in all files related to a entry in GRDCindexObj.
+        So to not read in the entire GRDC data-set one has to apply above
+        filter-functions before, reducing the entries in GRDCindexObj.
+
+
+        Return value:
+        -------------
+        No return value!
+            Below object-variables are updated directly:
+            self.id         = 1D ndarray of read in station IDs
+            self.data       = 2D ndarray of read in discharge data [ID, #datapoints]
+            self.lats       = 1D ndarray of read in Lat values 
+            self.lons       = 1D ndarray of read in Lon values 
+            self.time       = 2D ndarray of read in time-steps [ID, #datapoints]
+            self.meanArea   = 1D ndarray of read in meanAreas (catchment)
+
+        Parameters
+        ----------
+        start: str or datetime-object 
+            First time step of time-perios to read in. This needs to be 
+            passed as datetime-object or as string. If passed as string, 
+            one need also to pass the correct 'form' to convert string to 
+            datetie-object
+        end: str or datetime-object
+            Last time step of time-perios to read in. This needs to be 
+            passed as datetime-object or as string. If passed as string, 
+            one need also to pass the correct 'form' to convert string to 
+            datetie-object
+        metaLines: int
+            Number of lines belonging to metadata in GRDC data-files 
+            (those are skipped)
+        delimiter: str
+            String of delimiter char of GRDC data
+        form: str
+
+            Format string to convert 'start' and 'end' to datetime-object if those are passed as str
+        dischargeKey: str
+            String: 'Calculated' or 'Original'
+
+        '''
+        if dischargeKey not in ['Calculated', 'Original']:
+            print(f'ERROR:')
+            print(f'dischargeKey revived ({dischargeKey}) is not supported!')
+            return None
         if not isinstance(start, dt.datetime):
             start = dt.datetime.strptime(start, form)
         if not isinstance(end, dt.datetime):
             end = dt.datetime.strptime(end, form)
 
-        indexObj    = indexObj if not indexObj is None else self.GRDCindexObj
-        indexHeader = indexObj[0]
-        indexList   = indexObj[1]
+        indexHeader = self.GRDCindexObj[0]
+        indexList   = self.GRDCindexObj[1]
         file_idx    = indexHeader.index('File')
         id_idx      = indexHeader.index('GRDC-No')
         lat_idx     = indexHeader.index('Latitude')
@@ -256,7 +488,6 @@ class GRDCdataset(coreDataset):
         # time_idx = station_header.index('YYYY-MM-DD')
         # data_idx = station_header.index('Original')
 
-        out = {}
         tmp_out_id   = []
         tmp_out_data = []
         tmp_out_lats = []
@@ -336,8 +567,3 @@ class GRDCdataset(coreDataset):
         self.lons       = np.asarray(tmp_out_lons, dtype=float)
         self.time       = np.asarray(tmp_out_time)
         self.meanArea   = np.asarray(tmp_out_meanArea, dtype=float)
-                # out[station[id_idx]] = {'time':tmp_time, 'data':tmp_data, 
-             #                            'lat':station[lat_idx] ,'lon':station[lon_idx],
-             #                            'meanArea':station[meanArea]}
-
-        return out

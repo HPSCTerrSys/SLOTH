@@ -126,7 +126,7 @@ SimMeanQ = np.mean(Q, axis=0)
 GRDCfiles    = sorted(glob.glob(f'{dataRootDir}/{GRDCdataset}/*.mon'))
 GRDC_example = catchyNAME.GRDCdataset.GRDCdataset(GRDCfiles=GRDCfiles)
 # GRDC_example.filter_index(key='Country', value='DE')
-GRDC_example.filter_index(key='GRDC-No', value='6122110')
+GRDC_example.filter_index(key='GRDC-No', value=['6122110', '6119200'])
 # GRDC_example.filter_index_date(start='1979-01', end='1980-12', form='%Y-%m')
 GRDC_example.read_files(start='1980-01-01', end='1980-01-31', form='%Y-%m-%d')
 
@@ -135,17 +135,11 @@ print(GRDC_example.data)
 print(f'Found {GRDC_example.data.shape[0]} stations with {GRDC_example.data.shape[1]} data-points for applied filter.')
 print(f'Possible accessible data:')
 print(f'GRDC_example.id.shape: {GRDC_example.id.shape} ({type(GRDC_example.id)})')
-# print(f'GRDC_example.id: {GRDC_example.id}')
 print(f'GRDC_example.data.shape: {GRDC_example.data.shape} ({type(GRDC_example.data)})')
-# print(f'GRDC_example.data: {GRDC_example.data}')
 print(f'GRDC_example.lats.shape: {GRDC_example.lats.shape} ({type(GRDC_example.lats)})')
-# print(f'GRDC_example.lats: {GRDC_example.lats}')
 print(f'GRDC_example.lons.shape: {GRDC_example.lons.shape} ({type(GRDC_example.lons)})')
-# print(f'GRDC_example.lons: {GRDC_example.lons}')
 print(f'GRDC_example.time.shape: {GRDC_example.time.shape} ({type(GRDC_example.time)})')
-# print(f'GRDC_example.time: {GRDC_example.time}')
 print(f'GRDC_example.meanArea.shape: {GRDC_example.meanArea.shape} ({type(GRDC_example.meanArea)})')
-# print(f'GRDC_example.meanArea: {GRDC_example.meanArea}')
 print(f'############################################################################')
 
 
@@ -165,7 +159,7 @@ Mapper  = catchyNAME.mapper.mapper(SimLons=SimLons, SimLats=SimLats,
 
 print(f'Map Catchment')
 Mapper.ObsMeanArea = GRDC_example.meanArea
-Mapper.MapBestCatchment(search_rad=3, slopex=slopex[0], slopey=slopey[0])
+Mapper.MapBestCatchment(search_rad=3, dy=dy, dx=dy, slopex=slopex[0], slopey=slopey[0])
 MapBestCatchment_X = Mapper.MapXIdx_fit
 MapBestCatchment_Y = Mapper.MapYIdx_fit
 
