@@ -230,6 +230,8 @@ for hwYear in hwYears:
     vmax = 24
     # why needed?
     varName = 'TSA'
+    # For mor detailed information about how plot_HeatWaveInvest() does work, see
+    # sloth/PlotLib.py --> plot_HeatWaveInvest()
     sloth.PlotLib.plot_HeatWaveInvest(abs_intensity_array=abs_intensity_array, dailyTime_hw=dailyTime_hw, 
         varName=varName, pixel_x=pixel_x, pixel_y=pixel_y, hwYear=hwYear,
         rel_intensity_array=rel_intensity_array, dailyMean_hw=dailyMean_hw, clima_smooth=clima_smooth, 

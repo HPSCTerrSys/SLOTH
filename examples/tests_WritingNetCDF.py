@@ -20,6 +20,8 @@ fileNameA = f'{dataRootDir}/{datasetName}/{procType}/{dataDate}/{varName}_ts.nc'
 
 fileNameB = '../data/example_WriteNetCDF/example_netCDF_EU11'
 
+# For mor detailed information about how createNetCDF() does work, see
+# sloth/toolBox.py --> createNetCDF()
 fileNameB = sloth.toolBox.createNetCDF(fileNameB, domain='EU11', fillValue=-123456, NBOUNDCUT=4)
 
 with nc.Dataset(fileNameA, 'r') as nc_fileA:

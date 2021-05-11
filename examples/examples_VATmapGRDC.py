@@ -78,6 +78,8 @@ print(f'slopey.shape: {slopey.shape}')
 ###############################################################################
 ### Initialize Diagnostics and calculate discharge (Q)
 ###############################################################################
+# For mor detailed information about how mappIndicator() does work, see
+# sloth/toolBox.py --> mappIndicator()
 indicatorMap = sloth.toolBox.mappIndicator(ParFlowNamelist=pflname, IndicatorFile=indicatorfile)
 alpha   = ht.array(indicatorMap['alpha'], is_split=0, comm=ht.MPI_WORLD)
 nvg     = ht.array(indicatorMap['nvg'], is_split=0, comm=ht.MPI_WORLD)
@@ -124,6 +126,8 @@ SimMeanQ = np.mean(Q, axis=0)
 ###############################################################################
 # provide list of individual GRDC files
 GRDCfiles    = sorted(glob.glob(f'{dataRootDir}/{GRDCdataset}/*.mon'))
+# For mor detailed information about how GRDCdataset() does work, see
+# sloth/GRDCdataset.py --> GRDCdataset()
 GRDC_example = sloth.GRDCdataset.GRDCdataset(GRDCfiles=GRDCfiles)
 # GRDC_example.filter_index(key='Country', value='DE')
 GRDC_example.filter_index(key='GRDC-No', value=['6122110', '6119200'])
@@ -152,6 +156,8 @@ SimLons = SimLons.numpy()
 SimLats = SimLats.numpy()
 slopex  = slopex.numpy()
 slopey  = slopey.numpy()
+# For mor detailed information about how mapper() does work, see
+# sloth/mapper.py --> mapper()
 Mapper  = sloth.mapper.mapper(SimLons=SimLons, SimLats=SimLats,
 	                ObsLons=GRDC_example.lons, ObsLats=GRDC_example.lats,
 	                ObsIDs=GRDC_example.id, 

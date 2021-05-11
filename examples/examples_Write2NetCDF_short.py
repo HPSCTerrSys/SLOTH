@@ -33,6 +33,8 @@ data = np.random.rand(5,2000,2000)
 ###############################################################################
 #### Create netCDF file and fill with basic attributes
 ###############################################################################
+# For mor detailed information about how createNetCDF() does work, see
+# sloth/toolBox.py --> createNetCDF()
 netCDFFileName = sloth.toolBox.createNetCDF(saveFile, domain='DE05', 
 	author='Niklas WAGNER', contact='n.wagner@fz-juelich.de',
 	institution='FZJ - IBG-3', history=f'Created: {dt.datetime.now().strftime("%Y-%m-%d %H:%M")}',

@@ -83,6 +83,8 @@ print(f'mask.shape: {mask.shape}')
 
 # reading pfl-namelist and map indicator file against
 print('reading pfl-namelist and map Indicator against')
+# For mor detailed information about how mappIndicator() does work, see
+# sloth/toolBox.py --> mappIndicator()
 indicatorMap = sloth.toolBox.mappIndicator(ParFlowNamelist=pflname, IndicatorFile=indicatorfile)
 dz_mult = ht.array(indicatorMap['dz_mult'], is_split=0, comm=ht.MPI_WORLD)
 dz      = indicatorMap['dz']
@@ -104,6 +106,8 @@ mask_numpy = mask.numpy()
 wtd_numpy = np.where(mask_numpy[0]==0,wtd_numpy,np.nan)
 
 print('plot')
+# For mor detailed information about how plot_SanityCheck_3D() does work, see
+# sloth/SanityCheck.py --> plot_SanityCheck_3D()
 sloth.SanityCheck.plot_SanityCheck_3D(data=wtd_numpy,
     kind='mean', figname='./examples_WTD.pdf',
     fig_title='WTD [m] (t,y,x)', minax_title='min', maxax_title='max', 
@@ -112,6 +116,8 @@ sloth.SanityCheck.plot_SanityCheck_3D(data=wtd_numpy,
 ###############################################################################
 #### Create netCDF file and fill with basic attributes
 ###############################################################################
+# For mor detailed information about how createNetCDF() does work, see
+# sloth/toolBox.py --> createNetCDF()
 netCDFFileName = sloth.toolBox.createNetCDF('./WTD_testFile.nc', domain='EU11', 
     author='Niklas WAGNER', contact='n.wagner@fz-juelich.de',
     institution='FZJ - IBG-3', history=f'Created: {dt.datetime.now().strftime("%Y-%m-%d %H:%M")}',

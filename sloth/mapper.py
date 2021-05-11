@@ -589,7 +589,7 @@ class mapper:
                     # Calculate area of catchment by multiplying with dx and dy
                     # Than change units from [m^2] to [km^2] to stay compatible to GRDC
                     tmp_catchmentMask *= dx*dy
-                    tmp_catchmentMask += 1./(1000.*1000.)
+                    tmp_catchmentMask *= 1./(1000.*1000.)
                     tmp_catchmentArea= np.nansum(tmp_catchmentMask)
                     # Add information for current inspected pixel in 
                     # temporary results list
