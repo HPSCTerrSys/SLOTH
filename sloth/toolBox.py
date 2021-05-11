@@ -36,13 +36,18 @@ class toolBox:
         This algorithem is 
 
         INPUT: 
-            slopex  - slopes in x-direction [2D ndarray]
-            slopey  - slopes in y-direction [2D ndarray]
-            x       - index in x-direction to calulate catchment from [int]
-            y       - index in y-direction to calulate catchment from [int]
+        slopex: 2D ndarray
+            slopes in x-direction
+        slopey: 2D ndarray
+            slopes in y-direction
+        x: int
+            index in x-direction to calulate catchment from 
+        y: int
+            index in y-direction to calulate catchment from
 
         RETURN:
-            catchment   - 2D ndarray of the same size as slopex/y. 0=not part of catchment; 1=part of catchment
+        catchment: 2D ndarray 
+            ndarray of the same size as slopex/y. 0 = not part of catchment; 1 = part of catchment
         """
         dims = slopey.shape
         nx = dims[1]
@@ -205,7 +210,6 @@ class toolBox:
             plt.close('all')
 
     def get_intervalSlice(dates, sliceInterval='month'):
-    # def get_intervalSlice(dates, dumpInterval, sliceInterval='month'):
         ''' This functions calculates interval slices of a given time-series
 
         This function calculates interval slices of a given time-series, 

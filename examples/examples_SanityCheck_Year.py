@@ -9,9 +9,9 @@ import glob
 import sys
 import os
 
-catchyNAME_path='../'
-sys.path.append(catchyNAME_path)
-import catchyNAME
+sloth_path='../'
+sys.path.append(sloth_path)
+import sloth
 
 ###############################################################################
 ### Define some paths, filenames, etc
@@ -62,8 +62,8 @@ maxax_title  = f'{varName} max'
 kinax_title  = f'{varName} mean'
 hisax_title  = f'{varName} mean - distribution'
 
-# use 'plot_SanityCheck_3D' from script catchyNAME/SanityCheck.py imported above
-catchyNAME.SanityCheck.plot_SanityCheck_3D(data=var, 
+# use 'plot_SanityCheck_3D' from script sloth/SanityCheck.py imported above
+sloth.SanityCheck.plot_SanityCheck_3D(data=var, 
         # below is optional
         data_mask=var_mask, kind='mean', figname=figname,
         lowerP=2, upperP=98, interactive=False,

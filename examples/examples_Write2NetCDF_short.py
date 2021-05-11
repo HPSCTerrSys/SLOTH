@@ -12,9 +12,9 @@ import numpy as np
 import datetime as dt
 import sys
 
-catchyNAME_path='../'
-sys.path.append(catchyNAME_path)
-import catchyNAME
+sloth_path='../'
+sys.path.append(sloth_path)
+import sloth
 
 
 ###############################################################################
@@ -33,7 +33,7 @@ data = np.random.rand(5,2000,2000)
 ###############################################################################
 #### Create netCDF file and fill with basic attributes
 ###############################################################################
-netCDFFileName = catchyNAME.toolBox.createNetCDF(saveFile, domain='DE05', 
+netCDFFileName = sloth.toolBox.createNetCDF(saveFile, domain='DE05', 
 	author='Niklas WAGNER', contact='n.wagner@fz-juelich.de',
 	institution='FZJ - IBG-3', history=f'Created: {dt.datetime.now().strftime("%Y-%m-%d %H:%M")}',
 	description='Write a short description of your data to ship with the netCDF files!',

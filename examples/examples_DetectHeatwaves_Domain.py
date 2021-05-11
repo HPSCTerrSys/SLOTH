@@ -11,9 +11,9 @@ import cftime
 from scipy import signal
 import scipy.ndimage as ndimage
 
-catchyNAME_path='../'
-sys.path.append(catchyNAME_path)
-import catchyNAME
+sloth_path='../'
+sys.path.append(sloth_path)
+import sloth
 
 ###############################################################################
 #### Define some paths, filenames, options, etc

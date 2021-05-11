@@ -6,9 +6,9 @@ import matplotlib.pyplot as plt
 import netCDF4 as nc
 import heat as ht
 
-catchyNAME_path='../'
-sys.path.append(catchyNAME_path)
-import catchyNAME
+sloth_path='../'
+sys.path.append(sloth_path)
+import sloth
 
 ext_src='../extern/ana_parflow-diagnostics_pythonheat'
 sys.path.append(ext_src)
@@ -78,7 +78,7 @@ print(f'slopey.shape: {slopey.shape}')
 ###############################################################################
 ### Initialize Diagnostics and calculate discharge (Q)
 ###############################################################################
-indicatorMap = catchyNAME.toolBox.mappIndicator(ParFlowNamelist=pflname, IndicatorFile=indicatorfile)
+indicatorMap = sloth.toolBox.mappIndicator(ParFlowNamelist=pflname, IndicatorFile=indicatorfile)
 alpha   = ht.array(indicatorMap['alpha'], is_split=0, comm=ht.MPI_WORLD)
 nvg     = ht.array(indicatorMap['nvg'], is_split=0, comm=ht.MPI_WORLD)
 sres    = ht.array(indicatorMap['sres'], is_split=0, comm=ht.MPI_WORLD)
@@ -124,7 +124,7 @@ SimMeanQ = np.mean(Q, axis=0)
 ###############################################################################
 # provide list of individual GRDC files
 GRDCfiles    = sorted(glob.glob(f'{dataRootDir}/{GRDCdataset}/*.mon'))
-GRDC_example = catchyNAME.GRDCdataset.GRDCdataset(GRDCfiles=GRDCfiles)
+GRDC_example = sloth.GRDCdataset.GRDCdataset(GRDCfiles=GRDCfiles)
 # GRDC_example.filter_index(key='Country', value='DE')
 GRDC_example.filter_index(key='GRDC-No', value=['6122110', '6119200'])
 # GRDC_example.filter_index_date(start='1979-01', end='1980-12', form='%Y-%m')
@@ -152,7 +152,7 @@ SimLons = SimLons.numpy()
 SimLats = SimLats.numpy()
 slopex  = slopex.numpy()
 slopey  = slopey.numpy()
-Mapper  = catchyNAME.mapper.mapper(SimLons=SimLons, SimLats=SimLats,
+Mapper  = sloth.mapper.mapper(SimLons=SimLons, SimLats=SimLats,
 	                ObsLons=GRDC_example.lons, ObsLats=GRDC_example.lats,
 	                ObsIDs=GRDC_example.id, 
 	                SimMeanQ=SimMeanQ, ObsMeanQ=np.nanmean(GRDC_example.data, axis=1))

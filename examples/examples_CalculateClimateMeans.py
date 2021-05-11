@@ -28,9 +28,9 @@ import os
 import glob
 import cftime
 
-catchyNAME_path='../'
-sys.path.append(catchyNAME_path)
-import catchyNAME
+sloth_path='../'
+sys.path.append(sloth_path)
+import sloth
 
 
 ###############################################################################
@@ -94,7 +94,7 @@ for file in files:
         timeUnits    = nc_time.units
 
     # Calculate the slices for the current file based on the choose meanInterval
-    dailySlices = catchyNAME.toolBox.get_intervalSlice(dates=dates, sliceInterval=meanInterval)
+    dailySlices = sloth.toolBox.get_intervalSlice(dates=dates, sliceInterval=meanInterval)
     # Loop over all slices, mask 'missing' values with np.nan, and calculate 
     # related mean. The averaged data gets appended for each file and slice.
     for Slice in dailySlices:
@@ -157,4 +157,4 @@ if meanInterval == 'month':
             #'dpi': 100,
             'figsize': (10, 4),
             }
-    catchyNAME.PlotLib.plot_ClimateYearMonth(clima, **kwargs)
+    sloth.PlotLib.plot_ClimateYearMonth(clima, **kwargs)

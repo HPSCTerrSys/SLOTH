@@ -4,9 +4,9 @@ import netCDF4 as nc
 from struct import pack, unpack
 import sys
 
-catchyNAME_path='../'
-sys.path.append(catchyNAME_path)
-import catchyNAME.ParFlow_IO as pio
+sloth_path='../'
+sys.path.append(sloth_path)
+import sloth.ParFlow_IO as pio
 
 ext_path='../extern/ana_parflow-diagnostics_pythonheat/'
 sys.path.append(ext_path)

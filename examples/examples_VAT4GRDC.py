@@ -5,9 +5,9 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import netCDF4 as nc
 
-catchyNAME_path='../'
-sys.path.append(catchyNAME_path)
-import catchyNAME
+sloth_path='../'
+sys.path.append(sloth_path)
+import sloth
 
 
 # 1) define where your GRDC dataset is located
@@ -20,7 +20,7 @@ files     = sorted(glob.glob(f'{file_path}/*.mon'))
 # 2) initialize GRDC dataset-object
 #    Below step creates a GRDCdataset instance defined with VAT, holding 
 #    the data and provides some useful functions to process the data-set.
-GRDC_example = catchyNAME.GRDCdataset.GRDCdataset(GRDCfiles=files)
+GRDC_example = sloth.GRDCdataset.GRDCdataset(GRDCfiles=files)
 
 # 3) filter your data
 #    GRDC datasets contains many stations all for different time-periods.

@@ -10,9 +10,9 @@ import sys
 import glob
 import copy
 
-catchyNAME_path='../'
-sys.path.append(catchyNAME_path)
-import catchyNAME
+sloth_path='../'
+sys.path.append(sloth_path)
+import sloth
 
 ###############################################################################
 ### Define some paths, filenames, etc
@@ -132,5 +132,5 @@ kwargs_imshow2PDiff = {
 ### Start plotting
 ###############################################################################
 print(f'Start plotting')
-catchyNAME.PlotLib.plot_imshow2PDiff(v1=var_D1_ave, v2=var_D2_ave,
+sloth.PlotLib.plot_imshow2PDiff(v1=var_D1_ave, v2=var_D2_ave,
         **kwargs_imshow2PDiff)

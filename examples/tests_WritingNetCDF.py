@@ -4,9 +4,9 @@ import matplotlib as mpl
 import sys
 import os
 
-catchyNAME_path='../'
-sys.path.append(catchyNAME_path)
-import catchyNAME
+sloth_path='../'
+sys.path.append(sloth_path)
+import sloth
 
 dataRootDir = '/p/scratch/cslts/shared_data/tmp_TestDataSet/samples'
 datasetName = 'ERA5Climat_EUR11_ECMWF-ERA5_analysis_FZJ-IBG3'
@@ -20,7 +20,7 @@ fileNameA = f'{dataRootDir}/{datasetName}/{procType}/{dataDate}/{varName}_ts.nc'
 
 fileNameB = '../data/example_WriteNetCDF/example_netCDF_EU11'
 
-fileNameB = catchyNAME.toolBox.createNetCDF(fileNameB, domain='EU11', fillValue=-123456, NBOUNDCUT=4)
+fileNameB = sloth.toolBox.createNetCDF(fileNameB, domain='EU11', fillValue=-123456, NBOUNDCUT=4)
 
 with nc.Dataset(fileNameA, 'r') as nc_fileA:
 	rlonA = nc_fileA.variables['rlon'][...]

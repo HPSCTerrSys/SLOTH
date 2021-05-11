@@ -8,9 +8,9 @@ import heat as ht
 import matplotlib.pyplot as plt
 import datetime as dt
 
-catchyNAME_path='../'
-sys.path.append(catchyNAME_path)
-import catchyNAME
+sloth_path='../'
+sys.path.append(sloth_path)
+import sloth
 
 
 def calc_WTD(press, dz, dz_mult):
@@ -83,7 +83,7 @@ print(f'mask.shape: {mask.shape}')
 
 # reading pfl-namelist and map indicator file against
 print('reading pfl-namelist and map Indicator against')
-indicatorMap = catchyNAME.toolBox.mappIndicator(ParFlowNamelist=pflname, IndicatorFile=indicatorfile)
+indicatorMap = sloth.toolBox.mappIndicator(ParFlowNamelist=pflname, IndicatorFile=indicatorfile)
 dz_mult = ht.array(indicatorMap['dz_mult'], is_split=0, comm=ht.MPI_WORLD)
 dz      = indicatorMap['dz']
 
@@ -104,7 +104,7 @@ mask_numpy = mask.numpy()
 wtd_numpy = np.where(mask_numpy[0]==0,wtd_numpy,np.nan)
 
 print('plot')
-catchyNAME.SanityCheck.plot_SanityCheck_3D(data=wtd_numpy,
+sloth.SanityCheck.plot_SanityCheck_3D(data=wtd_numpy,
     kind='mean', figname='./examples_WTD.pdf',
     fig_title='WTD [m] (t,y,x)', minax_title='min', maxax_title='max', 
     kinax_title='mean', cmapName='seismic')
@@ -112,7 +112,7 @@ catchyNAME.SanityCheck.plot_SanityCheck_3D(data=wtd_numpy,
 ###############################################################################
 #### Create netCDF file and fill with basic attributes
 ###############################################################################
-netCDFFileName = catchyNAME.toolBox.createNetCDF('./WTD_testFile.nc', domain='EU11', 
+netCDFFileName = sloth.toolBox.createNetCDF('./WTD_testFile.nc', domain='EU11', 
     author='Niklas WAGNER', contact='n.wagner@fz-juelich.de',
     institution='FZJ - IBG-3', history=f'Created: {dt.datetime.now().strftime("%Y-%m-%d %H:%M")}',
     description='I want tot est and more interactivly check WTD calculation!',
