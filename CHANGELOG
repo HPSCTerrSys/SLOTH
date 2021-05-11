@@ -1,0 +1,29 @@
+
+# Change Log
+All notable changes to this project will be documented in this file.
+ 
+The format is based on [Keep a Changelog](http://keepachangelog.com/)
+and this project adheres to [Semantic Versioning](http://semver.org/).
+ 
+## [Unreleased] - yyyy-mm-dd
+ 
+Here we write upgrading notes for brands. It's a team effort to make them as
+straightforward as possible.
+ 
+### Added
+
+### Changed
+ 
+### Fixed
+
+## [1.0.0] - 2021-05-11
+ 
+ 
+### Added
+
+### Changed
+
+Changed projects structure towards a python-package style.
+This e.g includes to only import one module, which further imports submodules, but still in a manner that the user can access individual submodule via dotnotation `module.submodule.function()`.
+
+### Fixed
