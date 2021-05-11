@@ -61,8 +61,8 @@ files = sorted(glob.glob(f'{dataRootDir}/{datasetName}/{procType}/*/{fileName}')
 # However we could also handle summer months (JJA) only and do a monthly based
 # calculation, in which case the Number of Intervals is NoI=3, as we do 
 # investigate 3 months only.
-meanInterval = 'day'
-NoI = 365
+meanInterval = 'month'
+NoI = 12
 
 
 ###############################################################################
@@ -94,6 +94,8 @@ for file in files:
         timeUnits    = nc_time.units
 
     # Calculate the slices for the current file based on the choose meanInterval
+    # For mor detailed information about how get_intervalSlice() does work, see
+    # sloth/toolBox.py --> get_intervalSlice()
     dailySlices = sloth.toolBox.get_intervalSlice(dates=dates, sliceInterval=meanInterval)
     # Loop over all slices, mask 'missing' values with np.nan, and calculate 
     # related mean. The averaged data gets appended for each file and slice.

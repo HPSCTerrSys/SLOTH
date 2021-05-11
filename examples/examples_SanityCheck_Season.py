@@ -66,7 +66,8 @@ maxax_title  = f'{varName} max'
 kinax_title  = f'{varName} mean'
 hisax_title  = f'{varName} mean - distribution'
 
-# use 'plot_SanityCheck_3D' from script sloth//SanityCheck.py imported above
+# For mor detailed information about how plot_SanityCheck_3D() does work, see
+# sloth/SanityCheck.py --> plot_SanityCheck_3D()
 sloth.SanityCheck.plot_SanityCheck_3D(data=var, 
         # below is optional
         data_mask=var_mask, kind='mean', figname=figname,

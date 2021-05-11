@@ -39,9 +39,9 @@ except FileNotFoundError:
 ##### CALCULATE ANOMALIES
 ###############################################################################
 try:
-    dailyAnomalyDomain = np.load(f'../data/example_ClimateMeans/IntervalyAnomalies_{meanInterval}.npy')
-    print(f'dailyAnomalyDomain.shape: {dailyAnomalyDomain.shape}')
-    print(f'dailyAnomalyDomain.dtype: {dailyAnomalyDomain.dtype}')
+    intervalAnomalyDomain = np.load(f'../data/example_ClimateMeans/IntervalyAnomalies_{meanInterval}.npy')
+    print(f'intervalAnomalyDomain.shape: {intervalAnomalyDomain.shape}')
+    print(f'intervalAnomalyDomain.dtype: {intervalAnomalyDomain.dtype}')
 except FileNotFoundError:
     intervalAnomalyDomain = np.empty(intervalMean.shape[0])
     for n, interval in enumerate(intervalMean):

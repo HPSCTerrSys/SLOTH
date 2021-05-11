@@ -20,6 +20,8 @@ files     = sorted(glob.glob(f'{file_path}/*.mon'))
 # 2) initialize GRDC dataset-object
 #    Below step creates a GRDCdataset instance defined with VAT, holding 
 #    the data and provides some useful functions to process the data-set.
+# For mor detailed information about how GRDCdataset() does work, see
+# sloth/GRDCdataset.py --> GRDCdataset()
 GRDC_example = sloth.GRDCdataset.GRDCdataset(GRDCfiles=files)
 
 # 3) filter your data
@@ -32,12 +34,16 @@ GRDC_example = sloth.GRDCdataset.GRDCdataset(GRDCfiles=files)
 #    with this filter-functions, meaning you can apply multiple filters to
 #    your dataset which are all added up.
 #    To be some clear, you can e.g.first filter for a country:
+# For mor detailed information about how filter_index() does work, see
+# sloth/GRDCdataset.py --> filter_index()
 GRDC_example.filter_index(key='Country', value='DE')
 #    and after this filter for a time-period - BUT DIFFERENT AS YOU THINK
 #    Note here the difference between 'filter-index' and 'filter_index_date':
 #    While 'filter_index' filters according to key-values pair straight forward
 #    'filter_index_date' does filter out those stations not fully covering the 
 #    provided time-period. 
+# For mor detailed information about how filter_index_date() does work, see
+# sloth/GRDCdataset.py --> filter_index_date()
 GRDC_example.filter_index_date(start='1979-01', end='1980-12', form='%Y-%m')
 #    At the end 'GRDC_example' does contain stations locate in Germany and
 #    holding data for the period 1980-01 to 1980-12.
@@ -50,6 +56,8 @@ GRDC_example.filter_index_date(start='1979-01', end='1980-12', form='%Y-%m')
 #    As 'filter_index_date' do remove those stations without data in given 
 #    time-period, here you can really define which time period you want to
 #    store with you final data-set
+# For mor detailed information about how read_files() does work, see
+# sloth/GRDCdataset.py --> read_files()
 GRDC_example.read_files(start='1980-01-01', end='1980-12-31', form='%Y-%m-%d')
 
 # 5) inspect your data
