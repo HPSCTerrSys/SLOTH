@@ -188,6 +188,7 @@ def plot_MappedSubAreas(mapper, fit_name='NotSet', search_rad=3, save_dir='../da
         x_sliced = mapper.MapXIdx_fit[idx] - ( rawX - search_rad)
         y_sliced = mapper.MapYIdx_fit[idx] - ( rawY - search_rad)
         ax.scatter(x_sliced, y_sliced, c='red', marker='o', label='best')
+        ax.legend()
         title_strs = [
                    f'GRDC-ID: {ID}',
                    f'fit-routine used: {fit_name}',
@@ -197,7 +198,7 @@ def plot_MappedSubAreas(mapper, fit_name='NotSet', search_rad=3, save_dir='../da
                    # f'ObsMeanArea / SimMeanArea: {mapper.ObsMeanArea[idx] / mapper.SimMeanArea[idx]:.2f} m^2/m^2'
                    ]
         ax.set_title('\n'.join(title_strs))
-        fig.savefig(f'{save_dir}/Mapplot_{ID}.png', bbox_inches='tight', pad_inches=0)
+        fig.savefig(f'{save_dir}/MappedSubAreas_{fit_name}_{ID}.png', bbox_inches='tight', pad_inches=0)
         plt.close('all')
 
 def get_intervalSlice(dates, sliceInterval='month'):
@@ -462,37 +463,43 @@ def mappIndicator(ParFlowNamelist, IndicatorFile):
     # indi_input indinput, etc is individual for each namelist...!
     # maybe read all GeomInputs, stre as list, loop over all and merge.
     # if one is crashing, skip
-    GeomInputs = PFNamelistDict['GeomInput.indi_input.GeomNames']
+    GeomInputNames = PFNamelistDict['GeomInput.Names']
+    for GeomInputName in GeomInputNames:
+        try:
+            GeomInputs = PFNamelistDict[f'GeomInput.{GeomInputName}.GeomNames']
 
-    IndicatorInput = {GeomInput:int(PFNamelistDict[f'GeomInput.{GeomInput}.Value']) for GeomInput in GeomInputs}
-    # print(f'IndicatorInput: {IndicatorInput}')
-    vanGA_GeomNames = PFNamelistDict['Phase.Saturation.GeomNames']
-    # print(f'vanGA_GeomNames: {vanGA_GeomNames}')
-    tcl_vanGA_keys = [ ]
-    vanG_a = {vanGA_GeomName:float(PFNamelistDict[f'Geom.{vanGA_GeomName}.Saturation.Alpha']) for vanGA_GeomName in vanGA_GeomNames}
-    # print(f'vanG_a: {vanG_a}')
-    vanG_n = {vanGA_GeomName:float(PFNamelistDict[f'Geom.{vanGA_GeomName}.Saturation.N']) for vanGA_GeomName in vanGA_GeomNames}
-    vanG_sres = {vanGA_GeomName:float(PFNamelistDict[f'Geom.{vanGA_GeomName}.Saturation.SRes']) for vanGA_GeomName in vanGA_GeomNames}
+            IndicatorInput = {GeomInput:int(PFNamelistDict[f'GeomInput.{GeomInput}.Value']) for GeomInput in GeomInputs}
+            # print(f'IndicatorInput: {IndicatorInput}')
+            vanGA_GeomNames = PFNamelistDict['Phase.Saturation.GeomNames']
+            # print(f'vanGA_GeomNames: {vanGA_GeomNames}')
+            tcl_vanGA_keys = [ ]
+            vanG_a = {vanGA_GeomName:float(PFNamelistDict[f'Geom.{vanGA_GeomName}.Saturation.Alpha']) for vanGA_GeomName in vanGA_GeomNames}
+            # print(f'vanG_a: {vanG_a}')
+            vanG_n = {vanGA_GeomName:float(PFNamelistDict[f'Geom.{vanGA_GeomName}.Saturation.N']) for vanGA_GeomName in vanGA_GeomNames}
+            vanG_sres = {vanGA_GeomName:float(PFNamelistDict[f'Geom.{vanGA_GeomName}.Saturation.SRes']) for vanGA_GeomName in vanGA_GeomNames}
 
-    ###############################################################################
-    ### prepare arrays to return
-    ###############################################################################
-    Indi3D = pio.read_pfb(f'{IndicatorFile}')
-    shape3D= Indi3D.shape
-    print(f'shape3D: {shape3D}')
-    alpha  = np.full(shape3D,vanG_a['domain'])
-    nvg    = np.full(shape3D,vanG_n['domain'])
-    sres   = np.full(shape3D,vanG_sres['domain'])
+            ###############################################################################
+            ### prepare arrays to return
+            ###############################################################################
+            Indi3D = pio.read_pfb(f'{IndicatorFile}')
+            shape3D= Indi3D.shape
+            print(f'shape3D: {shape3D}')
+            alpha  = np.full(shape3D,vanG_a['domain'])
+            nvg    = np.full(shape3D,vanG_n['domain'])
+            sres   = np.full(shape3D,vanG_sres['domain'])
 
-    ###############################################################################
-    ### mapp indicators to VanGenuchten parameter according to ParFlow-Namelist
-    ###############################################################################
-    for GeomName in vanGA_GeomNames:
-        if GeomName == 'domain':
+            ###############################################################################
+            ### mapp indicators to VanGenuchten parameter according to ParFlow-Namelist
+            ###############################################################################
+            for GeomName in vanGA_GeomNames:
+                if GeomName == 'domain':
+                    continue
+                alpha    = np.where(Indi3D == IndicatorInput[GeomName], vanG_a[GeomName], alpha)
+                nvg      = np.where(Indi3D == IndicatorInput[GeomName], vanG_n[GeomName], nvg)
+                sres     = np.where(Indi3D == IndicatorInput[GeomName], vanG_sres[GeomName], sres)
+        except KeyError:
             continue
-        alpha    = np.where(Indi3D == IndicatorInput[GeomName], vanG_a[GeomName], alpha)
-        nvg      = np.where(Indi3D == IndicatorInput[GeomName], vanG_n[GeomName], nvg)
-        sres     = np.where(Indi3D == IndicatorInput[GeomName], vanG_sres[GeomName], sres)
+
 
     outDict = {}
     outDict['alpha']   = alpha

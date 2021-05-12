@@ -110,13 +110,14 @@ diag = Diagnostics.Diagnostics(Mask=mask, Perm=perm,
     Terrainfollowing=True, Split=split)
 
 Q  = ht.full((press[:,0,...].shape),0,split=split)
+h2s = 1./(60.*60.) # convert h to sec
 for t in range(press.shape[0]):
     print(f'handle t={t}')
     Toplayerpress = diag.TopLayerPressure(Press=press[t])
     flowx, flowy = diag.OverlandFlow(Toplayerpress=Toplayerpress)
     flowx = ht.where(mask[0]!=0,flowx,0)
     flowy = ht.where(mask[0]!=0,flowy,0)
-    Q[t] = ht.abs(flowx)*dx + ht.abs(flowy)*dy
+    Q[t]  = (ht.abs(flowx)*dx + ht.abs(flowy)*dy) * h2s # convert [L^3/h] to [L^3/s]
 # convert from HeAT to numpy, as Diagnostics are based on HeAT
 Q = Q.numpy()
 SimMeanQ = np.mean(Q, axis=0)
@@ -130,7 +131,7 @@ GRDCfiles    = sorted(glob.glob(f'{dataRootDir}/{GRDCdataset}/*.mon'))
 # sloth/GRDCdataset.py --> GRDCdataset()
 GRDC_example = sloth.GRDCdataset.GRDCdataset(GRDCfiles=GRDCfiles)
 # GRDC_example.filter_index(key='Country', value='DE')
-GRDC_example.filter_index(key='GRDC-No', value=['6122110', '6119200'])
+GRDC_example.filter_index(key='GRDC-No', value=['6122110', '6119200', '6142520', '6335050'])
 # GRDC_example.filter_index_date(start='1979-01', end='1980-12', form='%Y-%m')
 GRDC_example.read_files(start='1980-01-01', end='1980-01-31', form='%Y-%m-%d')
 
@@ -163,9 +164,23 @@ Mapper  = sloth.mapper.mapper(SimLons=SimLons, SimLats=SimLats,
 	                ObsIDs=GRDC_example.id, 
 	                SimMeanQ=SimMeanQ, ObsMeanQ=np.nanmean(GRDC_example.data, axis=1))
 
+# For mor detailed information about how MapBestQ() does work, see
+# sloth/mapper.py --> MapBestQ()
+Mapper.MapBestQ(search_rad=2)
+# For mor detailed information about how plot_MappedSubAreas() does work, see
+# sloth/toolBox.py --> plot_MappedSubAreas()
+sloth.toolBox.plot_MappedSubAreas(mapper=Mapper, fit_name='BestQ', 
+    search_rad=10)
 print(f'Map Catchment')
 Mapper.ObsMeanArea = GRDC_example.meanArea
-Mapper.MapBestCatchment(search_rad=3, dy=dy, dx=dy, slopex=slopex[0], slopey=slopey[0])
+# For mor detailed information about how MapBestCatchment() does work, see
+# sloth/mapper.py --> MapBestCatchment()
+Mapper.MapBestCatchment(search_rad=2, dy=dy, dx=dy, 
+    slopex=slopex[0], slopey=slopey[0])
+# For mor detailed information about how plot_MappedSubAreas() does work, see
+# sloth/toolBox.py --> plot_MappedSubAreas()
+sloth.toolBox.plot_MappedSubAreas(mapper=Mapper, fit_name='BestCatchment', 
+    search_rad=10)
 MapBestCatchment_X = Mapper.MapXIdx_fit
 MapBestCatchment_Y = Mapper.MapYIdx_fit
 
