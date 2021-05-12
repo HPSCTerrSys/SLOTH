@@ -544,9 +544,9 @@ class mapper:
         search_rad : int 
             defining the radius around the origin pixel to search for best fitting catchment. 
         dy: float
-            defining the y-resolution of slope-grid
+            defining the y-resolution of slope-grid (in [m])
         dx: float
-            defining the x-resolution of slope-grid
+            defining the x-resolution of slope-grid (in [m])
         slopey: 2D ndarray
             defining the ParFlow slopes in y-direction used to calculate the catchment
         slopex: 2D ndarray
