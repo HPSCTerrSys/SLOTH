@@ -55,7 +55,7 @@ GRDCfiles    = sorted(glob.glob(f'{dataRootDir}/{GRDCdataset}/*.mon'))
 # sloth/GRDCdataset.py --> GRDCdataset()
 GRDC_example = sloth.GRDCdataset.GRDCdataset(GRDCfiles=GRDCfiles)
 # GRDC_example.filter_index(key='Country', value='DE')
-GRDC_example.filter_index(key='GRDC-No', value=['6122110', '6119200', '6142520', '6335050'])
+GRDC_example.filter_index(key='GRDC-No', value=['6122110', '6119200', '6142520', '6335050', '6142660'])
 # GRDC_example.filter_index_date(start='1979-01', end='1980-12', form='%Y-%m')
 GRDC_example.read_files(start='1997-01-01', end='2006-12-31', form='%Y-%m-%d')
 

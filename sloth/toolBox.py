@@ -181,7 +181,7 @@ def plot_MappedSubAreas(mapper, fit_name='NotSet', search_rad=3, save_dir='../da
         rawY = mapper.MapYIdx_raw[idx] 
         data2plot = mapper.SimMeanQ[rawY-search_rad:rawY+search_rad+1, rawX-search_rad:rawX+search_rad+1].copy()
         data2plot /= np.nanmax(mapper.SimMeanQ[rawY-search_rad:rawY+search_rad+1, rawX-search_rad:rawX+search_rad+1])
-        im = ax.imshow(data2plot)
+        im = ax.imshow(data2plot, origin='lower')
         fig.colorbar(im, ax=ax)
         # raw data is always the centre = search_rad
         ax.scatter(search_rad ,search_rad, c='red', marker='x', label='raw')
