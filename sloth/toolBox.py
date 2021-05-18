@@ -500,7 +500,6 @@ def mappIndicator(ParFlowNamelist, IndicatorFile):
         except KeyError:
             continue
 
-
     outDict = {}
     outDict['alpha']   = alpha
     outDict['nvg']     = nvg
