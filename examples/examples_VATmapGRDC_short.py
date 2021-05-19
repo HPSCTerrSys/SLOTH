@@ -55,8 +55,14 @@ GRDCfiles    = sorted(glob.glob(f'{dataRootDir}/{GRDCdataset}/*.mon'))
 # sloth/GRDCdataset.py --> GRDCdataset()
 GRDC_example = sloth.GRDCdataset.GRDCdataset(GRDCfiles=GRDCfiles)
 # GRDC_example.filter_index(key='Country', value='DE')
-GRDC_example.filter_index(key='GRDC-No', value=['6122110', '6119200', '6142520', '6335050', '6142660'])
-# GRDC_example.filter_index_date(start='1979-01', end='1980-12', form='%Y-%m')
+GRDC_example.filter_index(key='Catchment area', value=1000, operant='>')
+# GRDC_example.filter_index(key='GRDC-No', value=[6233201], operant='in')
+# GRDC_example.filter_index(key='GRDC-No', value=[6122110, 6119200, 6142520, 6335050, 6142660], operant='in')
+# GRDC_example.dump_index(keys2dump=['GRDC-No', 'River', 'Country',
+#                                    'Date start', 'Date end', 'Catchment area'])
+# Filtering for time-period of interest is important, as read_files() is 'stupid' 
+# and will crash if time-period is incomplete 
+GRDC_example.filter_index_date(start='1997-01', end='2007-01', form='%Y-%m')
 GRDC_example.read_files(start='1997-01-01', end='2006-12-31', form='%Y-%m-%d')
 
 print(f'############################################################################')
@@ -92,7 +98,7 @@ print(f'Map Catchment')
 Mapper.ObsMeanArea = GRDC_example.meanArea
 # For mor detailed information about how MapBestCatchment() does work, see
 # sloth/mapper.py --> MapBestCatchment()
-Mapper.MapBestCatchment(search_rad=2, dy=3000, dx=3000, slopex=slopex, slopey=slopey)
+Mapper.MapBestCatchment(search_rad=3, dy=3000, dx=3000, slopex=slopex, slopey=slopey)
 # For mor detailed information about how plot_MappedSubAreas() does work, see
 # sloth/toolBox.py --> plot_MappedSubAreas()
 sloth.toolBox.plot_MappedSubAreas(mapper=Mapper, fit_name='BestCatchment', search_rad=10)

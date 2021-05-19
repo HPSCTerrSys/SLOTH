@@ -131,8 +131,8 @@ GRDCfiles    = sorted(glob.glob(f'{dataRootDir}/{GRDCdataset}/*.mon'))
 # sloth/GRDCdataset.py --> GRDCdataset()
 GRDC_example = sloth.GRDCdataset.GRDCdataset(GRDCfiles=GRDCfiles)
 # GRDC_example.filter_index(key='Country', value='DE')
-GRDC_example.filter_index(key='GRDC-No', value=['6122110', '6119200', '6142520', '6335050'])
-# GRDC_example.filter_index_date(start='1979-01', end='1980-12', form='%Y-%m')
+GRDC_example.filter_index(key='GRDC-No', value=[6122110, 6119200, 6142520, 6335050], operant='in')
+GRDC_example.filter_index_date(start='1979-01', end='1980-12', form='%Y-%m')
 GRDC_example.read_files(start='1980-01-01', end='1980-01-31', form='%Y-%m-%d')
 
 print(f'############################################################################')
@@ -175,7 +175,7 @@ print(f'Map Catchment')
 Mapper.ObsMeanArea = GRDC_example.meanArea
 # For mor detailed information about how MapBestCatchment() does work, see
 # sloth/mapper.py --> MapBestCatchment()
-Mapper.MapBestCatchment(search_rad=2, dy=dy, dx=dy, 
+Mapper.MapBestCatchment(search_rad=3, dy=dy, dx=dy, 
     slopex=slopex[0], slopey=slopey[0])
 # For mor detailed information about how plot_MappedSubAreas() does work, see
 # sloth/toolBox.py --> plot_MappedSubAreas()

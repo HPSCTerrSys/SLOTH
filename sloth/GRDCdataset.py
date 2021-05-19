@@ -10,7 +10,7 @@ class GRDCdataset():
 
     This class (GRDCdataset()) is aimed to easily handle GRDC datasets, 
     which are usually stored in individual files per station and therefore
-    are not really easy to insect / to get an overview.
+    are not really easy to inspect / to get an overview.
 
     Therefore this class offers functions to:
     -) read in entire GRC datasets
@@ -250,7 +250,40 @@ class GRDCdataset():
 
         self.GRDCindexObj = (header, entries)
 
-    def filter_index(self, key, value, indexObj=None, store=True):
+    def check_filter_index(self, key, value, operant, indexObj):
+        ''' This is a separate function to keep filter_index() functions readable.
+
+        This function checks if the passed data fulfills some basic 
+        requirements as e.g. if the passed operant is supported. 
+        This is basically to avoid trivial errors while using this class.
+
+        Return value:
+        -------------
+        __: boolean 
+            True if check is passed, False if some errors are detected.
+
+        '''
+        # Check if passed operant is supported, while supported operants
+        # are hard-coded below
+        supportedOperants = ['=', '==', '<', '<=', '>', '>=', 'in']
+        if operant not in supportedOperants:
+            print(f'ERROR GRDCdataset.filter_index(): operant ({operant}) is not supported ({supportedOperants})')
+            return False
+        # Check if value is a list in case operant == 'in'
+        if not ( (operant == 'in') == (isinstance(value, list)) ):
+            print(f'ERROR GRDCdataset.filter_index(): value type ({type(value)}) is not supported by operant = "{operant}"')
+            return False
+        # Check if key is in header
+        try:
+            header  = indexObj[0]
+            key_idx = header.index(key)
+        except ValueError:
+            print(f'ERROR GRDCdataset.filter_index(): key ({key}) is not found in indexObj-header ({indexObj[0]})')
+            return False
+
+        return True
+
+    def filter_index(self, key, value, operant=None, indexObj=None, store=True):
         ''' This function filters a GRDCindexObj
 
         To access individual entries of a GRDC data-set one need to filter 
@@ -283,6 +316,12 @@ class GRDCdataset():
             List of string of GRDCindexFile header to filter
         value: list
             List of values (str) which to keep after filtering
+        operant: str
+            String defining how to filter data. E.g 
+            -) Finding all stations inside DE:
+            key='Country', value='DE', operant='=='
+            -) Finding all stations which catchment is bigger than X:
+            key='Catchment area', value=X, operant='>'
         indexObj: tuple
             Tuple of two lists, where first entry is the index header, and second entry is the index body
             This parameter is reserved for more complex filtering
@@ -293,12 +332,34 @@ class GRDCdataset():
         '''
         # use self.GRDCindexObj is nothing is passed
         indexObj = indexObj if not indexObj is None else self.GRDCindexObj
+        #check if passed arguments are correct / expected
+        if not self.check_filter_index(key=key, value=value, operant=operant, indexObj=indexObj):
+            print('ERROR: check_filter_index() failed --> self.filter_index() canceled!')
+            sys.exit(1)
 
         header  = indexObj[0]
         key_idx = header.index(key)
         entries = indexObj[1]
-        entries_filtered = [row for row in entries if row[key_idx] in value]
-
+        if operant in ['=', '==']:
+            try:
+                entries_filtered = [row for row in entries if float(row[key_idx]) == value]
+            except ValueError:
+                entries_filtered = [row for row in entries if row[key_idx] == value]
+        elif operant == 'in':
+            try:
+                entries_filtered = [row for row in entries if float(row[key_idx]) in value]
+            except ValueError:
+                entries_filtered = [row for row in entries if row[key_idx] in value]
+        elif operant == '<':
+            entries_filtered = [row for row in entries if float(row[key_idx]) < value]
+        elif operant == '<=':
+            entries_filtered = [row for row in entries if float(row[key_idx]) <= value]
+        elif operant == '>':
+            entries_filtered = [row for row in entries if float(row[key_idx]) > value]
+        elif operant == '>=':
+            entries_filtered = [row for row in entries if float(row[key_idx]) >= value]
+        else:
+            print(f'GRDCdataset.filter_index(): Could not manage to filter the data ERROR')
         # only store result in current object if wanted.
         # true is default but to keep the option to say no
         if store:
@@ -414,7 +475,8 @@ class GRDCdataset():
         for n, row in enumerate(entries):
             tmp_out = [row[idx] for idx in key_idx]
             # Truncate output if string is too long
-            tmp_out = [(item[:10] + '..') if len(item) > 10 else item for item in tmp_out]
+            tmp_out = ['{:10.10}'.format(item) for item in tmp_out] 
+            # tmp_out = [(item[:10] + '..') if len(item) > 10 else item for item in tmp_out]
 
             print(f'{n:03}', '\t'.join(tmp_out))
 
