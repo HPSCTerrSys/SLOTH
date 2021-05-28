@@ -329,7 +329,7 @@ if __name__=='__main__':
     var_mask  = var.mask
     if not var_mask.any():
         var_mask  = np.zeros(var.shape, dtype=bool)
-        var       = var.filled(fill_value=np.nan)
+    var       = var.filled(fill_value=np.nan)
     if maskValueLower is not None:
         var[var <= maskValueLower] = np.nan
     if maskValueUpper is not None:
@@ -341,11 +341,11 @@ if __name__=='__main__':
         f'Var: {varname} -- Slices: {Slices}',
     ]
     fig_title    = '\n'.join(tmp_title_str)
-    figname      = f'{filename}_SanityCheck_t{Slices[0]}.pdf'
+    figname      = f'{filename}_SanityCheck.pdf'
     minax_title  = f'{varname} min'
     maxax_title  = f'{varname} max'
-    kinax_title  = f'{varname} sum'
-    hisax_title  = f'{varname} sum - distribution'
+    kinax_title  = f'{varname} mean'
+    hisax_title  = f'{varname} mean - distribution'
 
     if ND == '3D':
         plot_SanityCheck_3D(data=var, data_mask=var_mask, kind='mean', figname=figname,
