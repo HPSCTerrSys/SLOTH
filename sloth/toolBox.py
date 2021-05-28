@@ -258,7 +258,7 @@ def get_intervalSlice(dates, sliceInterval='month'):
         return False
     else:
         dumpInterval = tmp_dumpInterval[0]
-        print(f'DONE')        
+        print(f'DONE --> DumpInterval: {dumpInterval}')        
     
     # Finding the first time-step of a interval, by looping over the time-series and 
     # check for each time-step if this is the first of the interval (break loop if found).
@@ -282,9 +282,16 @@ def get_intervalSlice(dates, sliceInterval='month'):
             # using the first of current month at midnight as reference
             tmp_first_ref = tmp_first.replace(day=1, hour=0, minute=0, second=0)
 
-        if (tmp_first - dumpInterval) == tmp_first_ref:
+        # First time-step of dates is already first of a interval
+        if (tmp_first == tmp_first_ref):
             print(f'check step {Offset} is first of a month at midnight')
             break
+        #if (tmp_first - dumpInterval) == tmp_first_ref:
+        #    print(f'check step {Offset} is first of a month at midnight')
+        #    break
+        # First time-step is not the exact first of a interval but set in
+        # middle of time-bounds and therefore halfe a dumpInteral away from
+        # first date of a interval
         elif (tmp_first - (0.5*dumpInterval)) == tmp_first_ref:
             print(f'check step {Offset} is first of a month at midnight')
             break
@@ -301,7 +308,7 @@ def get_intervalSlice(dates, sliceInterval='month'):
     # next time-step belong to the next interval.
     # NWR 20210422:
     # there should be some clever and short solution for below loop ...!
-    # now that we know the dumpInterval and first step is first of month...
+    # now that we know the dumpInterval and first step is first of interval...
     print(f'########################################################################')
     print(f'#### getting month series / slices')
     print(f'########################################################################')
