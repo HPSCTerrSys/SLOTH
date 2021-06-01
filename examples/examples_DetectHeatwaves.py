@@ -20,18 +20,18 @@ import sloth
 # set start and end date of climatology (already calculated)
 # date_start_clim = cftime.datetime(1965, 6, 1, calendar='noleap')
 # date_final_clim = cftime.datetime(1986, 1, 1, calendar='noleap')
-dailyMeanFile  = f'../data/example_ClimateMeans/intervalMean_day.npy'
-dailyTimeFile  = f'../data/example_ClimateMeans/intervalTime_day.npy'
-refClimatology = f'../data/example_ClimateMeans/climate_day.npy'
+dailyMeanFile  = f'../data/example_ClimateMeans/intervalMean_day_060708.npy'
+dailyTimeFile  = f'../data/example_ClimateMeans/intervalTime_day_060708.npy'
+refClimatology = f'../data/example_ClimateMeans/climate_day_060708.npy'
 
 # For full years and monthly means --> NoI 12 (12 month per year)
 # For full years and daily means   --> NoI 365 (365 days per year)
 # We do use daily means for full years
-NoI = 365
+NoI = 92
 
 # Year to investigate for HeatWaves (HW)
 # currently only one year possible!
-hwYears = [1984]#, 1973]
+hwYears = [1973]#, 1973]
 
 # HW investigation performed with this script is based on percentile 
 # calculation. To 'smooth' the calculation the percentiles are calculated not
