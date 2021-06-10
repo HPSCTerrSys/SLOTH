@@ -26,7 +26,7 @@ refClimatology = f'../data/example_ClimateMeans/climate_day_060708.npy'
 
 # For full years and monthly means --> NoI 12 (12 month per year)
 # For full years and daily means   --> NoI 365 (365 days per year)
-# We do use daily means for full years
+# For JJA daily means              --> NoI 30+31+31 = 62 (92 days in JJA)
 NoI = 92
 
 # Year to investigate for HeatWaves (HW)
