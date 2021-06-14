@@ -124,7 +124,7 @@ for file in files:
 
         # Dumping np.ma arrays to .npy is not possible, so fill tmp_monthMean 
         # with np.nan before
-        tmp_monthMean = tmp_var.filled(fill_value=np.nan)
+        tmp_monthMean = tmp_monthMean.filled(fill_value=np.nan)
         tmp_IntervalMean.append(tmp_monthMean)
         tmp_IntervalTime.append(tmp_timeMean)
         print(f'len(tmp_IntervalMean): {len(tmp_IntervalMean)}')
