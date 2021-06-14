@@ -40,13 +40,12 @@ dataRootDir = '/p/scratch/cslts/shared_data/tmp_TestDataSet/samples'
 datasetName = 'ERA5Climat_EUR11_ECMWF-ERA5_analysis_FZJ-IBG3'
 procType    = 'postpro'
 # CLM style
-varName = 'tas'
+varName = 'TSA'
 fileName = f'{varName}.nc'
 # COSMO style
 #varName = 'T_2M'
 #fileName = f'{varName}_ts.nc'
 files = sorted(glob.glob(f'{dataRootDir}/{datasetName}/{procType}/*/{fileName}'))
-files = sorted(glob.glob('/p/scratch/cjibg35/tsmpforecast/development/tmp/tas_EUR-11_NCC-NorESM1-M_historical_r1i1p1_CLMcom-ETH-COSMO-crCLIM-v1-1_v1_day_19710101-19751231.nc'))
 
 # Climatology calculations are always based on comparisons of individual 
 # intervals between different years. 
@@ -85,49 +84,41 @@ for file in files:
     # Open the file and read in data and time
     with nc.Dataset(file, 'r') as nc_file:
         data  = nc_file.variables[varName]
-        print(f'data.shape: {data.shape}')
-        # add some chekc here if ndims is correct
-        # Extract data, units, time, etc for later usage.
-        data         = data[...]
         nc_time      = nc_file.variables['time']
         calendar     = nc_time.calendar
         dates        = nc.num2date(nc_time[:],units=nc_time.units,calendar=nc_time.calendar)
         timeValues   = nc_time[:]
         timeCalendar = nc_time.calendar
         timeUnits    = nc_time.units
+        print(f'data.shape: {data.shape}')
+        print(f'dates.shape: {dates.shape}')
 
-    # Calculate the slices for the current file based on the choose meanInterval
-    # For mor detailed information about how get_intervalSlice() does work, see
-    # sloth/toolBox.py --> get_intervalSlice()
-    dailySlices = sloth.toolBox.get_intervalSlice(dates=dates, sliceInterval=meanInterval)
-    # Loop over all slices, mask 'missing' values with np.nan, and calculate 
-    # related mean. The averaged data gets appended for each file and slice.
-    for Slice in dailySlices:
-        # Skip dates not in valid range
-        tmp_dates    = dates[Slice]
-        monthsValid   = [ date.month in validMonths for date in tmp_dates]
-        if not all(monthsValid):
-            continue
-        tmp_time     = timeValues[Slice]
-        tmp_time     = tmp_time.filled(fill_value=np.nan)
-        tmp_var      = data[Slice]
-        #tmp_var_mask = tmp_var.mask
-        #if not tmp_var_mask.any():
-        #    tmp_var_mask  = np.zeros(tmp_var.shape, dtype=bool)
-        #tmp_var       = tmp_var.filled(fill_value=np.nan)
-
-        # tmp_timeMean  = np.nanmean(tmp_time, axis=0, keepdims=True)
-        tmp_timeMean  = np.mean(tmp_time, axis=0, keepdims=True)
-        tmp_timeMean  = nc.num2date(tmp_timeMean, units=timeUnits,calendar=timeCalendar)
-        # tmp_monthMean = np.nanmean(tmp_var, axis=0, keepdims=True, dtype=float)
-        tmp_monthMean = np.mean(tmp_var, axis=0, keepdims=True, dtype=float)
-
-        # Dumping np.ma arrays to .npy is not possible, so fill tmp_monthMean 
-        # with np.nan before
-        tmp_monthMean = tmp_monthMean.filled(fill_value=np.nan)
-        tmp_IntervalMean.append(tmp_monthMean)
-        tmp_IntervalTime.append(tmp_timeMean)
-        print(f'len(tmp_IntervalMean): {len(tmp_IntervalMean)}')
+        # Calculate the slices for the current file based on the choose meanInterval
+        # For mor detailed information about how get_intervalSlice() does work, see
+        # sloth/toolBox.py --> get_intervalSlice()
+        dailySlices = sloth.toolBox.get_intervalSlice(dates=dates, sliceInterval=meanInterval)
+        # Loop over all slices, mask 'missing' values with np.nan, and calculate 
+        # related mean. The averaged data gets appended for each file and slice.
+        for Slice in dailySlices:
+            # Skip dates not in valid range
+            tmp_dates    = dates[Slice]
+            monthsValid   = [ date.month in validMonths for date in tmp_dates]
+            if not all(monthsValid):
+                continue
+            tmp_time     = timeValues[Slice]
+            tmp_time     = tmp_time.filled(fill_value=np.nan)
+            tmp_var      = data[Slice]
+        
+            tmp_timeMean  = np.mean(tmp_time, axis=0, keepdims=True)
+            tmp_timeMean  = nc.num2date(tmp_timeMean, units=timeUnits,calendar=timeCalendar)
+            tmp_monthMean = np.mean(tmp_var, axis=0, keepdims=True, dtype=float)
+   
+            # Dumping np.ma arrays to .npy is not possible, so fill tmp_monthMean 
+            # with np.nan before
+            tmp_monthMean = tmp_monthMean.filled(fill_value=np.nan)
+            tmp_IntervalMean.append(tmp_monthMean)
+            tmp_IntervalTime.append(tmp_timeMean)
+            print(f'len(tmp_IntervalMean): {len(tmp_IntervalMean)}')
 
 
     print('##################')
