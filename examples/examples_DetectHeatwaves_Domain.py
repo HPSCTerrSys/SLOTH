@@ -146,6 +146,11 @@ for hwYear in hwYears:
     events = events[1:,...]
     print(f'events.shape: {events.shape}')
     print(f'Number of events (groups of days) exceeding 90th percentile: {n_events}')
+    # store temporal and spartial event information (t,y,x) to disk:
+    if not os.path.exists(f'../data/example_HWevents/'):
+        os.makedirs(f'../data/example_HWevents/')
+    with open(f'../data/example_HWevents/Events_{hwYear}.npy', 'wb') as f:
+        np.save(f, events)
 
     # Labels are unique so np.unique(a, return_counts=True)) could be used
     # to count occurrence of individual events which is equal to event-duration
@@ -174,7 +179,7 @@ for hwYear in hwYears:
     ALL_event_labels.append(event_labels)
     ALL_event_label_counts.append(event_label_counts)
     print(f'Numbers of the heat-events exceeding min. length of {minDuration} days: {event_label_counts[event_label_counts>=minDuration].shape} event')
-     
+    
     ###############################################################################
     #### Calculate some HW properties as intensity etc.
     ###############################################################################
