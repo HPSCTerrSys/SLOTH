@@ -50,11 +50,13 @@ except FileNotFoundError:
 HWeventDurations = []
 for HwStatsFile in HwStatsFiles:
     print(f'HwStatsFile: {HwStatsFile}')
+    # HW were stored as python-dicts. Therefore it is needed to read those in
+    # with the flag 'allow_pickle=True' 
     HwStats = np.load(HwStatsFile, allow_pickle=True)
-    #print(f'type(HwStats): {type(HwStats)}')
+    # Further 'np.load()' does return a numpy ndarray, that we need to extract 
+    # the item to get a dict again.
     HwStats = HwStats.item()
-    #print(f'type(HwStats): {type(HwStats)}')
-    #print(f'HwStats.keys(): {HwStats.keys()}')
+    
     tmp_HWeventDurations = [HwStats[key]['duration'] for key in HwStats.keys()]
     HWeventDurations += tmp_HWeventDurations
 
@@ -66,10 +68,13 @@ events_list = []
 eventsDuration_list = []
 for EvStatsFile in EvStatsFiles:
     print(f'EvStatsFile: {EvStatsFile}')
-    EvStats = np.load(EvStatsFile)#, allow_pickle=True)
-    #EvStats = EvStats.item()
+    EvStats = np.load(EvStatsFile)
     events_list.append(EvStats)
-    #
+    
+    # EvStats does contain the 3D information if pixel does exceed the 90p
+    # TSA value. Further those are labeld, that connected pixel share the same
+    # label. This way 'counting' (np.unique(EvStats, return_counts=True)) does
+    # return the length / duration of each individual event
     tmp_eventsLabel, tmp_eventsDuration = np.unique(EvStats, return_counts=True)
     # remove (slice out) label 0, as is is 'no HW'
     tmp_eventsDuration = tmp_eventsDuration[1:]
@@ -86,15 +91,11 @@ print(f'eventsDuration: \n{eventsDuration}')
 ###############################################################################
 # set array of individual durations in days
 days = np.arange(1,26)
-# Find and sum up all events equal to some ref-value, what is equal of finding
-# and counting events equal to a given duration.
-# (--1--) >> np.sum(ALL_event_label_counts==tmpThreshold)
-# Apply this to all values / durations / days and save as ndarray
-# (--2--) >> np.array([ (--1--) for tmpThreshold in days] )
 eventsA = np.array([ np.sum(eventsDuration==tmpThreshold) for tmpThreshold in days] )
 # normalize by 'land-pixel'
 eventsA_mean = eventsA / landPixels
 eventsB = np.array([ np.sum(eventsDuration>=tmpThreshold) for tmpThreshold in days] )
+# normalize by 'land-pixel'
 eventsB_mean = eventsB / landPixels
 
 fig, ax = plt.subplots(figsize=(9,5))
@@ -110,6 +111,8 @@ plt.savefig(f'Test_{projectName}.pdf')
 ###############################################################################
 #### Plot stuff on p.5 LPO
 ###############################################################################
+# Count non-zero values in 3D events. This way one gets the accumulated
+# hot-days for each pixel over time.
 accumulated_events = np.count_nonzero(events[:92], axis=0)
 fig, ax = plt.subplots(figsize=(9,5))
 ax.set_title(f'{projectName} Accumulated hot days > 90p TSA prec. for JJA 1979')
