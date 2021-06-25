@@ -6,6 +6,7 @@ from . import ParFlow_IO
 from . import PlotLib
 from . import SanityCheck
 from . import VanG
+from . import analysis
 
 # Importing external repos
 # Those are defined in sloth/extern.py
