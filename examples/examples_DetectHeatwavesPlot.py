@@ -3,6 +3,7 @@
 [ADD SOME DESCRIPTIN HERE]
 """
 import numpy as np
+import netCDF4 as nc
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import sys
@@ -17,84 +18,52 @@ import sloth
 ###############################################################################
 #### Define some paths, filenames, options, etc
 ###############################################################################
-rootDateDir       = '/p/project/cesmtst/poshyvailo1/SLOTH/data'
+#rootDateDir       = '/p/project/cesmtst/poshyvailo1/SLOTH/data'
+rootDateDir       = '../data'
 #projectName       = 'IPSL-IPSL-CM5A-LR_REMO2015'
-projectName       = 'TSMP_MPI-ESM-LR'
-refClimatology    = f'{rootDateDir}/example_ClimateMeans/climate_day_{projectName}_1976_2005.npy'
-HwFileNamePattern = f'HWevents_????_{projectName}.npy'
-EvFileNamePattern = f'Events_????_{projectName}.npy'
+projectName       = 'TSMP_ERA5'
+EvFileNamePattern = f'Events_????_{projectName}.nc'
+EvFiles = sorted(glob.glob(f'{rootDateDir}/example_HWevents/{projectName}/{EvFileNamePattern}'))
 
-HwStatsFiles = sorted(glob.glob(f'{rootDateDir}/example_HWevents/{projectName}/{HwFileNamePattern}'))
-EvStatsFiles = sorted(glob.glob(f'{rootDateDir}/example_HWevents/{projectName}/{EvFileNamePattern}'))
-#EvStatsFiles = sorted(glob.glob(f'{rootDateDir}/example_HWevents/{projectName}/{EvFileNamePattern}'))
-#print(f'HWstatsFiles: {HWstatsFiles}')
+days = np.arange(1,26)
+###############################################################################
+##### Read in all events -- 'examples_DetectHeatwaves_Domain.py'
+###############################################################################
+accumulated_events = []
+eventsA = []
+eventsB = []
+for EvFile in EvFiles:
+    print(f'EvFile: {EvFile}')
+    with nc.Dataset(EvFile, 'r') as nc_file:
+        events = nc_file.variables['events'][...]
+        # MASK 'EVENTS' HERE WITH LAND SEA MASK OR WHATEVER YOU WANT
 
-###############################################################################
-##### Read in climatology calculated with 'examples_CalculateClimateMeans.py
-##### those are only needed for 'landPixeld' --> how to better solve this?
-###############################################################################
-try:
-    clima = np.load(refClimatology)
+        # 'events' does contain the 3D information if pixel does exceed the 90p
+        # threshold. Further those pixels are labeled, that connected pixel 
+        # share the same value. This way 'counting' 
+        # (np.unique(EvStats, return_counts=True)) does return the 
+        # length / duration of each individual event
+        eventsLabel, eventsDuration = np.unique(events, return_counts=True)
+        # remove (slice out) label 0, as this is 'not a hot day'
+        eventsDuration = eventsDuration[1:]
 
-    # mask holding 1 where land
-    mask = np.zeros_like(clima[0])
-    mask[clima[0]!=np.nan] = 1
-    landPixels = np.sum(mask)
-except FileNotFoundError:
-    print(f'ERROR: not all needed files were not found: EXIT')
-    sys.exit()
-
-###############################################################################
-##### Read in HwStats created with 'examples_DetectHeatwaves_Domain.py'
-###############################################################################
-HWeventDurations = []
-for HwStatsFile in HwStatsFiles:
-    print(f'HwStatsFile: {HwStatsFile}')
-    # HW were stored as python-dicts. Therefore it is needed to read those in
-    # with the flag 'allow_pickle=True' 
-    HwStats = np.load(HwStatsFile, allow_pickle=True)
-    # Further 'np.load()' does return a numpy ndarray, that we need to extract 
-    # the item to get a dict again.
-    HwStats = HwStats.item()
+        eventsA.append([ np.sum(eventsDuration==tmpThreshold) for tmpThreshold in days] )
+        eventsB.append([ np.sum(eventsDuration>=tmpThreshold) for tmpThreshold in days] )
+        accumulated_events.append(np.count_nonzero(events, axis=0))
     
-    tmp_HWeventDurations = [HwStats[key]['duration'] for key in HwStats.keys()]
-    HWeventDurations += tmp_HWeventDurations
-
-
-###############################################################################
-##### Read in all events created with 'examples_DetectHeatwaves_Domain.py'
-###############################################################################
-events_list = []
-eventsDuration_list = []
-for EvStatsFile in EvStatsFiles:
-    print(f'EvStatsFile: {EvStatsFile}')
-    EvStats = np.load(EvStatsFile)
-    events_list.append(EvStats)
-    
-    # EvStats does contain the 3D information if pixel does exceed the 90p
-    # TSA value. Further those are labeld, that connected pixel share the same
-    # label. This way 'counting' (np.unique(EvStats, return_counts=True)) does
-    # return the length / duration of each individual event
-    tmp_eventsLabel, tmp_eventsDuration = np.unique(EvStats, return_counts=True)
-    # remove (slice out) label 0, as is is 'no HW'
-    tmp_eventsDuration = tmp_eventsDuration[1:]
-    print(f'type(tmp_eventsDuration): {type(tmp_eventsDuration)}')
-    eventsDuration_list.append(tmp_eventsDuration)
-    print(f'EvStats.shape: {EvStats.shape}')
-events         = np.concatenate(events_list, axis=0)
-print(f'events.shape: {events.shape}')
-eventsDuration = np.concatenate(eventsDuration_list, axis=0)
-print(f'eventsDuration: \n{eventsDuration}')
-
+eventsA = np.stack(eventsA)
+eventsA = np.sum(eventsA, axis=0)
+eventsB = np.stack(eventsB)
+eventsB = np.sum(eventsB, axis=0)
+accumulated_events = np.stack(accumulated_events)
+accumulated_events = np.sum(accumulated_events, axis=0)
 ###############################################################################
 #### Plot stuff Fig.5 Vautard
 ###############################################################################
-# set array of individual durations in days
-days = np.arange(1,26)
-eventsA = np.array([ np.sum(eventsDuration==tmpThreshold) for tmpThreshold in days] )
+# hardcoded value for landPixels, until this is available via events.nc
+landPixels = 90000
 # normalize by 'land-pixel'
 eventsA_mean = eventsA / landPixels
-eventsB = np.array([ np.sum(eventsDuration>=tmpThreshold) for tmpThreshold in days] )
 # normalize by 'land-pixel'
 eventsB_mean = eventsB / landPixels
 

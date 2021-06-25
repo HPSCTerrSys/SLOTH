@@ -3,11 +3,13 @@
 [ADD SOME DESCRIPTIN HERE]
 """
 import numpy as np
+import netCDF4 as nc
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import sys
 import os
 import cftime
+import datetime as dt
 from scipy import signal
 import scipy.ndimage as ndimage
 
@@ -113,9 +115,25 @@ for hwYear in hwYears:
     ###############################################################################
     # currently hard-coded to JJA
     timeSlices = [item.month in [6,7,8] for item in dailyTime_hw]
-    dailyMean_hw = dailyMean_hw[timeSlices]
-    dailyTime_hw = dailyTime_hw[timeSlices]
-    clima_90p    = clima_90p_raw[timeSlices]
+    dailyMean_hw     = dailyMean_hw[timeSlices]
+    dailyTime_hw     = dailyTime_hw[timeSlices]
+    nc_time_units    = f'days since {dailyTime_hw[0].strftime("%Y-%m-%d")}'
+    nc_time_calendar = '365_day'
+    nc_time_hw       = cftime.date2num(dailyTime_hw, units=nc_time_units, calendar=nc_time_calendar)
+    clima_90p        = clima_90p_raw[timeSlices]
+
+    ###############################################################################
+    #### Prepare output netCDF file to later appand different variables to
+    ###############################################################################
+    # For mor detailed information about how createNetCDF() does work, see
+    # sloth/toolBox.py --> createNetCDF()
+    saveFile=f'../data/example_HWevents/Events_{hwYear}.nc'
+    netCDFFileName = sloth.toolBox.createNetCDF(saveFile, domain='EU11',
+        timeCalendar=nc_time_calendar, timeUnit=nc_time_units,
+        author='Niklas WAGNER', contact='n.wagner@fz-juelich.de',
+        institution='FZJ - IBG-3', history=f'Created: {dt.datetime.now().strftime("%Y-%m-%d %H:%M")}',
+        description='This files does contain information about heat-waves based on 90p thereshold',
+        source='---', NBOUNDCUT=4)
 
     ###############################################################################
     #### Calculate events / where daily mean exceeds the 90p threshold
@@ -147,22 +165,30 @@ for hwYear in hwYears:
     print(f'events.shape: {events.shape}')
     print(f'Number of events (groups of days) exceeding 90th percentile: {n_events}')
     # store temporal and spartial event information (t,y,x) to disk:
-    if not os.path.exists(f'../data/example_HWevents/'):
-        os.makedirs(f'../data/example_HWevents/')
-    with open(f'../data/example_HWevents/Events_{hwYear}.npy', 'wb') as f:
-        np.save(f, events)
+    with nc.Dataset(netCDFFileName, 'a') as nc_file:
+        ncVar = nc_file.createVariable('events', 'f8', ('time', 'rlat', 'rlon',),
+                                        fill_value=-9999, zlib=True)
+        print(f'ncVar.shape: {ncVar.shape}')
+        ncVar.standard_name = 'events'
+        ncVar.long_name = 'events'
+        ncVar.units ='-'
+        ncVar.description = 'labeled hot days; 0 indicating "not a hot day"; same label indicating consecutive hot days'
+        ncVar.grid_mapping = 'rotated_pole'
+        ncVar[...] = events[...]
+        ncTime = nc_file.variables['time']
+        ncTime[...] = nc_time_hw[...]
 
     # Labels are unique so np.unique(a, return_counts=True)) could be used
     # to count occurrence of individual events which is equal to event-duration
     # this should be faster than looping over all events...
     print(f'start counting events')
     event_labels, event_label_counts = np.unique(events, return_counts=True)
-    # remove (slice out) label 0, as is is 'no HW'
+    # remove (slice out) label 0, as this is 'not a hot day'
     event_labels = event_labels[1:]
     event_label_counts = event_label_counts[1:]
     # What do we have now?
     # -) event_labels 
-    #    This variable now holds a unique array off all used labels, which is
+    #    This variable now holds a unique array of all used labels, which is
     #    basically a range [1,N] where N is the number of events exceeding the 
     #    90p threshold. The length of 'event_labels' does hold the number of 
     #    events exceeding the 90p threshold
@@ -175,10 +201,10 @@ for hwYear in hwYears:
     #    exceeding the 90p threshold. Filtering this array with
     #    >> event_label_counts[event_label_counts>=minDuration]
     #    could show the number of events with duration>=minDuration.
-    # ADD FOR FINAL USE
-    ALL_event_labels.append(event_labels)
-    ALL_event_label_counts.append(event_label_counts)
     print(f'Numbers of the heat-events exceeding min. length of {minDuration} days: {event_label_counts[event_label_counts>=minDuration].shape} event')
+    ## ADD FOR FINAL USE
+    #ALL_event_labels.append(event_labels)
+    #ALL_event_label_counts.append(event_label_counts)
     
     ###############################################################################
     #### Calculate some HW properties as intensity etc.
@@ -194,21 +220,35 @@ for hwYear in hwYears:
     currentEvent = 1
     # first try to load already calculated data
     try:
-        tmp_HWevents = np.load(f'../data/example_HWevents/HWevents_{hwYear}.npy', allow_pickle=True)
-        tmp_HWevents = tmp_HWevents.item()
-        HWevents = {**HWevents, **tmp_HWevents}
-    # if not found (re-) calculate
+        test = np.load(f'../NIX.npy') # to force 'except'
     except FileNotFoundError:
         ###############################################################################
         #### HEAT WAVE indices calculation
         #### see also: https://github.com/ecjoliver/marineHeatWaves/blob/master/marineHeatWaves.py
         ###############################################################################
+        nevents    = event_labels.shape[0]
+        mask_value = -9999
+        index_start                    = np.full(shape=nevents, fill_value=mask_value, dtype=int)
+        index_end                      = np.full(shape=nevents, fill_value=mask_value, dtype=int)
+        #date_start                     = np.full(shape=nevents, fill_value=mask_value, dtype=object)
+        #date_end                       = np.full(shape=nevents, fill_value=mask_value, dtype=object)
+        max_temp                       = np.full(shape=nevents, fill_value=mask_value, dtype=float)
+        index_peak                     = np.full(shape=nevents, fill_value=mask_value, dtype=int)
+        #date_peak                      = np.full(shape=nevents, fill_value=mask_value, dtype=object)
+        duration                       = np.full(shape=nevents, fill_value=mask_value, dtype=float)
+        intensity_max                  = np.full(shape=nevents, fill_value=mask_value, dtype=float)
+        intensity_mean                 = np.full(shape=nevents, fill_value=mask_value, dtype=float)
+        intensity_cumulative           = np.full(shape=nevents, fill_value=mask_value, dtype=float)
+        intensity_max_relThresh        = np.full(shape=nevents, fill_value=mask_value, dtype=float)
+        intensity_mean_relThresh       = np.full(shape=nevents, fill_value=mask_value, dtype=float)
+        intensity_cumulative_relThresh = np.full(shape=nevents, fill_value=mask_value, dtype=float)
+
         tmp_HWevents = {}
         print(f'needed HWevents file were not found: calculate')
         for ev in event_labels[event_label_counts>=minDuration]:
-            print(f'#### Handling event-label {ev} ({currentEvent} of {maxEvent})') 
+            print(f'#### Handling event-label {ev} ({currentEvent} of {maxEvent} in {hwYear})') 
             event_idx = np.where(events == ev)
-            print(f'#### -- event_idx: {event_idx}')
+            ##print(f'#### -- event_idx: {event_idx}')
             tt_start       = event_idx[0][0]
             tt_end         = event_idx[0][-1]
             # Pixel of individual HW event
@@ -216,23 +256,16 @@ for hwYear in hwYears:
             # 'event_idx' are equal for all time steps of particular event
             pixel_y        = event_idx[-2][0]
             pixel_x        = event_idx[-1][0]
-            # store below calculated stats in individual dict entry for each pixel
-            # Due to 'hwYear' this index is even unique over all years, which is 
-            # important for later use!
-            tmp_dict_key = f'{hwYear}_{ev}'
-            tmp_HWevents[tmp_dict_key] = {}
-            tmp_mhw = tmp_HWevents[tmp_dict_key]
 
-            tmp_date_satrt = dailyTime_hw[tt_start]
-            tmp_date_end   = dailyTime_hw[tt_end]
-            print('tmp_date_start: ', cftime.datetime.strftime(tmp_date_satrt, '%Y-%m-%d'))
-            print('tmp_date_end: ', cftime.datetime.strftime(tmp_date_end, '%Y-%m-%d')) 
+            #tmp_date_start = dailyTime_hw[tt_start]
+            #tmp_date_end   = dailyTime_hw[tt_end]
+            ##print('tmp_date_start: ', cftime.datetime.strftime(tmp_date_start, '%Y-%m-%d'))
+            ##print('tmp_date_end: ', cftime.datetime.strftime(tmp_date_end, '%Y-%m-%d')) 
 
-            tmp_mhw['index_start'] = tt_start
-            tmp_mhw['index_end'] = tt_end
-            tmp_mhw['date_start'] = tmp_date_satrt
-            tmp_mhw['date_end'] = tmp_date_end
-
+            index_start[ev] = tt_start
+            index_end[ev]   = tt_end
+            #date_start[ev]  = tmp_date_start
+            #date_end[ev]    = tmp_date_end
             
             temp_mhw = dailyMean_hw[tt_start:tt_end+1,pixel_y,pixel_x]
             thresh_mhw = clima_90p[tt_start:tt_end+1,pixel_y,pixel_x]
@@ -244,37 +277,130 @@ for hwYear in hwYears:
                     
             # Find peak
             tt_peak = np.argmax(mhw_relThresh)
-            tmp_mhw['max_temp'] = temp_mhw[tt_peak]
-            tmp_mhw['date_peak'] = dailyTime_hw[tt_start+tt_peak]          
-            tmp_mhw['index_peak'] = tt_start + tt_peak
-            print('max_temp: ', temp_mhw[tt_peak])
-            print('date_peak: ', cftime.datetime.strftime(dailyTime_hw[tt_start+tt_peak], '%Y-%m-%d'))
+            max_temp[ev] = temp_mhw[tt_peak]
+            #date_peak[ev] = dailyTime_hw[tt_start+tt_peak]          
+            index_peak[ev] = tt_start + tt_peak
+            ##print('max_temp: ', temp_mhw[tt_peak])
+            ##print('date_peak: ', cftime.datetime.strftime(dailyTime_hw[tt_start+tt_peak], '%Y-%m-%d'))
                             
             # MHW Duration
-            tmp_mhw['duration'] = len(mhw_relSeas)
-            print('duration: ', len(mhw_relSeas), ' days')
+            duration[ev] = len(mhw_relSeas)
+            ##print('duration: ', len(mhw_relSeas), ' days')
             
             # MHW Intensity metrics
-            tmp_mhw['intensity_max'] = mhw_relSeas[tt_peak]
-            tmp_mhw['intensity_mean'] = mhw_relSeas.mean()
-            tmp_mhw['intensity_cumulative'] = mhw_relSeas.sum()
+            intensity_max[ev] = mhw_relSeas[tt_peak]
+            intensity_mean[ev] = mhw_relSeas.mean()
+            intensity_cumulative[ev] = mhw_relSeas.sum()
             
-            tmp_mhw['intensity_max_relThresh'] = mhw_relThresh[tt_peak]
-            tmp_mhw['intensity_mean_relThresh'] = mhw_relThresh.mean()
-            print('Maximum of abs. intensity:', mhw_relThresh[tt_peak], ' K')
-            tmp_mhw['intensity_cumulative_relThresh'] = mhw_relThresh.sum()
+            intensity_max_relThresh[ev] = mhw_relThresh[tt_peak]
+            intensity_mean_relThresh[ev] = mhw_relThresh.mean()
+            ##print('Maximum of abs. intensity:', mhw_relThresh[tt_peak], ' K')
+            intensity_cumulative_relThresh[ev] = mhw_relThresh.sum()
             
             print('################ End of the heat event #', ev)
             currentEvent += 1              
-        
-        if not os.path.exists(f'../data/example_HWevents/'):
-            os.makedirs(f'../data/example_HWevents/')
-        with open(f'../data/example_HWevents/HWevents_{hwYear}.npy', 'wb') as f:
-            np.save(f, tmp_HWevents)
-        # ADD FOR FINAL USE
-        # merging two dicts:
-        HWevents = {**HWevents, **tmp_HWevents}
+    
+        with nc.Dataset(netCDFFileName, 'a') as nc_file:
+            dev = nc_file.createDimension('evLable', nevents)
+            
+            ncVar_index_start = nc_file.createVariable('index_start', 'i8', ('evLable',),
+                                        fill_value=mask_value, zlib=True)
+            ncVar_index_start.standard_name = 'index_start'
+            ncVar_index_start.long_name = 'start index in time-axis of event'
+            ncVar_index_start.units ='-'
+            ncVar_index_start.description = 'start time-step of related event'
+            ncVar_index_start[...] = np.ma.masked_where(index_start==mask_value,index_start)[...]
 
+            ncVar_index_end = nc_file.createVariable('index_end', 'i8', ('evLable',),
+                                        fill_value=mask_value, zlib=True)
+            ncVar_index_end.standard_name = 'index_end'
+            ncVar_index_end.long_name = 'end index in time-axis of event'
+            ncVar_index_end.units ='-'
+            ncVar_index_end.description = 'end time-step of related event'
+            ncVar_index_end[...] = np.ma.masked_where(index_end==mask_value,index_end)[...]
+
+            ncVar_max_temp = nc_file.createVariable('max_temp', 'f8', ('evLable',),
+                                        fill_value=mask_value, zlib=True)
+            ncVar_max_temp.standard_name = 'max_temp'
+            ncVar_max_temp.long_name = 'max temperatur of event'
+            ncVar_max_temp.units ='K'
+            ncVar_max_temp.description = 'max. temperatur of related event'
+            ncVar_max_temp[...] = np.ma.masked_where(max_temp==mask_value,max_temp)[...]
+            
+            ncVar_index_peak = nc_file.createVariable('index_peak', 'i8', ('evLable',),
+                                        fill_value=mask_value, zlib=True)
+            ncVar_index_peak.standard_name = 'index_peak'
+            ncVar_index_peak.long_name = 'index of max_temp in time-axis of event'
+            ncVar_index_peak.units ='-'
+            ncVar_index_peak.description = 'time-step of max_temp of related event'
+            ncVar_index_peak[...] = np.ma.masked_where(index_peak==mask_value,index_peak)[...]
+
+            ncVar_duration = nc_file.createVariable('duration', 'i8', ('evLable',),
+                                        fill_value=mask_value, zlib=True)
+            ncVar_duration.standard_name = 'duration'
+            ncVar_duration.long_name = 'duration of event'
+            ncVar_duration.units ='-'
+            ncVar_duration.description = 'duration of related event'
+            ncVar_duration[...] = np.ma.masked_where(duration==mask_value,duration)[...]
+
+            ncVar_intensity_max = nc_file.createVariable('intensity_max', 'f8', ('evLable',),
+                                        fill_value=mask_value, zlib=True)
+            ncVar_intensity_max.standard_name = 'intensity_max'
+            ncVar_intensity_max.long_name = 'max intensity of event'
+            ncVar_intensity_max.units ='K'
+            ncVar_intensity_max.description = 'max intensity of related event'
+            ncVar_intensity_max[...] = np.ma.masked_where(intensity_max==mask_value,intensity_max)[...]
+
+            ncVar_intensity_mean = nc_file.createVariable('intensity_mean', 'f8', ('evLable',),
+                                        fill_value=mask_value, zlib=True)
+            ncVar_intensity_mean.standard_name = 'intensity_mean'
+            ncVar_intensity_mean.long_name = 'mean intensity of event'
+            ncVar_intensity_mean.units ='K'
+            ncVar_intensity_mean.description = 'mean intensity of related event'
+            ncVar_intensity_mean[...] = np.ma.masked_where(intensity_mean==mask_value,intensity_mean)[...]
+
+            ncVar_intensity_cumulative = nc_file.createVariable('intensity_cumulative', 'f8', ('evLable',),
+                                        fill_value=mask_value, zlib=True)
+            ncVar_intensity_cumulative.standard_name = 'intensity_cumulative'
+            ncVar_intensity_cumulative.long_name = 'cumulative intensity of event'
+            ncVar_intensity_cumulative.units ='K'
+            ncVar_intensity_cumulative.description = 'cumulative intensity of related event'
+            ncVar_intensity_cumulative[...] = np.ma.masked_where(intensity_cumulative==mask_value,intensity_cumulative)[...]
+
+            ncVar_intensity_max_relThresh = nc_file.createVariable('intensity_max_relThresh', 'f8', ('evLable',),
+                                        fill_value=mask_value, zlib=True)
+            ncVar_intensity_max_relThresh.standard_name = 'intensity_max_relThresh'
+            ncVar_intensity_max_relThresh.long_name = 'max relThresh intensity of event'
+            ncVar_intensity_max_relThresh.units ='K'
+            ncVar_intensity_max_relThresh.description = 'max relThresh intensity of related event'
+            ncVar_intensity_max_relThresh[...] = np.ma.masked_where(intensity_max_relThresh==mask_value,intensity_max_relThresh)[...]
+
+            ncVar_intensity_mean_relThresh = nc_file.createVariable('intensity_mean_relThresh', 'f8', ('evLable',),
+                                        fill_value=mask_value, zlib=True)
+            ncVar_intensity_mean_relThresh.standard_name = 'intensity_mean_relThresh'
+            ncVar_intensity_mean_relThresh.long_name = 'mean relThresh intensity of event'
+            ncVar_intensity_mean_relThresh.units ='K'
+            ncVar_intensity_mean_relThresh.description = 'mean relThresh intensity of related event'
+            ncVar_intensity_mean_relThresh[...] = np.ma.masked_where(intensity_mean_relThresh==mask_value,intensity_mean_relThresh)[...]
+
+            ncVar_intensity_cumulative_relThresh = nc_file.createVariable('intensity_cumulative_relThresh', 'f8', ('evLable',),
+                                        fill_value=mask_value, zlib=True)
+            ncVar_intensity_cumulative_relThresh.standard_name = 'intensity_cumulative_relThresh'
+            ncVar_intensity_cumulative_relThresh.long_name = 'cumulative relThresh intensity of event'
+            ncVar_intensity_cumulative_relThresh.units ='K'
+            ncVar_intensity_cumulative_relThresh.description = 'cumulative relThresh intensity of related event'
+            ncVar_intensity_cumulative_relThresh[...] = np.ma.masked_where(intensity_cumulative_relThresh==mask_value,intensity_cumulative_relThresh)[...]
+
+
+        ##if not os.path.exists(f'../data/example_HWevents/'):
+        ##    os.makedirs(f'../data/example_HWevents/')
+        ##with open(f'../data/example_HWevents/HWevents_{hwYear}.npy', 'wb') as f:
+        ##    np.save(f, tmp_HWevents)
+        ### ADD FOR FINAL USE
+        ### merging two dicts:
+        ##HWevents = {**HWevents, **tmp_HWevents}
+
+"""
 # create ndarray out of lst appended to for individual years
 ALL_event_labels = np.concatenate(ALL_event_labels, axis=0)
 ALL_event_label_counts = np.concatenate(ALL_event_label_counts, axis=0)
@@ -345,3 +471,4 @@ plt.savefig(f'Mean_frequency_amplitude_{varName}.pdf')
 # plt.savefig(f'Mean_frequency_hot_days_{varName}.png', dpi=380) 
 # plt.show()
 # exit()
+"""
