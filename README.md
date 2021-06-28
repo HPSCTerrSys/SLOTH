@@ -1,7 +1,10 @@
-# SLOTH
+[[_TOC_]]
+
+# Welcome to SLOTH
 This repository does holed smaller and bigger **helper** scripts for simulations based on [TSMP](https://www.terrsysmp.org/).  
-The overall idea is to support the analysis progress of [TSMP](https://www.terrsysmp.org/)-simulations by providing  easy accessible functions and methods helping the user to focus on the real analysis task. Further, example-scripts should provide ideas and hits of how to tackle different analysis steps if those are not easily mapped within a modular function or method.  
-All function, methods, and examples collected within the **SLOTH**-repository does work out-of-the-box by using a provided default data-set under `/p/project/cslts/shared_data` to guarantee an easy usage.
+The overall idea is to support the analysis progress of [TSMP](https://www.terrsysmp.org/)-simulations by providing  easy accessible functions and methods helping the user to focus on the real analysis task.  
+Further, example-scripts should provide ideas and hits of how to tackle different analysis steps if those are not easily mapped within a modular function or method.  
+All function, methods, and examples collected within the **SLOTH**-repository does work out-of-the-box by using a provided default data-set under `/p/project/cslts/shared_data` to enable an direct usage.
 
 In general it is to be noted, that the **SLOTH**-repository is not a full collection of analysis-scripts, but a living repository, aimed to grow with upcoming tasks and providing the found solutions in a prepared and documented way for everyone who is facing a similar task at a later time.  
 Further, the **SLOTH**-repository is not aimed to act as a single solution for analysis tasks, and therefore make use of already existing repositories living in IBG-3 [GitLab](https://icg4geo.icg.kfa-juelich.de/) to avoid redundancies.  
@@ -13,7 +16,7 @@ E-mail: n.wagner@fz-juelich.de
 ## Getting Started
 
 ### Prepare the SLOTH repository
-As this repository make use of submodules (git-repositories inside og git-repositories are called submodules) a little extra treatment is needed to clone this repo. Basically there are two options:
+As this repository make use of submodules (git-repositories inside of git-repositories are called submodules) a little extra treatment is needed to clone this repo. Basically there are two options:
 
 **Option 1**
 Clone the repository as usual 
@@ -38,7 +41,9 @@ git clone --recurse-submodules https://icg4geo.icg.kfa-juelich.de/SoftwareTools/
 Now the repository is ready to test.
 
 ### Use the SLOTH repository  
-All scripts inside of the **SLOTH**-repository are developed and tested with a default tool-chain based on `Stage2020` and provided under `/p/project/cslts/local/juwels/env_ini.JUWELS.stage2020.GCC`. So to use **SLOTH** you first have to source this environment file:  
+All scripts inside of the **SLOTH**-repository are developed and tested with a default tool-chain based on `Stage2020` and provided under  
+`/p/project/cslts/local/juwels/env_ini.JUWELS.stage2020.GCC`.  
+So to use **SLOTH** you first have to source this environment file:  
 ```
 source /p/project/cslts/local/juwels/env_ini.JUWELS.stage2020.GCC
 ```  
