@@ -1,13 +1,19 @@
 # SLOTH
-This repo is aimed to holed different **monitoring**, **analysing**,  
-**validation**, and small **helper** scripts for simulaitons based on [TSMP](https://www.terrsysmp.org/). More details can be found in the related [Wiki](https://icg4geo.icg.kfa-juelich.de/SoftwareTools/SLOTH/wikis/home)
+This repository does holed smaller and bigger **helper** scripts for simulations based on [TSMP](https://www.terrsysmp.org/).  
+The overall idea is to support the analysis progress of [TSMP](https://www.terrsysmp.org/)-simulations by providing  easy accessible functions and methods helping the user to focus on the real analysis task. Further, example-scripts should provide ideas and hits of how to tackle different analysis steps if those are not easily mapped within a modular function or method.  
+All function, methods, and examples collected within the **SLOTH**-repository does work out-of-the-box by using a provided default data-set under `/p/project/cslts/shared_data` to guarantee an easy usage.
 
+In general it is to be noted, that the **SLOTH**-repository is not a full collection of analysis-scripts, but a living repository, aimed to grow with upcoming tasks and providing the found solutions in a prepared and documented way for everyone who is facing a similar task at a later time.  
+Further, the **SLOTH**-repository is not aimed to act as a single solution for analysis tasks, and therefore make use of already existing repositories living in IBG-3 [GitLab](https://icg4geo.icg.kfa-juelich.de/) to avoid redundancies.  
+
+All questions regarding **SLOTH** and its content could be addressed to:  
+Name: Niklas WAGNER  
+E-mail: n.wagner@fz-juelich.de
 
 ## Getting Started
 
-### Get the repo
-As this repository contains submodules (git-repos inside git-repos) a little 
-special treatment is needed to clone this repo. Basically there are two options:
+### Prepare the SLOTH repository
+As this repository make use of submodules (git-repositories inside og git-repositories are called submodules) a little extra treatment is needed to clone this repo. Basically there are two options:
 
 **Option 1**
 Clone the repository as usual 
@@ -29,6 +35,26 @@ git clone --recurse-submodules https://icg4geo.icg.kfa-juelich.de/SoftwareTools/
 ```
 > **Note:** you have to type the GitLab password for each submodule!
 
+Now the repository is ready to test.
 
-### Dependencies
-This repository make use of one of the IBG-3 tool-chains: `/p/project/cslts/local/juwels/env_ini.JUWELS.stage2020.GCC`
+### Use the SLOTH repository  
+All scripts inside of the **SLOTH**-repository are developed and tested with a default tool-chain based on `Stage2020` and provided under `/p/project/cslts/local/juwels/env_ini.JUWELS.stage2020.GCC`. So to use **SLOTH** you first have to source this environment file:  
+```
+source /p/project/cslts/local/juwels/env_ini.JUWELS.stage2020.GCC
+```  
+Afterwards all scripts inside of **SLOTH** are working out-of-the-box. Test this e.g. by moving to `examples/` and run one of the example-scripts:  
+```
+cd SLOTH/examples/  
+python ex_SanityCheck_Season.py
+``` 
+To use **SLOTH** outside the repository, as for example in you own workflow, you have to extend your local `PYTHONPATH`, to tell python where to find **SLOTH**. You can do this by:  
+```
+cd SLOTH  
+export PYTHONPATH=$PYTHONPATH:${pwd}
+```
+Afterwards you can simply import **SLOTH** inside any of your python scripts by:
+```
+import sloth
+```
+You find this also within the example-scripts.
+
