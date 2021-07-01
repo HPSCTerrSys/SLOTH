@@ -63,3 +63,20 @@ import sloth
 ```
 You find this also within the example-scripts.
 
+## How to contribute
+You can contribute to **SLOTH** with your own functions, methods, and classes which does calculate a specific quantity or fulfill a specific task.  
+To do so, simply create a new branch and upload an example script to the `examples/` directory within the new branch. This way everything stays clean and the master-branch (which should be a working branch) is not messed up. Within this new branch you can develop whatever you want, as you are not interfering with the master branch.  
+If you are done with developing / uploading contact the maintainer of **SLOTH**, who will decide then if your development is ready to go to the master-branch and therefore to be part of **SLOTH**.  
+
+To do so:  
+```
+# clone SLOTH as described within the 'Getting Started' section
+cd SLOTH
+git checkout -b YOURDEVELOPBRANCHNAME
+cd examplse/
+# Start developing
+# [...]
+# If ready push to GitLab (ALWAYS PULL BEFORE!)
+git pull origin YOURDEVELOPBRANCHNAME
+git push origin YOURDEVELOPBRANCHNAME
+```
