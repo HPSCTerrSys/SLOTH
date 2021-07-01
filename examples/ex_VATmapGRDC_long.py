@@ -1,3 +1,13 @@
+""" This script is calculating Q from ParFlow and comparing to GRDC
+
+This script is calculating the surface discharge based on ParFlow modeloutput
+and the Diagnosticx.py written by SKT. 
+Afterwards, a GRDC data-set is read in showing the functionality of the pyhton 
+class GRDCdataset() part of the SLOTH repo.
+Last the best matching pixel of the individual GRDC stations within the model 
+domain is found using different 'mapping' funcitons, which are part of the 
+GRDCdataset() class.     
+"""
 import numpy as np
 import sys
 import glob
