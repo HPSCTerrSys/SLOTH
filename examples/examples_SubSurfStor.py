@@ -12,11 +12,6 @@ sloth_path='../'
 sys.path.append(sloth_path)
 import sloth
 
-src_path='../extern/ana_parflow-diagnostics_pythonheat'
-sys.path.append(src_path)
-import Diagnostics
-import IO as htio
-
 def get_3Dgroundwaterbody_mask(satur):
     nz, ny, nx = satur.shape
     gwb        = ht.zeros((nz+1, ny, nx))
@@ -87,21 +82,21 @@ print(f'mask.shape: {mask.shape}')
 mask = ht.where(mask[0]==99999,0,1)  # 0 land, 1 sea
 print(f'mask.shape: {mask.shape}')
 
-sstorage = htio.read_pfb(sstoragefile, split=split)
+sstorage = sloth.extern.diagIO.read_pfb(sstoragefile, split=split)
 print(f'sstorage.shape: {sstorage.shape}')
 
-poro = htio.read_pfb(porofile, split=split)
+poro = sloth.extern.diagIO.read_pfb(porofile, split=split)
 print(f'poro.shape: {poro.shape}')
 
-permz = htio.read_pfb(permFileZ, split=split)
-permy = htio.read_pfb(permFileY, split=split)
-permx = htio.read_pfb(permFileX, split=split)
+permz = sloth.extern.diagIO.read_pfb(permFileZ, split=split)
+permy = sloth.extern.diagIO.read_pfb(permFileY, split=split)
+permx = sloth.extern.diagIO.read_pfb(permFileX, split=split)
 print(f'permz.shape: {permz.shape}')
 print(f'permy.shape: {permy.shape}')
 print(f'permx.shape: {permx.shape}')
 
-slopex = htio.read_pfb(slopeFileX, split=split)
-slopey = htio.read_pfb(slopeFileY, split=split)
+slopex = sloth.extern.diagIO.read_pfb(slopeFileX, split=split)
+slopey = sloth.extern.diagIO.read_pfb(slopeFileY, split=split)
 print(f'slopex.shape: {slopex.shape}')
 print(f'slopey.shape: {slopey.shape}')
 
@@ -130,7 +125,7 @@ mannings = ht.full(alpha.shape, 5.5e-5, split=split)
 ###############################################################################
 ### Initialize Diagnostics
 ###############################################################################
-diag = Diagnostics.Diagnostics(Mask=mask, Perm=perm,
+diag = sloth.extern.Diagnostics.Diagnostics(Mask=mask, Perm=perm,
     Poro=poro,
     Sstorage=sstorage,
     Ssat=1., Sres=sres, Nvg=nvg, Alpha=alpha,
