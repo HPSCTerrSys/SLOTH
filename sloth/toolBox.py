@@ -281,7 +281,6 @@ def get_intervalSlice(dates, sliceInterval='month'):
         elif sliceInterval == 'month':
             # using the first of current month at midnight as reference
             tmp_first_ref = tmp_first.replace(day=1, hour=0, minute=0, second=0)
-
         # First time-step of dates is already first of a interval
         if (tmp_first == tmp_first_ref):
             print(f'check step {Offset} is first of a month at midnight')
