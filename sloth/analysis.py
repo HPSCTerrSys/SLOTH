@@ -13,6 +13,7 @@ Check examples/ to see how this works.
 """
 import sys
 import os
+import heat as ht
 import numpy as np
 import netCDF4 as nc
 import datetime as dt
