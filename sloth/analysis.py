@@ -55,7 +55,7 @@ def calc_gwr_v1(spw, wtd, cellCenterDepth3D):
     return gwr
 
 def calc_gwr_v2(spw, wtd_z_index):
-    spqShape = spw.shape
+    spwShape = spw.shape
     nx = spwShape[-1]
     ny = spwShape[-2]
     nz = spwShape[-3]
