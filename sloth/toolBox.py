@@ -347,7 +347,7 @@ def createNetCDF(fileName, domain=None, nz=None, author=None,
         # South-West Corner of domain in rotated coordinates
         SWC_Y = -5.38725   # [deg]
         SWC_X = -10.82725  # [deg]
-    elif domain == 'EU11':
+    elif domain == 'EU11_TSMP':
         ny = 432           # [-]
         nx = 444           # [-]
         dy = dx = 0.110    # [deg]
@@ -357,6 +357,16 @@ def createNetCDF(fileName, domain=None, nz=None, author=None,
         # South-West Corner of domain in rotated coordinates
         SWC_Y = -24.4720   # [deg]
         SWC_X = -29.4713   # [deg]
+    elif domain == 'EU11': #################LPo, 25.06.2021!!!!!!!!! check if it is correct!!!!!!!!!!
+        ny = 412           # [-]
+        nx = 424           # [-]
+        dy = dx = 0.110    # [deg]
+        # Rotated pole geographical coordinates
+        rpol_Y  = 39.25    # [deg]
+        rpol_X  = -162.0   # [deg]
+        # South-West Corner of domain in rotated coordinates
+        SWC_Y = -23.375   # [deg] rlat
+        SWC_X = -28.375   # [deg] rlon
     else:
         print(f'ERROR: passed domain is not supported. domain={domain} --> Exit')
         return False
