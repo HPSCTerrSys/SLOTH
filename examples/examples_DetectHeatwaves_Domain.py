@@ -128,7 +128,7 @@ for hwYear in hwYears:
     # For mor detailed information about how createNetCDF() does work, see
     # sloth/toolBox.py --> createNetCDF()
     saveFile=f'../data/example_HWevents/Events_{hwYear}.nc'
-    netCDFFileName = sloth.toolBox.createNetCDF(saveFile, domain='EU11',
+    netCDFFileName = sloth.toolBox.createNetCDF(saveFile, domain='EU11_TSMP',
         timeCalendar=nc_time_calendar, timeUnit=nc_time_units,
         author='Niklas WAGNER', contact='n.wagner@fz-juelich.de',
         institution='FZJ - IBG-3', history=f'Created: {dt.datetime.now().strftime("%Y-%m-%d %H:%M")}',
