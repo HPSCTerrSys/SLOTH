@@ -226,7 +226,10 @@ for hwYear in hwYears:
         #### HEAT WAVE indices calculation
         #### see also: https://github.com/ecjoliver/marineHeatWaves/blob/master/marineHeatWaves.py
         ###############################################################################
-        nevents    = event_labels.shape[0]
+        # As I cut lables equal to zero, which indicates 'not a hot day', the shape
+        # of `event_labels` is no longer the number of events as ther is missing one
+        # the event 'no event'. I need +1 here to readd this missing number.
+        nevents    = event_labels.shape[0]+1 
         mask_value = -9999
         index_start                    = np.full(shape=nevents, fill_value=mask_value, dtype=int)
         index_end                      = np.full(shape=nevents, fill_value=mask_value, dtype=int)
