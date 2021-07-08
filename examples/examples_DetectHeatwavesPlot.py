@@ -25,18 +25,26 @@ projectName       = 'TSMP_ERA5'
 EvFileNamePattern = f'Events_????_{projectName}.nc'
 EvFiles = sorted(glob.glob(f'{rootDateDir}/example_HWevents/{projectName}/{EvFileNamePattern}'))
 
-days = np.arange(1,26)
 ###############################################################################
 ##### Read in all events -- 'examples_DetectHeatwaves_Domain.py'
 ###############################################################################
 accumulated_events = []
+days = np.arange(1,26)
 eventsA = []
 eventsB = []
+fig6_amplitude = np.arange(10)
+fig6_frequency = []
 for EvFile in EvFiles:
     print(f'EvFile: {EvFile}')
     with nc.Dataset(EvFile, 'r') as nc_file:
         events = nc_file.variables['events'][...]
+        # change dtype to int
+        events = events.astype(int)
+        Nevents = np.max(events)
         # MASK 'EVENTS' HERE WITH LAND SEA MASK OR WHATEVER YOU WANT
+        # EXAMPLE BELOW for a LandSeaMask (LSM) holding zeros for sea
+        # and ones for land pixel:
+        # events = np.ma.masked_where(LSM==0, events)
 
         # 'events' does contain the 3D information if pixel does exceed the 90p
         # threshold. Further those pixels are labeled, that connected pixel 
@@ -44,19 +52,44 @@ for EvFile in EvFiles:
         # (np.unique(EvStats, return_counts=True)) does return the 
         # length / duration of each individual event
         eventsLabel, eventsDuration = np.unique(events, return_counts=True)
-        # remove (slice out) label 0, as this is 'not a hot day'
-        eventsDuration = eventsDuration[1:]
 
+        # Read in 1D variables for detailed information on HeatWaves which are
+        # heat-events with a duration >= minDuration
+        intensity_max_relThresh = nc_file.variables['intensity_max_relThresh'][...]
+        print(f'intensity_max_relThresh.shape: {intensity_max_relThresh.shape:}')
+        print(f'Nevents: {Nevents}')
+        # Mask same values for 1D variables which were masked for 'events' (e.g.
+        # according to a LandSeaMask).
+        mask1D = np.full(Nevents, True)
+        mask1D[eventsLabel] = False
+        intensity_max_relThresh = np.ma.masked_where(mask1D, intensity_max_relThresh)
+        # You can do this for any other 1D variable as well, as the mask1D
+        # stays the same. For example:
+        # Further1DVariable = np.ma.masked_where(mask1D, Further1DVariable)
+
+        # Calculate / collect the two variables (eventsA and eventsB) needed
+        # for 'Vautard Fig 5.'
         eventsA.append([ np.sum(eventsDuration==tmpThreshold) for tmpThreshold in days] )
         eventsB.append([ np.sum(eventsDuration>=tmpThreshold) for tmpThreshold in days] )
+
+        # Count nonzero values / labels along axis=0, the time axis.
+        # Those pixel does exceed the 90p threshold and can be used to plot
+        # a 'number of hot days' map.
         accumulated_events.append(np.count_nonzero(events, axis=0))
     
+        # Calculate / collect variables needed for 'Vautard Fig 6.'
+        fig6_frequency.append(np.array([ np.sum(intensity_max_relThresh>=threshold) for threshold in fig6_amplitude ]))
+
 eventsA = np.stack(eventsA)
 eventsA = np.sum(eventsA, axis=0)
 eventsB = np.stack(eventsB)
 eventsB = np.sum(eventsB, axis=0)
 accumulated_events = np.stack(accumulated_events)
 accumulated_events = np.sum(accumulated_events, axis=0)
+fig6_frequency = np.stack(fig6_frequency)
+fig6_frequency = np.sum(fig6_frequency, axis=0)
+# frequency: NumberOfEventsExceedingAmplitude / TotalNumberOfEvents 
+fig6_frequency = fig6_frequency / fig6_frequency[0]
 ###############################################################################
 #### Plot stuff Fig.5 Vautard
 ###############################################################################
@@ -80,15 +113,24 @@ plt.savefig(f'Test_{projectName}.pdf')
 ###############################################################################
 #### Plot stuff on p.5 LPO
 ###############################################################################
-# Count non-zero values in 3D events. This way one gets the accumulated
-# hot-days for each pixel over time.
-accumulated_events = np.count_nonzero(events[:92], axis=0)
 fig, ax = plt.subplots(figsize=(9,5))
 ax.set_title(f'{projectName} Accumulated hot days > 90p TSA prec. for JJA 1979')
 img = ax.imshow(accumulated_events, origin='lower', cmap='Reds', interpolation=None)
 fig.colorbar(img)
 fig.savefig(f'p5_{projectName}.pdf')
 
+
+###############################################################################
+#### Plot Fig.6 Vautard
+###############################################################################
+fig, ax = plt.subplots(figsize=(9,5))
+ax.grid()
+ax.plot(fig6_amplitude,fig6_frequency, ls='--', label='TSMP heatwaves with duration > 6 days & >= amplitude from X-axis', linewidth=2)
+ax.legend(loc='upper center', fancybox=True, shadow=True)
+plt.title(f'{projectName} heat waves investigation',fontsize=12,fontweight='bold')
+plt.xlabel('Amplitude (T exceeds 90p) [K]', fontsize=11)
+plt.ylabel('Frequency of events', fontsize=11)
+plt.savefig(f'p6_{projectName}.pdf')
 
 """    
 ###############################################################################
