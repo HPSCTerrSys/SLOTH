@@ -20,42 +20,60 @@ import sloth
 ###############################################################################
 #### Define some paths, filenames, options, etc
 ###############################################################################
-dailyMeanFile  = f'../data/example_ClimateMeans/intervalMean_day.npy'
-dailyTimeFile  = f'../data/example_ClimateMeans/intervalTime_day.npy'
-refClimatology = f'../data/example_ClimateMeans/climate_day.npy'
+# Defining the file holding the dataset which should be investigated towards
+# heat-events
+dailyMeanFile         = f'../data/example_ClimateMeans/Means_1979-1984_NoI-92_1984_MeanInterval-day.nc'
+dailyMeanVarName      = 'mean_TSA'
+# Defining the files holding the reference data.
+# So climat-mean values as well as the daily mean values which were used to 
+# calculate the climat-mean. This daily mean values are used within this script 
+# to calculate the 90p threshold which is used to detect the heat-events. 
+# NOTE:
+# 'dailyMeanFile' and 'refDailyMeanFile' could hold the same data! 
+# Introducing two different variabels simply enable the user to easily compare 
+# arbitrary datasets with the same reference period.
+refClimatology        = f'../data/example_ClimateMeans/ClimateMeans_1979-1981_NoI-92_MeanInterval-day.nc'
+refClimatologyVarName = 'ClimatMean_TSA'
+refDailyMeanFile      = f'../data/example_ClimateMeans/Means_1979-1981_NoI-92_1981_MeanInterval-day.nc'
+refDailyMeanVarName   = 'mean_TSA'
 
+# The number of Intervals used for the reference dataset.
 # For full years and monthly means --> NoI 12 (12 month per year)
 # For full years and daily means   --> NoI 365 (365 days per year)
-# We do use daily means for full years
-NoI = 365
+NoI = 92
 
-# Year(s) to investigate for HeatWaves (HW)
-hwYears = [1979,1980,1981,1982,1983,1984]
+# Year(s) to investigate for HeatEvents (HE).
+hwYears  = [1979,1980,1981,1982,1983,1984]
+# Month(s) to investigate for HeatEvents (HE).
+hwMonths = [6,7,8] 
 
-# HW investigation performed with this script is based on percentile 
+# HE investigation performed with this script is based on percentile 
 # calculation. To 'smooth' the calculation the percentiles are calculated not
 # for the time-series of a single day, but as kind of running-percentile for
 # a 'window' of X days
 window_percentile = 5
 
-# A single hot day crossing the 90p threshold is not a HW, minDuration does
-# define how many 'too hot days' in a row building a HW
+# A single HE (hot day) crossing the 90p threshold is not a HW (HeatWave), 
+# minDuration does define how many HE (hot days) in a row does building a HW
 minDuration = 6
 
 ###############################################################################
-##### Read in climatology calculated with 'examples_CalculateClimateMeans.py
+##### Read in ref data calculated with 'examples_CalculateClimateMeans.py
 ###############################################################################
 try:
-    dailyMean = np.load(dailyMeanFile)
-    print(f'dailyMean.shape: {dailyMean.shape}')
-    dailyTime = np.load(dailyTimeFile, allow_pickle=True)
-    print(f'dailyTime.dtype: {dailyTime.dtype}')
-    clima = np.load(refClimatology)
+    with nc.Dataset(dailyMeanFile, 'r') as nc_file:
+        dailyMean = nc_file.variables[dailyMeanVarName][...]
+        nc_time   = nc_file.variables['time']
+        dailyTime = nc.num2date(nc_time[:],units=nc_time.units,calendar=nc_time.calendar)
 
-    # mask holding 1 where land 
-    mask = np.zeros_like(clima[0])
-    mask[clima[0]!=np.nan] = 1
-    landPixels = np.sum(mask)
+    with nc.Dataset(refClimatology, 'r') as nc_file:
+        clima     = nc_file.variables[refClimatologyVarName][...]
+        climaTime = nc_file.variables['time'][...]
+
+    with nc.Dataset(refDailyMeanFile, 'r') as nc_file:
+        refDailyMean = nc_file.variables[refDailyMeanVarName][...]
+        nc_time      = nc_file.variables['time']
+        refDailyTime = nc.num2date(nc_time[:],units=nc_time.units,calendar=nc_time.calendar)
 except FileNotFoundError:
     print(f'ERROR: not all needed files were not found: EXIT')
     sys.exit()
@@ -65,13 +83,9 @@ except FileNotFoundError:
 #### preparing HeatWave investigation
 ###############################################################################
 # HeatWave investigation performed in this script is based on the 90p 
-# percentile of the climatology. 
-# Create array holding the 90p percentiles, which shape is [365, Y, X] for 
-# our case (NoI=365)
-climaDim_90p = [NoI]
-climaDim_90p = climaDim_90p + [dim for dim in dailyMean[0].shape]
-clima_90p_raw = np.empty(climaDim_90p)
-print(f'intervalClima_90p.shape: {clima_90p_raw.shape}')
+# percentile of the climatology.
+clima_90p_full = np.empty_like(clima)
+print(f'intervalClima_90p.shape: {clima_90p_full.shape}')
 
 # To 'smooth' the 90p percentile, a window around each day is taken into 
 # account, that percentiles are not calculated out of the time-series of a 
@@ -90,37 +104,37 @@ for curr_day in range(NoI):
         if i < 0 or i > dailyMean.shape[0]:
             continue
         if tmpWindow is None:
-            tmpWindow = dailyMean[i::NoI]
+            tmpWindow = refDailyMean[i::NoI]
         else:
-            tmpWindow = np.append(tmpWindow, dailyMean[i::NoI], axis=0)
+            tmpWindow = np.append(tmpWindow, refDailyMean[i::NoI], axis=0)
     # Calculating the 'windowed' 90p percentile for each day a year. 
-    clima_90p_raw[curr_day]=np.percentile(tmpWindow, 90, axis=0)
+    clima_90p_full[curr_day]=np.percentile(tmpWindow, 90, axis=0)
     # print('highest 90p percentile over entire domain: ',np.nanmax(clima_90p[curr_day]))
 
 
 # loop over individual years HW-detection should be applied
 HWevents = {}
-ALL_event_label_counts = []
-ALL_event_labels = []
 for hwYear in hwYears:
     ###############################################################################
-    #### Extract year of interests for HW analysis (out of entire daily-means)
+    #### Filter the HW data
+    #### Filter for those dates which are of interesst and slice out (remove) other 
     ###############################################################################
-    boolSlice = [ hwYear == item.year for item in dailyTime]
+    # First filter for years defined in 'hwYears'
+    boolSlice = [ item.year==hwYear for item in dailyTime]
     dailyMean_hw = dailyMean[boolSlice]
     dailyTime_hw = dailyTime[boolSlice]
-
-    ###############################################################################
-    #### Filter for some periods as JJA etc.
-    ###############################################################################
-    # currently hard-coded to JJA
-    timeSlices = [item.month in [6,7,8] for item in dailyTime_hw]
+    # Second filter for months defined in 'hwMonths'
+    timeSlices       = [item.month in hwMonths for item in dailyTime_hw]
     dailyMean_hw     = dailyMean_hw[timeSlices]
     dailyTime_hw     = dailyTime_hw[timeSlices]
     nc_time_units    = f'days since {dailyTime_hw[0].strftime("%Y-%m-%d")}'
     nc_time_calendar = '365_day'
     nc_time_hw       = cftime.date2num(dailyTime_hw, units=nc_time_units, calendar=nc_time_calendar)
-    clima_90p        = clima_90p_raw[timeSlices]
+    # 'clima' should be (has to be!) of same length as one year of 'dailyMean' 
+    # values, wherefore I can use the same slice
+    clima_90p        = clima_90p_full[timeSlices]
+    # Now 'dailyMean_hw', 'dailyTime_hw', and 'clima_90p' does contain values for
+    # those dates only, which are of interesst.
 
     ###############################################################################
     #### Prepare output netCDF file to later appand different variables to
@@ -128,6 +142,8 @@ for hwYear in hwYears:
     # For mor detailed information about how createNetCDF() does work, see
     # sloth/toolBox.py --> createNetCDF()
     saveFile=f'../data/example_HWevents/Events_{hwYear}.nc'
+    if not os.path.exists(f'../data/example_HWevents/'):
+        os.makedirs(f'../data/example_HWevents/')
     netCDFFileName = sloth.toolBox.createNetCDF(saveFile, domain='EU11_TSMP',
         timeCalendar=nc_time_calendar, timeUnit=nc_time_units,
         author='Niklas WAGNER', contact='n.wagner@fz-juelich.de',
@@ -183,13 +199,10 @@ for hwYear in hwYears:
     # this should be faster than looping over all events...
     print(f'start counting events')
     event_labels, event_label_counts = np.unique(events, return_counts=True)
-    # remove (slice out) label 0, as this is 'not a hot day'
-    event_labels = event_labels[1:]
-    event_label_counts = event_label_counts[1:]
     # What do we have now?
     # -) event_labels 
     #    This variable now holds a unique array of all used labels, which is
-    #    basically a range [1,N] where N is the number of events exceeding the 
+    #    basically a range [0,N] where N is the number of events exceeding the 
     #    90p threshold. The length of 'event_labels' does hold the number of 
     #    events exceeding the 90p threshold
     # -) event_label_counts
@@ -202,9 +215,6 @@ for hwYear in hwYears:
     #    >> event_label_counts[event_label_counts>=minDuration]
     #    could show the number of events with duration>=minDuration.
     print(f'Numbers of the heat-events exceeding min. length of {minDuration} days: {event_label_counts[event_label_counts>=minDuration].shape} event')
-    ## ADD FOR FINAL USE
-    #ALL_event_labels.append(event_labels)
-    #ALL_event_label_counts.append(event_label_counts)
     
     ###############################################################################
     #### Calculate some HW properties as intensity etc.
@@ -226,10 +236,7 @@ for hwYear in hwYears:
         #### HEAT WAVE indices calculation
         #### see also: https://github.com/ecjoliver/marineHeatWaves/blob/master/marineHeatWaves.py
         ###############################################################################
-        # As I cut lables equal to zero, which indicates 'not a hot day', the shape
-        # of `event_labels` is no longer the number of events as ther is missing one
-        # the event 'no event'. I need +1 here to readd this missing number.
-        nevents    = event_labels.shape[0]+1 
+        nevents    = event_labels.shape[0]
         mask_value = -9999
         index_start                    = np.full(shape=nevents, fill_value=mask_value, dtype=int)
         index_end                      = np.full(shape=nevents, fill_value=mask_value, dtype=int)
@@ -394,84 +401,3 @@ for hwYear in hwYears:
             ncVar_intensity_cumulative_relThresh.description = 'cumulative relThresh intensity of related event'
             ncVar_intensity_cumulative_relThresh[...] = np.ma.masked_where(intensity_cumulative_relThresh==mask_value,intensity_cumulative_relThresh)[...]
 
-
-        ##if not os.path.exists(f'../data/example_HWevents/'):
-        ##    os.makedirs(f'../data/example_HWevents/')
-        ##with open(f'../data/example_HWevents/HWevents_{hwYear}.npy', 'wb') as f:
-        ##    np.save(f, tmp_HWevents)
-        ### ADD FOR FINAL USE
-        ### merging two dicts:
-        ##HWevents = {**HWevents, **tmp_HWevents}
-
-"""
-# create ndarray out of lst appended to for individual years
-ALL_event_labels = np.concatenate(ALL_event_labels, axis=0)
-ALL_event_label_counts = np.concatenate(ALL_event_label_counts, axis=0)
-# why is below needed?
-# should passed somewhat else.
-varName = 'TSA'
-###############################################################################
-#### Plot stuff Fig.5 Vautard
-###############################################################################
-# set array of individual durations in days
-days = np.arange(1,16)
-# Find and sum up all events equal to some ref-value, what is equal of finding
-# and counting events equal to a given duration.
-# (--1--) >> np.sum(ALL_event_label_counts==tmpThreshold)
-# Apply this to all values / durations / days and save as ndarray
-# (--2--) >> np.array([ (--1--) for tmpThreshold in days] )
-HeventsA = np.array([ np.sum(ALL_event_label_counts==tmpThreshold) for tmpThreshold in days] )
-# normalize by 'land-pixel'
-HeventsA_mean = HeventsA / landPixels
-HeventsB = np.array([ np.sum(ALL_event_label_counts>=tmpThreshold) for tmpThreshold in days] )
-HeventsB_mean = HeventsB / landPixels
-
-fig, ax = plt.subplots(figsize=(9,5))
-ax.grid()
-ax.plot(days,HeventsA_mean, color='blue', label='TSMP heatwaves '+ varName + '(= duration from X-axis)', linewidth=2)  #varName
-ax.plot(days,HeventsB_mean, color='red', label='TSMP heatwaves '+ varName + '(>=duration from X-axis)', linewidth=2)  #varName
-#ax.plot(days, n_event_modified, color='red', label='TSMP heatwaves (>90th percentile of '+ varName +')', linewidth=2)  #varName, L504='>90p'
-#ax.set_xticks(labels_idx)
-ax.legend(loc='upper center', fancybox=True, shadow=True)
-plt.title('TSMP '+str(varName) + ' heat waves investigation',fontsize=12,fontweight='bold')                
-plt.xlabel('Duration [days]', fontsize=11)
-plt.ylabel('Mean numbers of events', fontsize=11)
-plt.savefig(f'Mean_numbers_heatwaves_{varName}.pdf') 
-# plt.show()
-
-###############################################################################
-#### Plot stuff Fig.6a Vautard, 2013
-
-###############################################################################
-# set array of individual amplitudes 
-amplitude = np.arange(0,9)
-# get labels of all events exceeding a given minDuration. As described above
-# the length of this array is equal to the number of events exceeding the 
-# minDuration.
-maxEvent  = ALL_event_labels[ALL_event_label_counts>=minDuration].shape[0]
-frequencyGTamplitude = np.array([ len({k:v for k,v in HWevents.items() if v['duration'] >= minDuration and v['intensity_max_relThresh'] >= tmpThreshold}) for tmpThreshold in amplitude], dtype=float)
-frequencyGTamplitude *= 1./maxEvent
-fig, ax = plt.subplots(figsize=(9,5))
-ax.grid()
-ax.plot(amplitude,frequencyGTamplitude, color='red', label='TSMP heatwaves with duration >=6 days & >= amplitude from X-axis', linewidth=2)  #varName
-ax.legend(loc='upper right', fancybox=True, shadow=True,  ncol=4)
-plt.title('TSMP '+str(varName) + ' heat waves investigation',fontsize=12,fontweight='bold')                
-plt.xlabel('Amplitude (T excess of 90th percentile) [K]', fontsize=11)
-plt.ylabel('Frequency of events', fontsize=11)
-plt.savefig(f'Mean_frequency_amplitude_{varName}.pdf') 
-# plt.show()
-
-# ###############################################################################
-# #### Plot stuff Fig.7 Vautard, 2013
-# ###############################################################################
-# fig, ax = plt.subplots(figsize=(9,5))
-# ax.grid()
-# ax.plot(tot_year,freq_tot_hw_days, color='red', label='TSMP mean hot days (exceeding 90th percentile)', linewidth=2)  #varName
-# ax.legend(loc='upper left', fancybox=True, shadow=True)
-# plt.title('TSMP '+str(varName) + ' heat waves investigation: JJA '+str(year_start_hw) + '-' +str(year_final_hw),fontsize=12,fontweight='bold')                
-# plt.xlabel('Year', fontsize=11)
-# plt.ylabel('Hot days frquency', fontsize=11)
-# plt.savefig(f'Mean_frequency_hot_days_{varName}.png', dpi=380) 
-# plt.show()
-# exit()
-"""
