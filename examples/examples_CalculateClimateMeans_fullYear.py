@@ -54,7 +54,7 @@ files = sorted(glob.glob(f'{dataRootDir}/{datasetName}/{procType}/*/{fileName}')
 # If the interval we are interested in is 'day', we do compare the same 
 # day between different years.
 # etc.
-# In any case we do have to know how the Number of Intervals (NoI) a year does 
+# In any case we do have to know the Number of Intervals (NoI) a year does 
 # contain. For daily based calculation this usually is NoI=365 (365 days a 
 # year), for monthly based calculations this usually is NoI=12 (12 month a 
 # year).
@@ -64,19 +64,19 @@ files = sorted(glob.glob(f'{dataRootDir}/{datasetName}/{procType}/*/{fileName}')
 meanInterval = 'month'
 NoI = 12
 
-
 ###############################################################################
 #### Read in data and calculate interval mean and calculate center time-step
 ###############################################################################
-# Create a tmp lists to append data at. Append data to a list and convert this 
-# list into a ndarray once at the end is much faster than appending to ndarray 
-# (np.append()) at each iteration step.
-# I guess this is because list contains pointers and appending a 
+# Appending data to a list and convert this list into a ndarray once at the end 
+# is much faster than appending to ndarray (np.append()) at each iteration 
+# step. I guess this is because a list contains pointers and appending a 
 # pointer is quiet fast, while np.append() open and restructure the
 # entire array which is getting bigger and bigger while reading in more
 # and more data / files.
 tmp_IntervalMean = []
 tmp_IntervalTime = []
+tmp_timeCalendar = []
+tmp_timeUnits    = []
 # Loop over all files of our data-set.
 for file in files:
     # Open the file and read in data and time
@@ -84,39 +84,36 @@ for file in files:
         data  = nc_file.variables[varName]
         print(f'data.shape: {data.shape}')
         # add some chekc here if ndims is correct
-        # Extract data, units, time, etc for later usage.
-        data         = data[...]
+        # Extract units, time, etc for later usage.
+        dataUnits    = data.units
         nc_time      = nc_file.variables['time']
         calendar     = nc_time.calendar
         dates        = nc.num2date(nc_time[:],units=nc_time.units,calendar=nc_time.calendar)
         timeValues   = nc_time[:]
         timeCalendar = nc_time.calendar
         timeUnits    = nc_time.units
+        # Store timeUnits and timeCalendar to proper store output netCDF
+        tmp_timeCalendar.append(timeCalendar)
+        tmp_timeUnits.append(timeUnits)
 
-    # Calculate the slices for the current file based on the choose meanInterval
-    # For mor detailed information about how get_intervalSlice() does work, see
-    # sloth/toolBox.py --> get_intervalSlice()
-    dailySlices = sloth.toolBox.get_intervalSlice(dates=dates, sliceInterval=meanInterval)
-    # Loop over all slices, mask 'missing' values with np.nan, and calculate 
-    # related mean. The averaged data gets appended for each file and slice.
-    for Slice in dailySlices:
-        tmp_time     = timeValues[Slice]
-        tmp_time     = tmp_time.filled(fill_value=np.nan)
-        tmp_var      = data[Slice]
-        tmp_var_mask = tmp_var.mask
-        if not tmp_var_mask.any():
-            tmp_var_mask  = np.zeros(tmp_var.shape, dtype=bool)
-        tmp_var       = tmp_var.filled(fill_value=np.nan)
+        # Calculate the slices for the current file based on the choose meanInterval
+        # For mor detailed information about how get_intervalSlice() does work, see
+        # sloth/toolBox.py --> get_intervalSlice()
+        dailySlices = sloth.toolBox.get_intervalSlice(dates=dates, sliceInterval=meanInterval)
+        # Loop over all slices, mask 'missing' values with np.nan, and calculate 
+        # related mean. The averaged data gets appended for each file and slice.
+        for Slice in dailySlices:
+            tmp_time     = timeValues[Slice]
+            tmp_time     = tmp_time.filled(fill_value=np.nan)
+            tmp_var      = data[Slice]
 
-        tmp_timeMean  = np.nanmean(tmp_time, axis=0, keepdims=True)
-        # tmp_timeMean  = np.ma.mean(tmp_time, axis=0, keepdims=True)
-        tmp_timeMean  = nc.num2date(tmp_timeMean, units=timeUnits,calendar=timeCalendar)
-        tmp_monthMean = np.nanmean(tmp_var, axis=0, keepdims=True, dtype=float)
-        # tmp_monthMean = np.ma.mean(tmp_var, axis=0, keepdims=True, dtype=float)
+            tmp_timeMean  = tmp_time.mean(axis=0, keepdims=True)
+            tmp_timeMean  = nc.num2date(tmp_timeMean, units=timeUnits,calendar=timeCalendar)
+            tmp_monthMean = tmp_var.mean(axis=0, keepdims=True, dtype=float)
 
-        tmp_IntervalMean.append(tmp_monthMean)
-        tmp_IntervalTime.append(tmp_timeMean)
-        print(f'len(tmp_IntervalMean): {len(tmp_IntervalMean)}')
+            tmp_IntervalMean.append(tmp_monthMean)
+            tmp_IntervalTime.append(tmp_timeMean)
+            print(f'len(tmp_IntervalMean): {len(tmp_IntervalMean)}')
 
 
     print('##################')
@@ -124,27 +121,87 @@ for file in files:
 intervalMean = np.concatenate(tmp_IntervalMean, axis=0)
 print(f'intervalMean.shape: {intervalMean.shape}')
 intervalTime = np.concatenate(tmp_IntervalTime, axis=0)
-# save everything for later use         
-if not os.path.exists(f'../data/example_ClimateMeans/'):
-            os.makedirs(f'../data/example_ClimateMeans/')
-with open(f'../data/example_ClimateMeans/intervalMean_{meanInterval}.npy', 'wb') as f:
-    np.save(f, intervalMean)
-with open(f'../data/example_ClimateMeans/intervalTime_{meanInterval}.npy', 'wb') as f:
-    np.save(f, intervalTime)
-
 
 # First create an empty array of same shape as intervalMean but with 
 # t-dim (0-axis) = NoI
 climaDim = [NoI]    
 climaDim = climaDim + [dim for dim in intervalMean[0].shape]
 clima = np.empty(climaDim)
-    
-for curr_day in range(NoI):
+for curr_interval in range(NoI):
     # The climat mean is simple the mean of all entries with NoI in distance.
-    clima[curr_day] = np.nanmean(intervalMean[curr_day::NoI], axis=0, dtype=float)        
-# dump climate data
-with open(f'../data/example_ClimateMeans/climate_{meanInterval}.npy', 'wb') as f:
-    np.save(f, clima)
+    # NoI=12 --> for all entries with a distance of 12 --> month
+    # NoI=365 --> for all entries with a distance of 365 --> days
+    clima[curr_interval] = intervalMean[curr_interval::NoI].mean(axis=0, dtype=float)
+
+###############################################################################
+#### Prepare output netCDF file to appand different variables
+###############################################################################
+# For mor detailed information about how createNetCDF() does work, see
+# sloth/toolBox.py --> createNetCDF()
+saveDir = f'../data/example_ClimateMeans/'
+# save everything for later use         
+if not os.path.exists(f'{saveDir}'):
+            os.makedirs(f'{saveDir}')
+
+#### Store the ClimatMean values
+###############################################################################
+YearStart=f'{intervalTime[0].year}'
+YearEnd=f'{intervalTime[-1].year}'
+descriptionStr = [
+        f'This file does contain climate mean values on a {meanInterval} base ',
+        f'calculated for the years {YearStart} to {YearEnd}.',
+        ]
+descriptionStr = ''.join(descriptionStr)
+saveFile=f'{saveDir}/ClimateMeans_{YearStart}-{YearEnd}_NoI-{NoI}_MeanInterval-{meanInterval}.nc'
+netCDFFileName = sloth.toolBox.createNetCDF(saveFile, domain='EU11_TSMP',
+    author='Niklas WAGNER', contact='n.wagner@fz-juelich.de',
+    institution='FZJ - IBG-3', history=f'Created: {dt.datetime.now().strftime("%Y-%m-%d %H:%M")}',
+    description=descriptionStr,
+    source='---', NBOUNDCUT=4)
+
+with nc.Dataset(netCDFFileName, 'a') as nc_file:
+    ncVar = nc_file.createVariable(f'ClimatMean_{varName}', 'f8', ('time', 'rlat', 'rlon',),
+                    fill_value=9999, zlib=True)
+    ncVar.standard_name = f'climat_{varName}'
+    ncVar.long_name = f'climat mean of {varName}'
+    ncVar.units =f'{dataUnits}'
+    ncVar.description = f'{meanInterval} based climat mean values'
+    ncVar[...] = clima[...]
+    
+    ncTime = nc_file.createVariable('time', 'i4', ('time',),
+                    fill_value=9999, zlib=True)
+    ncTime.description = f'{meanInterval} number in year'
+    ncTime[...] = np.arange(clima.shape[0])
+
+#### Store the Mean values
+###############################################################################
+descriptionStr = [
+        f'This file does contain {meanInterval} mean values ',
+        f'calculated for the years {YearStart} to {YearEnd}.',
+        ]
+descriptionStr = ''.join(descriptionStr)
+# take the first read in timeUnits and timeCalendar for output netCDF
+timeUnitsOut    = tmp_timeUnits[0]
+timeCalendarOut = tmp_timeCalendar[0]
+saveFile=f'{saveDir}/Means_{YearStart}-{YearEnd}_MeanInterval-{meanInterval}.nc'
+netCDFFileName = sloth.toolBox.createNetCDF(saveFile, domain='EU11_TSMP',
+    timeCalendar=timeCalendarOut, timeUnit=timeUnitsOut,
+    author='Niklas WAGNER', contact='n.wagner@fz-juelich.de',
+    institution='FZJ - IBG-3', history=f'Created: {dt.datetime.now().strftime("%Y-%m-%d %H:%M")}',
+    description=descriptionStr,
+    source='---', NBOUNDCUT=4)
+
+with nc.Dataset(netCDFFileName, 'a') as nc_file:
+    ncVar = nc_file.createVariable(f'mean_{varName}', 'f8', ('time', 'rlat', 'rlon',),
+                    fill_value=9999, zlib=True)
+    ncVar.standard_name = f'mean {varName}'
+    ncVar.long_name = f'mean of {varName}'
+    ncVar.units =f'{dataUnits}'
+    ncVar.description = f'{meanInterval} based mean values'
+    ncVar[...] = intervalMean[...]
+
+    ncTime = nc_file.variables['time']
+    ncTime[...] = nc.date2num(intervalTime, units=timeUnitsOut,calendar=timeCalendarOut)[...]
 
 # plot if meanInterval='month'
 if meanInterval == 'month':
