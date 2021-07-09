@@ -64,7 +64,7 @@ files = sorted(glob.glob(f'{dataRootDir}/{datasetName}/{procType}/*/{fileName}')
 meanInterval = 'day'
 NoI = 92
 # Define which dates to handle
-validYears  = np.arange(1979,1982)
+validYears  = np.arange(1979,1985)
 validMonths = [6,7,8]
 
 
@@ -169,7 +169,7 @@ saveFile=f'{saveDir}/ClimateMeans_{YearStart}-{YearEnd}_NoI-{NoI}_MeanInterval-{
 netCDFFileName = sloth.toolBox.createNetCDF(saveFile, domain='EU11_TSMP',
     author='Niklas WAGNER', contact='n.wagner@fz-juelich.de',
     institution='FZJ - IBG-3', history=f'Created: {dt.datetime.now().strftime("%Y-%m-%d %H:%M")}',
-    description=descriptionStr),
+    description=descriptionStr,
     source='---', NBOUNDCUT=4)
 
 with nc.Dataset(netCDFFileName, 'a') as nc_file:
@@ -199,12 +199,12 @@ descriptionStr = ''.join(descriptionStr)
 # take the first read in timeUnits and timeCalendar for output netCDF
 timeUnitsOut    = tmp_timeUnits[0]
 timeCalendarOut = tmp_timeCalendar[0]
-saveFile=f'{saveDir}/Means_{YearStart}-{YearEnd}_MeanInterval-{meanInterval}.nc'
+saveFile=f'{saveDir}/Means_{YearStart}-{YearEnd}_NoI-{NoI}_{YearEnd}_MeanInterval-{meanInterval}.nc'
 netCDFFileName = sloth.toolBox.createNetCDF(saveFile, domain='EU11_TSMP',
     timeCalendar=timeCalendarOut, timeUnit=timeUnitsOut,
     author='Niklas WAGNER', contact='n.wagner@fz-juelich.de',
     institution='FZJ - IBG-3', history=f'Created: {dt.datetime.now().strftime("%Y-%m-%d %H:%M")}',
-    description=descriptionStr),
+    description=descriptionStr,
     source='---', NBOUNDCUT=4)
 
 with nc.Dataset(netCDFFileName, 'a') as nc_file:

@@ -183,7 +183,7 @@ descriptionStr = ''.join(descriptionStr)
 # take the first read in timeUnits and timeCalendar for output netCDF
 timeUnitsOut    = tmp_timeUnits[0]
 timeCalendarOut = tmp_timeCalendar[0]
-saveFile=f'{saveDir}/Means_{YearStart}-{YearEnd}_MeanInterval-{meanInterval}.nc'
+saveFile=f'{saveDir}/Means_{YearStart}-{YearEnd}_NoI-{NoI}_MeanInterval-{meanInterval}.nc'
 netCDFFileName = sloth.toolBox.createNetCDF(saveFile, domain='EU11_TSMP',
     timeCalendar=timeCalendarOut, timeUnit=timeUnitsOut,
     author='Niklas WAGNER', contact='n.wagner@fz-juelich.de',
