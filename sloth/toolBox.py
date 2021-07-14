@@ -530,6 +530,48 @@ def mappIndicator(ParFlowNamelist, IndicatorFile):
     outDict['nx']      = nx
 
     return outDict
+
+def get_prudencaMask(lat2D, lon2D, prudName):
+    """ return a prudance mask
+
+    Return a boolean mask-array (True = masked, False = not masked) based on 
+    a passed set of longitude and latitude values and the name of the prudence
+    region.
+    The shape of the mask-array is set equal to the shape of input lat2D.
+
+    INPUT:
+      lat2D:    ndarray
+                2D latitude information for each pixel
+      lon2D:    ndarray
+                2D longitude information for each pixel
+      prudName: str
+                Short name of prudence region
+    RETURN
+      prudMask: ndarray
+                Ndarray of dtype boolean of the same shape as lat2D.
+                True = masked; False = not masked
+    """
+    if (prudName=='BI'):
+        prudMask = np.where((lat2D < 50.0) | (lat2D > 59.0)  | (lon2D < -10.0) | (lon2D >  2.0), True, False)
+    elif (prudName=='IP'):
+        prudMask = np.where((lat2D < 36.0) | (lat2D > 44.0)  | (lon2D < -10.0) | (lon2D >  3.0), True, False)
+    elif (prudName=='FR'):
+        prudMask = np.where((lat2D < 44.0) | (lat2D > 50.0)  | (lon2D < -5.0) | (lon2D >  5.0), True, False)
+    elif (prudName=='ME'):
+        prudMask = np.where((lat2D < 48.0) | (lat2D > 55.0)  | (lon2D < 2.0) | (lon2D >  16.0), True, False)
+    elif (prudName=='SC'):
+        prudMask = np.where((lat2D < 55.0) | (lat2D > 70.0)  | (lon2D < 5.0) | (lon2D >  30.0), True, False)
+    elif (prudName=='AL'):
+        prudMask = np.where((lat2D < 44.0) | (lat2D > 48.0)  | (lon2D < 5.0) | (lon2D >  15.0), True, False)
+    elif (prudName=='MD'):
+        prudMask = np.where((lat2D < 36.0) | (lat2D > 44.0)  | (lon2D < 3.0) | (lon2D >  25.0), True, False)
+    elif (prudName=='EA'):
+        prudMask = np.where((lat2D < 44.0) | (lat2D > 55.0)  | (lon2D < 16.0) | (lon2D >  30.0), True, False)
+    else:
+        print(f'prudance region {prudName} not found --> EXIT')
+        eys.exit(1)
+
+    return prudMask
         
 if __name__ == '__main__':
     print('Im there!')
