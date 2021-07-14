@@ -38,13 +38,26 @@ for EvFile in EvFiles:
     print(f'EvFile: {EvFile}')
     with nc.Dataset(EvFile, 'r') as nc_file:
         events = nc_file.variables['events'][...]
+        rlon1D = nc_file.variables['rlon'][...]
+        rlat1D = nc_file.variables['rlat'][...]
+        rotPol = nc_file.variables['rotated_pole']
+        rotPolLat = float(rotPol.grid_north_pole_latitude)
+        rotPolLon = float(rotPol.grid_north_pole_longitude)
+        # unrotate rlon and rlat:
+        lat2D, lon2D = sloth.extern.undo_grid_rotation(rlat=rlat1D,rlon=rlon1D,
+                             np_lat=rotPolLat,np_lon=rotPolLon)
         # change dtype to int
         events = events.astype(int)
-        Nevents = np.max(events)
+        Nevents = np.max(events)+1 # take label 'zero' into account
         # MASK 'EVENTS' HERE WITH LAND SEA MASK OR WHATEVER YOU WANT
         # EXAMPLE BELOW for a LandSeaMask (LSM) holding zeros for sea
         # and ones for land pixel:
         # events = np.ma.masked_where(LSM==0, events)
+        prudMask = sloth.toolBox.get_prudencaMask(lat2D=lat2D, lon2D=lon2D, prudName="MD")
+        # np.ma.masked_where seems to have some trouble with automatic 
+        # broadcasting, so doing this manually
+        prudMask = np.broadcast_to(prudMask, events.shape )
+        events = np.ma.masked_where(prudMask, events)
 
         # 'events' does contain the 3D information if pixel does exceed the 90p
         # threshold. Further those pixels are labeled, that connected pixel 
@@ -52,6 +65,7 @@ for EvFile in EvFiles:
         # (np.unique(EvStats, return_counts=True)) does return the 
         # length / duration of each individual event
         eventsLabel, eventsDuration = np.unique(events, return_counts=True)
+        print(f'mask: eventsLabel.shape: {eventsLabel.shape}')
 
         # Read in 1D variables for detailed information on HeatWaves which are
         # heat-events with a duration >= minDuration
