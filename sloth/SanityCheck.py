@@ -84,6 +84,8 @@ def plot_SanityCheck_3D(data, data_mask=None, kind='sum',
         data_kin_T = np.nanmean(data, axis=0)
     
     if data_mask is not None:
+        data_min_T[data_mask[0]] = np.nan
+        data_max_T[data_mask[0]] = np.nan
         data_kin_T[data_mask[0]] = np.nan
 
     ###########################################################################
