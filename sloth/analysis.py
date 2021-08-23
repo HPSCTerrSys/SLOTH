@@ -22,6 +22,12 @@ from . import ParFlow_IO as pio
 import matplotlib.pyplot as plt
 
 def calc_wtd(press, cellDepths):
+    """ calculate the water table depth
+
+    assuming dimensions:
+    dim=3D: (z, y, x)
+    dim=4D: (t, z, y, x)
+    """
     totalColumnDepth = ht.sum(cellDepths)
     dim = press.ndim
     if dim==3:
@@ -55,6 +61,10 @@ def calc_gwr_v1(spw, wtd, cellCenterDepth3D):
     return gwr
 
 def calc_gwr_v2(spw, wtd_z_index):
+    """
+    see also:
+    https://www.mi.fu-berlin.de/en/math/groups/ag-numerik/download/dateien/VL_Engelhardt_3.pdf
+    """
     spwShape = spw.shape
     nx = spwShape[-1]
     ny = spwShape[-2]
@@ -70,15 +80,19 @@ def calc_gwr_v2(spw, wtd_z_index):
 def get_3Dgroundwaterbody_mask(satur):
     ''' calculating a 3D mask of the groundwater-body
 
+    The groundwater-body is that volume of a soil column which is continuously 
+    fully saturated seen from the very bottom of the model domain (bedrock).
+
     Return:
       gwb_mask    = ht-ndarray
         A HeAT-array of the same shape as 'satur' input, holding 1 at pixels
         belonging to the groundwater-body, and 0 for other pixel
       wtd_z_index = ht-ndarray
-        A HeAT-array of the same spatial shape as 'satur' (no z dimension),
-        holding the index of the first (first from bottom to top/surface) 
-        unsaturated layer for each pixel. If there are N layers with the model
-        and the index has a value of N+1, than the entire column is saturated!
+        A HeAT-array of the same 2D shape as 'satur' (no z dimension),
+        holding the index of the first (counted from bottom/bedrock to 
+        top/surface) unsaturated layer for each soil column. If there are N 
+        layers with the model and the index has a value of N+1, than the entire 
+        column is saturated!
     '''
     nz, ny, nx = satur.shape
     gwb        = ht.zeros((nz+1, ny, nx))
