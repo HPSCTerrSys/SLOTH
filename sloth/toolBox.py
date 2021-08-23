@@ -15,7 +15,8 @@ import sys
 import os
 import numpy as np
 import netCDF4 as nc
-import datetime as dt
+import datetime
+from calendar import monthrange
 from . import pars_ParFlowTCL as ppfl
 from . import ParFlow_IO as pio
 import matplotlib.pyplot as plt
@@ -519,6 +520,29 @@ def mappIndicator(ParFlowNamelist, IndicatorFile):
     outDict['nx']      = nx
 
     return outDict
+
+def spher_dist_v1(lon1, lat1, lon2, lat2, Rearth=6373):
+    """ calculate the spherical / haversine distance
+
+    Source: https://www.kompf.de/gps/distcalc.html
+    This function is supposed to proper handle different shaped coords
+    latX and lonX is supposed to be passed in rad
+
+    return 2D ndarray
+    """
+    term1 = np.sin(lat1) * np.sin(lat2)
+    term2 = np.cos(lat1) * np.cos(lat2)
+    term3 = np.cos(lon2 - lon1)
+    return Rearth * np.arccos(term1+term2*term3)
+
+def find_nearest_Index_2D(point, coord2D):
+    dist = np.abs(coord2D - point)
+    idx = np.unravel_index(np.argmin(dist, axis=None),dist.shape)
+    return idx[0], idx[1]
+
+def plusOneMonth(currDate):
+    num_days = monthrange(currDate.year, currDate.month)[1]
+    return currDate + datetime.timedelta(hours=24*num_days)
         
 if __name__ == '__main__':
     print('Im there!')
