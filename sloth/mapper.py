@@ -259,7 +259,6 @@ class mapper:
     ###########################################################################
     ########################## Auxiliary tools ################################
     ###########################################################################
-
     def spher_dist_v1(self, lon1, lat1, lon2, lat2, Rearth=6373):
         """ calculate the spherical / haversine distance
 
@@ -401,10 +400,10 @@ class mapper:
         '''
         # are all variables defined?
         if self.SimMeanQ is None:
-            print('self.SimMeanQ is not defined yet, but required by function self.MapBestQ()!')
+            print('self.SimMeanQ is not defined yet, but required by function self.check4MapXXX()!')
             return False
         if self.ObsMeanQ is None:
-            print('self.ObsMeanQ is not defined yet, but required by function self.MapBestQ()!')
+            print('self.ObsMeanQ is not defined yet, but required by function self.check4MapXXX()!')
             return False
         if self.SimMeanQ.shape != self.SimLons.shape:
             print(f'The shape of self.SimMeanQ {self.SimMeanQ.shape} is not equal the shape of self.SimLons / self.SimLats {self.SimLons.shape}!')
@@ -557,7 +556,7 @@ class mapper:
         self.MapRaw()
         #check if all needed data are already defined
         if not self.check4MapXXX():
-            print('check4MapXXX() failed --> self.MapBestQ() canceled!')
+            print('check4MapXXX() failed --> self.MapBestCatchment() canceled!')
             return None
 
         # Create empty lists for results
