@@ -10,6 +10,7 @@
 # ignore data
 data/*
 *.npy
+loadenvs
 
 # keep all .gitkeep files
 !*.gitkeep
