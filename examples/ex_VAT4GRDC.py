@@ -36,7 +36,7 @@ GRDC_example = sloth.GRDCdataset.GRDCdataset(GRDCfiles=files)
 #    To be some clear, you can e.g.first filter for a country:
 # For mor detailed information about how filter_index() does work, see
 # sloth/GRDCdataset.py --> filter_index()
-GRDC_example.filter_index(key='Country', value='DE')
+GRDC_example.filter_index(key='Country', value='DE', operant='==')
 #    and after this filter for a time-period - BUT DIFFERENT AS YOU THINK
 #    Note here the difference between 'filter-index' and 'filter_index_date':
 #    While 'filter_index' filters according to key-values pair straight forward

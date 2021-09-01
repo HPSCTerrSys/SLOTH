@@ -383,7 +383,7 @@ class mapper:
         self.MapYIdx_raw = np.array(tmp_MapYIdx_raw)
         self.MapXIdx_raw = np.array(tmp_MapXIdx_raw)
 
-    def check4MapXXX(self):
+    def check4MapQ(self):
         ''' This is a separate function to keep MapXXX functions readable.
 
         This function checks if the passed data fulfills some basic 
@@ -400,10 +400,10 @@ class mapper:
         '''
         # are all variables defined?
         if self.SimMeanQ is None:
-            print('self.SimMeanQ is not defined yet, but required by function self.check4MapXXX()!')
+            print('self.SimMeanQ is not defined yet, but required by function self.check4MapQ()!')
             return False
         if self.ObsMeanQ is None:
-            print('self.ObsMeanQ is not defined yet, but required by function self.check4MapXXX()!')
+            print('self.ObsMeanQ is not defined yet, but required by function self.check4MapQ()!')
             return False
         if self.SimMeanQ.shape != self.SimLons.shape:
             print(f'The shape of self.SimMeanQ {self.SimMeanQ.shape} is not equal the shape of self.SimLons / self.SimLats {self.SimLons.shape}!')
@@ -438,8 +438,8 @@ class mapper:
         # First MapRaw(), than adjust according to best fitting Q
         self.MapRaw()
         #check if all needed data are already defined
-        if not self.check4MapXXX():
-            print('check4MapXXX() failed --> self.MapBestQ() canceled!')
+        if not self.check4MapQ():
+            print('check4MapQ() failed --> self.MapBestQ() canceled!')
             return None
 
         # Create empty lists for results
@@ -493,8 +493,8 @@ class mapper:
         # First MapRaw(), than adjust according to highest Q
         self.MapRaw()
         #check if all needed data are already defined
-        if not self.check4MapXXX():
-            print('check4MapXXX() failed --> self.MapBestQ() canceled!')
+        if not self.check4MapQ():
+            print('check4MapQ() failed --> self.MapBestQ() canceled!')
             return None
 
         # Create empty lists for results
@@ -522,6 +522,28 @@ class mapper:
         # update object-variables with found information
         self.MapYIdx_fit = np.array(tmp_MapYIdx_fit)
         self.MapXIdx_fit = np.array(tmp_MapXIdx_fit)
+
+    def check4MapArea(self):
+        ''' This is a separate function to keep MapXXX functions readable.
+
+        This function checks if the passed data fulfills some basic 
+        requirements as e.g. self.ObsMeanArea is defnined.
+        This is basically to avoid trivial errors while using this class.
+        Because self.MapRaw() is called as part of all self.MapBestXXX() 
+        functions, this function only checks additional requirements
+
+        Return value:
+        -------------
+        __: boolean 
+            True if check is passed, False if some errors are detected.
+
+        '''
+        # are all variables defined?
+        if self.ObsMeanArea is None:
+            print('self.ObsMeanArea is not defined yet, but required by function self.check4MapArea()!')
+            return False
+
+        return True
 
     def MapBestCatchment(self, search_rad=1, dx=12500., dy=12500., slopey=None, slopex=None):
         ''' This functions maps OBS on SimGrid by choosing that pixel which related 
@@ -555,8 +577,8 @@ class mapper:
         # First MapRaw(), than adjust according to best fitting catchment-size
         self.MapRaw()
         #check if all needed data are already defined
-        if not self.check4MapXXX():
-            print('check4MapXXX() failed --> self.MapBestCatchment() canceled!')
+        if not self.check4MapArea():
+            print('check4MapArea() failed --> self.MapBestCatchment() canceled!')
             return None
 
         # Create empty lists for results

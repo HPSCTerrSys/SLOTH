@@ -25,31 +25,24 @@ class GRDCdataset():
     ###########################################################################
     ############################# Definition ##################################
     ###########################################################################
-    def __init__(self, data=None, GRDCfiles=None, GRDCindexFile=None,
-                       GRDCindexObj=None):
+    def __init__(self, GRDCfiles=None, GRDCindexFile=None, GRDCstationsFile=None):
         ''' Default constructor of GRDCdataset-class
 
         Object-variables:
         -----------------
-        data: 2D ndarray
-            Two dimensional ndarray containing the lon value for each point of 
-            SimGrid
-        GRDCfiles: 2D ndarray
-            Two dimensional ndarray containing the lat value for each point of 
-            SimGrid
-        GRDCindexFile: 1D ndarray
-            One dimensional ndarray containing the lon values for each individual 
-            GRDC station stored with the object
-        GRDCindexObj: 1D ndarray
-            One dimensional ndarray containing the lat values for each individual 
+        GRDCfiles: list
+            List of all GRDC-files belonging to the dataset of interesst.
+        GRDCindexFile: str
+            The full path to the index file. for both: to store index file at,
+            or to read index file from.
         
         '''
-        self.data               = data
-        self.dataDim            = None
         self.GRDCfiles          = GRDCfiles
         self.GRDCindexFile      = GRDCindexFile if GRDCindexFile is not None else './index_GRDC_DEFAULT.csv'
-        self.GRDCindexObj       = GRDCindexObj 
+        self.GRDCstationsFile    = GRDCstationsFile
 
+        self.GRDCstationsDict   = None
+        self.GRDCindexObj       = None
         self.id                 = None
         self.data               = None
         self.lats               = None
@@ -64,50 +57,82 @@ class GRDCdataset():
         # GRDCheader_out: list
         #    list of keywords which should be used as header information in 
         #    GRDCindexFile.
-        self.GRDCkeywords       = ['GRDC-No', 'River', 'Station', 'Country', 'Latitude', 'Longitude', 'Catchment area', 'Time series']
-        self.GRDCheader_out     = ['GRDC-No', 'River', 'Station', 'Country', 'Latitude', 'Longitude', 'Catchment area', 'Date start', 'Date end', 'File']
+        self.GRDCkeywords       = ['GRDC-No', 'River', 'Station', 'Country', 'Latitude', 'Longitude', 
+                'Catchment area', 'Field delimiter', 'Meta Lines', 'Time series']
+        self.GRDCheader_out     = ['GRDC-No', 'River', 'Station', 'Country', 'Latitude', 'Longitude', 
+                'Catchment area', 'Field delimiter', 'Meta Lines', 'Date start', 'Date end', 'File']
 
         # force create index-file if GRDCindexFile not passed but GRDCfiles.
         if GRDCfiles is not None and GRDCindexFile is None:
             self.create_indexFile(force=True)
+        if GRDCstationsFile is not None and self.GRDCstationsDict is None:
+            self.read_GRDCstationsFile(delimiter=',')
 
     @property
-    def data(self):
-        return self.__data
-    @data.setter
-    def data(self, data):
-        """ data is expected to be an XD ndarray """
-        if data is None:
-            print(f'Initialize data as NoneType')
-            self.__data = None
+    def GRDCindexFile(self):
+        return self.__GRDCindexFile
+    @GRDCindexFile.setter
+    def GRDCindexFile(self, GRDCindexFile):
+        """ handle setting of GRDCindexFile"""
+        if GRDCindexFile is None:
+            print(f'Initialize GRDCindexFile as NoneType')
+            self.__GRDCindexFile = None
             return None
-        if not isinstance(data, np.ndarray):
-            print(f'data is of type {type(data)} but <class "numpy.ndarray"> is required!')
-            self.__data = None
+        if not isinstance(GRDCindexFile, str):
+            print(f'GRDCindexFile is of type {type(GRDCindexFile)} but <class "str"> is required!')
+            self.__GRDCindexFile = None
             return None
-
-        self.__data         = data
-        self.dataDim        = data.ndim
+        self.__GRDCindexFile = GRDCindexFile
+        # unset read variables if GRDCindexFile is changed
+        # This way I want to prevent getting inconsistent datasets.
+        self.id         = None
+        self.data       = None
+        self.lats       = None
+        self.lons       = None
+        self.time       = None
+        self.meanArea   = None
 
     @property
-    def GRDCindexObj(self):
-        return self.__GRDCindexObj
-    @GRDCindexObj.setter
-    def GRDCindexObj(self, GRDCindexObj):
-        """ GRDCindexObj is expected to be an XD ndarray """
-        if GRDCindexObj is None:
-            print(f'Initialize GRDCindexObj as NoneType')
-            self.__GRDCindexObj = None
+    def GRDCfiles(self):
+        return self.__GRDCfiles
+    @GRDCfiles.setter
+    def GRDCfiles(self, GRDCfiles):
+        """ handle setting GRDCfiles"""
+        if GRDCfiles is None:
+            print(f'Initialize GRDCfiles as NoneType')
+            self.__GRDCfiles = None
             return None
-        if not isinstance(GRDCindexObj, tuple):
-            print(f'GRDCindexObj is of type {type(GRDCindexObj)} but <tuple> is required!')
-            self.__data = None
+        if not isinstance(GRDCfiles, list):
+            print(f'GRDCfiles is of type {type(GRDCfiles)} but <list> is required!')
+            self.__GRDCfiles = None
             return None
-        self.__GRDCindexObj         = GRDCindexObj
+        self.__GRDCfiles = GRDCfiles
+        # unset read variables if GRDCfiles is changed
+        # This way I want to prevent getting inconsistent datasets.
+        self.id         = None
+        self.data       = None
+        self.lats       = None
+        self.lons       = None
+        self.time       = None
+        self.meanArea   = None
 
-        # unset read variables if related index is changed
-        # This way I want to prevent from changing the index
-        # band getting confused with strange data, belong to another index
+    @property
+    def GRDCstationsFile(self):
+        return self.__GRDCstationsFile
+    @GRDCstationsFile.setter
+    def GRDCstationsFile(self, GRDCstationsFile):
+        """ handle setting GRDCstationsFile"""
+        if GRDCstationsFile is None:
+            print(f'Initialize GRDCstationsFile as NoneType')
+            self.__GRDCstationsFile = None
+            return None
+        if not isinstance(GRDCstationsFile, str):
+            print(f'GRDCstationsFile is of type {type(GRDCfiles)} but <str> is required!')
+            self.__GRDCstationsFile = None
+            return None
+        self.__GRDCstationsFile = GRDCstationsFile
+        # unset read variables if GRDCfiles is changed
+        # This way I want to prevent getting inconsistent datasets.
         self.id         = None
         self.data       = None
         self.lats       = None
@@ -118,11 +143,7 @@ class GRDCdataset():
     ###########################################################################
     ########################## Auxiliary tools ################################
     ###########################################################################
-
-    def create_indexFile(self, #files=None, # REMOVE 
-                         #keywords=None, header_out=None, # REMOVE
-                         meta_lines=40,#header_lines=1, # REMOVE
-                         force=False):
+    def create_indexFile(self, force=True):
         ''' This function indicates a GRDC data set
 
         GRDC data-sets are usually stored in individual files per station, what
@@ -141,12 +162,9 @@ class GRDCdataset():
 
         Parameters
         ----------
-        meta_lines: int
-            number of line in GRDC files belonging to meta-data (need to extract 
-            data itself)
         force: boolean
-            True:  force to indicates GRDCfiles again, even if GRDCindexFile 
-                   does already exist
+            True:  force to iterate through GRDCfiles again, even if 
+                   GRDCindexFile does already exist
             False: force to read GRDCindexFile if already exist
 
         '''
@@ -156,15 +174,16 @@ class GRDCdataset():
         # If both matches: read in existing GRDCindexFile instead of 
         # indicating again
         if os.path.isfile(self.GRDCindexFile) and force == False: 
-            print(f'self.GRDCindexFile ({self.GRDCindexFile}) already exist -- read in the existing file instead. Use "force=True" to overwrite')
+            print(f'self.GRDCindexFile ({self.GRDCindexFile}) already exist -- read in the existing file instead indicatin all files again.') 
+            print(f'-- Use keyword "force=True" to overwrite')
             self.read_indexFile()
             # Return None to exit function here
             return None
 
         # Create list to store results (individual station ID, name, area etc.)
         list_out    = []
-        # Open GRDCindexFile and overwrite if already exist to not append same 
-        # list at the end of file
+        # Open GRDCindexFile and force overwriting to not append same 
+        # list at the end of a already existing file
         with open(self.GRDCindexFile, "w") as fout:
             wr = csv.writer(fout)
             # Write header to file
@@ -179,16 +198,25 @@ class GRDCdataset():
                 # Save only metadata lines 
                 # -> better for performance and storage compared
                 #    to save entire file
-                metadata = [next(f) for x in range(meta_lines)]
-                # Loop over all metadata-lines
-                for line in metadata:
+                # Metadata lies does start with "#". 
+                # -> end loop is first char is not "#"
+                # -> count number of metalines for later read function
+                metaLines = 0
+                # Loop over all metadata-linesa
+                for line in f:
                     # Apply some filter
                     tmp_line = line
                     tmp_line = tmp_line.rstrip("\n")
                     tmp_line = ' '.join(tmp_line.split())
                     tmp_line = tmp_line.split(':')
+                    # Check is line is metadata-line
+                    if tmp_line[0][0] != '#':
+                        # line does not start with "#" -> no metadata-line
+                        # breake the for loop
+                        break
+                    metaLines += 1
                     # Go through all GRDCkeywords and check if those are
-                    # part of metadata lien. If so store related information
+                    # part of metadata line. If so store related information
                     '''
                     E.g metadata contains:
                     # Station:               KVEMO NATANEBI
@@ -213,11 +241,19 @@ class GRDCdataset():
                                 write2csv['Date end'] = tmp_data2write[1]
                 # write also location where files was found for later usage
                 write2csv['File'] = f'{single_file}'
+                write2csv['Meta Lines'] = metaLines
+                # special treatment for 'Catchment area'
+                # This seems to be empty in newer datasets but is shiped with 
+                # a GEOjson file. So if 'Catchment area' is empty in individual
+                # files, mark as NaN and read in later from extra file
+                if write2csv["Catchment area"] == '':
+                    write2csv["Catchment area"] = 'NaN'
 
             # Write found metadata to GRDCindexFile (append at end)
             with open(self.GRDCindexFile, "a") as fout:
                 wr = csv.writer(fout)
-                row_out = [write2csv[key] for key in write2csv.keys() ]
+                row_out = [write2csv[key] for key in self.GRDCheader_out ]
+                #row_out = [write2csv[key] for key in write2csv.keys() ]
                 # remember found metadata also for GRDCindexObj
                 list_out.append(row_out)
                 wr.writerow(row_out)
@@ -324,14 +360,14 @@ class GRDCdataset():
             key='Catchment area', value=X, operant='>'
         indexObj: tuple
             Tuple of two lists, where first entry is the index header, and second entry is the index body
-            This parameter is reserved for more complex filtering
+            This parameter is reserved for more complex filtering AND NOT YET USED!
         store: boolean
             True: set / update self.GRDCindexObj with filtered index
-            This parameter is reserved for more complex filtering
+            This parameter is reserved for more complex filtering AND NOT YET USED!
 
         '''
-        # use self.GRDCindexObj is nothing is passed
-        indexObj = indexObj if not indexObj is None else self.GRDCindexObj
+        # use self.GRDCindexObj if nothing is passed
+        indexObj = indexObj if indexObj is not None else self.GRDCindexObj
         #check if passed arguments are correct / expected
         if not self.check_filter_index(key=key, value=value, operant=operant, indexObj=indexObj):
             print('ERROR: check_filter_index() failed --> self.filter_index() canceled!')
@@ -480,9 +516,8 @@ class GRDCdataset():
 
             print(f'{n:03}', '\t'.join(tmp_out))
 
-    def read_files(self, start, end,# indexObj=None, # REMOVE
-                         metaLines=40, delimiter=';',
-                         form='%Y-%m-%d', dischargeKey='Calculated'):
+    def read_files(self, start, end,
+                form='%Y-%m-%d', dischargeKey='Calculated'):
         ''' This function reads GRDC data into a ndarray
 
         This is the key function of the GRDCdataset-class, which reads in 
@@ -515,11 +550,6 @@ class GRDCdataset():
             passed as datetime-object or as string. If passed as string, 
             one need also to pass the correct 'form' to convert string to 
             datetie-object
-        metaLines: int
-            Number of lines belonging to metadata in GRDC data-files 
-            (those are skipped)
-        delimiter: str
-            String of delimiter char of GRDC data
         form: str
 
             Format string to convert 'start' and 'end' to datetime-object if those are passed as str
@@ -536,19 +566,17 @@ class GRDCdataset():
         if not isinstance(end, dt.datetime):
             end = dt.datetime.strptime(end, form)
 
-        indexHeader = self.GRDCindexObj[0]
-        indexList   = self.GRDCindexObj[1]
-        file_idx    = indexHeader.index('File')
-        id_idx      = indexHeader.index('GRDC-No')
-        lat_idx     = indexHeader.index('Latitude')
-        lon_idx     = indexHeader.index('Longitude')
-        meanArea    = indexHeader.index('Catchment area')
-        start_idx   = indexHeader.index('Date start')
-        end_idx     = indexHeader.index('Date end')
-
-        # station_header    = ['YYYY-MM-DD', 'Original']
-        # time_idx = station_header.index('YYYY-MM-DD')
-        # data_idx = station_header.index('Original')
+        indexHeader   = self.GRDCindexObj[0]
+        indexList     = self.GRDCindexObj[1]
+        file_idx      = indexHeader.index('File')
+        id_idx        = indexHeader.index('GRDC-No')
+        lat_idx       = indexHeader.index('Latitude')
+        lon_idx       = indexHeader.index('Longitude')
+        meanArea_idx  = indexHeader.index('Catchment area')
+        delimiter_idx = indexHeader.index('Field delimiter')
+        metaLines_idx = indexHeader.index('Meta Lines')
+        start_idx     = indexHeader.index('Date start')
+        end_idx       = indexHeader.index('Date end')
 
         tmp_out_id   = []
         tmp_out_data = []
@@ -556,72 +584,55 @@ class GRDCdataset():
         tmp_out_lons = []
         tmp_out_time = []
         tmp_out_meanArea = []
+        #print(f'indexList: {indexList}')
         for station in indexList:
             #print(f'start reading GRDC_no: {station[id_idx]}')
 
-            # catch different GRDC time-stamps
-            try:
-                start_station = dt.datetime.strptime(station[start_idx], '%Y')
-                # calculating month between start and start_staion
-                sliceStart = (start.year - start_station.year) * 12 + start.month - start_station.month
-                #sliceEnd   = end   - dt.datetime.strptime(station[end_idx], '%Y')
-            except ValueError:
-                sliceStart = (start - dt.datetime.strptime(station[start_idx], '%Y-%m')).days
-                #sliceEnd   = end   - dt.datetime.strptime(station[end_idx], '%Y-%m')
-            #print(sliceStart)
-
             #print(f'sliceStart: {sliceStart}')
             with open(station[file_idx], "r", encoding="utf8", errors='ignore') as f:
+
+                # handle file pointer via csv module
+                reader = csv.reader(f, delimiter=station[delimiter_idx])
+
                 # skip meta data
-                _ = [next(f) for x in range(metaLines)]
-                # set file pointer
-                reader = csv.reader(f, delimiter=delimiter)
+                _ = [next(f) for x in range(station[metaLines_idx])]
+
                 # read header
                 tmp_header = next(reader, None)
-
-                # slice not needed data
-                _ = [next(f) for x in range(sliceStart)]
-
                 tmp_header = [ entry.strip() for entry in tmp_header ]
                 # get needed /  wanted index
                 time_idx = tmp_header.index('YYYY-MM-DD')
-                # print('time_idx:', time_idx)
                 data_idx = tmp_header.index(f'{dischargeKey}')
-                # print('data_idx:', data_idx)
+
                 # loop over all data
                 tmp_time = []
                 tmp_data = []
                 for row in reader:
+                    # skip lines before start-date
+                    tmp = self.read_GRDCdate(row[time_idx])
+                    if tmp < start:
+                        continue
+                    # break for lines after end-date
+                    elif tmp > end:
+                        break
+
                     #print(f'row: {row}')
-                    # print(row)
-                    try:
-                        tmp = dt.datetime.strptime(row[time_idx], '%Y-%m-%d')
-                    except ValueError:
-                        # monthly files does contain date format as: YYYY-mm-00
-                        # but datetime cannot handle day=00, so cut it 
-                        tmp_date = row[time_idx].split('-')
-                        tmp_date = '-'.join(tmp_date[:-1])
-                        tmp = dt.datetime.strptime(tmp_date, '%Y-%m')
-                        end = end.replace(day=1)
                     tmp_time.append(tmp)
                     tmp_data.append(row[data_idx].strip())
                     #print(f'tmp: {tmp} vs end: {end}')
-                    if tmp >= end:
-                        break
-                    # print(tmp_time)
-                #print(f'-- found {len(tmp_time)} data-points')
-                # tmp_time = np.asarray(tmp_time)
-                # tmp_data = np.asarray(tmp_data, dtype=float)
-                ## mask missing values
-                #tmp_data[tmp_data==-999] = np.nan
-                #tmp_data[tmp_data==-99] = np.nan
 
                 tmp_out_id.append(station[id_idx])
                 tmp_out_data.append(np.asarray(tmp_data, dtype=float))
                 tmp_out_lats.append(station[lat_idx])
                 tmp_out_lons.append(station[lon_idx])
+                #print(f'tmp_time: {tmp_time}')
                 tmp_out_time.append(np.asarray(tmp_time, dtype=object))
-                tmp_out_meanArea.append(station[meanArea])
+                # special treatment for catchment area which might be store in
+                # extra GRDCstationsFile...
+                tmpMeanArea = station[meanArea_idx] if station[meanArea_idx] != 'NaN' else None
+                if tmpMeanArea is None and self.GRDCstationsDict is not None:
+                    tmpMeanArea = self.GRDCstationsDict[station[id_idx]]['area']
+                tmp_out_meanArea.append(tmpMeanArea)
 
         self.id         = np.asarray(tmp_out_id, dtype=int)
         self.data       = np.asarray(tmp_out_data)
@@ -629,3 +640,45 @@ class GRDCdataset():
         self.lons       = np.asarray(tmp_out_lons, dtype=float)
         self.time       = np.asarray(tmp_out_time)
         self.meanArea   = np.asarray(tmp_out_meanArea, dtype=float)
+
+    def read_GRDCdate(self, date_str):
+        """ read GRDC data string
+
+        It is knowen that some GRDC datasets does contain dates in a form where
+        the day is indicated with zero. E.g. 1925-01-00.
+        day=00 cannot be handled by datetime, wherefore a special treatment is 
+        needed and done below.
+        """
+        try:
+            date_out = dt.datetime.strptime(date_str, '%Y-%m-%d')
+        except ValueError:
+            # monthly files could contain date format as: YYYY-mm-00
+            # but datetime cannot handle day=00, so cut it
+            tmp_date = date_str.split('-')
+            tmp_date = '-'.join(tmp_date[:-1])
+            date_out = dt.datetime.strptime(tmp_date, '%Y-%m')
+            date_out = date_out.replace(day=1)
+        return date_out
+
+    def read_GRDCstationsFile(self, delimiter=','):
+        """ read and store GRDC stations file as obj-dict
+
+        Some metadata information are not necessarily stored with the 
+        metadatalines of each individual station file, as for example the 
+        catchment area. For those situations this function does read the
+        GRDC stations file and store as a dict {grdc_no:row} to make those 
+        data easily available.
+        
+        NOTE:
+            The GRDC stations files has to be provided as csv file! 
+            The originally download format might be .xlsx, which has to be
+            converted to .csv. 
+            I decided to do so to not get this function overloaded by many
+            extern libs, but stay with basic libs (as far as possible).
+        """
+        with open(self.GRDCstationsFile, 'r') as f:
+            dictReader = csv.DictReader(f)
+            GRDCstationsDict = {row['grdc_no']:row for row in dictReader}
+            GRDCstationsDict['fieldnames'] = dictReader.fieldnames
+            self.GRDCstationsDict = GRDCstationsDict
+
