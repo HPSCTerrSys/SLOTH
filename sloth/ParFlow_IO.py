@@ -117,3 +117,52 @@ def read_pfb(filename):
             data[iz:iz+nz, iy:iy+ny, ix:ix+nx] = tmp_data
 
     return data
+
+def read_pfbMetaData(filename):
+    with open(filename, "rb") as f:
+        # read meta informations of datafile
+        meta_inf = np.fromfile(f, dtype='>f8', count = 3)
+        x1 = meta_inf[0]
+        y1 = meta_inf[1]
+        z1 = meta_inf[2]
+        print(f'x1: {x1}; y1: {y1}; z1: {z1}')
+
+
+        meta_inf = np.fromfile(f, dtype='>i4', count = 3)
+        nx = meta_inf[0]
+        ny = meta_inf[1]
+        nz = meta_inf[2]
+        nn = nx * ny * nz
+        print(f'nx: {nx}; ny: {ny}; nz: {nz}; nn: {nn}')
+
+
+        meta_inf = np.fromfile(f, dtype='>f8', count = 3)
+        dx = meta_inf[0]
+        dy = meta_inf[1]
+        dz = meta_inf[2]
+        print(f'dx: {dx}; dy: {dy}; dz: {dz}')
+
+
+        meta_inf = np.fromfile(f, dtype='>i4', count = 1)
+        nsubgrid = meta_inf[0]
+        print(f'nsubgrid: {nsubgrid}')
+
+
+        for s in range(nsubgrid):
+            meta_inf = np.fromfile(f, dtype='>i4', count = 9)
+            ix = meta_inf[0]
+            iy = meta_inf[1]
+            iz = meta_inf[2]
+            # print("---{0} Start Index (X,Y,Z):".format(s+1), ix, iy, iz)
+
+            nx = meta_inf[3]
+            ny = meta_inf[4]
+            nz = meta_inf[5]
+            nn = nx*ny*nz
+            # print("---{0} Dimensions (X,Y,Z):".format(s+1), nx, ny, nz)
+
+            rx = meta_inf[6]
+            ry = meta_inf[7]
+            rz = meta_inf[8]
+            # print("---{0} Offsets (X,Y,Z):".format(s+1), rx, ry, rz)
+
