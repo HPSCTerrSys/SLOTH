@@ -243,8 +243,8 @@ def plot_SanityCheck_2D(data, data_mask=None, figname='./SanityCheck.pdf',
         tmp_norm = mcolors.TwoSlopeNorm(vmin=tmp_vmin, vcenter=0, vmax=tmp_vmax)
     else:
         print(f'handling tmp_vmin: {tmp_vmin}; tmp_vmid: {tmp_vmid}; tmp_vmax: {tmp_vmax}')
-        #tmp_norm = mcolors.TwoSlopeNorm(vmin=tmp_vmin, vcenter=tmp_vmid, vmax=tmp_vmax)
-        tmp_norm = mcolors.TwoSlopeNorm(vmin=tmp_vmin, vcenter=0.005, vmax=tmp_vmax)
+        tmp_norm = mcolors.TwoSlopeNorm(vmin=tmp_vmin, vcenter=tmp_vmid, vmax=tmp_vmax)
+        #tmp_norm = mcolors.TwoSlopeNorm(vmin=tmp_vmin, vcenter=0.005, vmax=tmp_vmax)
     tmp_infostr = get_infostr(data_kin_T)
     kin_ax.text(0.01, 0.99, tmp_infostr,
                  verticalalignment='top', transform=kin_ax.transAxes,
