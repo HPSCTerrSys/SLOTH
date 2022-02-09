@@ -104,7 +104,7 @@ def plot_imshow2PDiff(v1, v2, **kwargs):
     elif np.sign(var_vmin)*np.sign(var_vmax) < 0.0:
         var_norm = mcolors.TwoSlopeNorm(vmin=var_vmin, vcenter=0, vmax=var_vmax)
     else:
-        var_norm = mcolors.TwoSlopeNorm(vmin=var_vmin, vcenter=(var_vmax+var_vmin,)/2., vmax=var_vmax)
+        var_norm = mcolors.TwoSlopeNorm(vmin=var_vmin, vcenter=(var_vmax+var_vmin)/2., vmax=var_vmax)
 
     fig = plt.figure(figsize=figsize, dpi=dpi)
     if title is not None:
