@@ -13,6 +13,7 @@ Check examples/ to see how this works.
 """
 import sys
 import os
+import glob
 import numpy as np
 import netCDF4 as nc
 import datetime
@@ -20,6 +21,10 @@ from calendar import monthrange
 from . import pars_ParFlowTCL as ppfl
 from . import ParFlow_IO as pio
 import matplotlib.pyplot as plt
+from scipy import ndimage as nd
+
+import sloth.slothHelper as slothHelper
+
 
 def calc_catchment(slopex, slopey, x, y):
     """ This function calculates the catchment related to a given pixel
@@ -96,81 +101,6 @@ def calc_catchment(slopex, slopey, x, y):
 
     # np.save('./catchment_mask', fc.reshape(dims))
     return fc.reshape(dims)
-
-def calc_catchment_old_nonzeroslope(slopex, slopey, x, y):
-    cmask = np.zeros_like(slopex)
-    cdim = cmask.shape
-    cmask[y,x] = 1
-    loop = 0
-    max_loop = 10000
-    new_p = 1
-    while (new_p != 0) and (loop < max_loop):
-        print('start loop {} (found {} new points in last loop)'.format(loop, new_p))
-        new_p = 0
-        for y in range(1, cdim[0]-1):
-            for x in range(1, cdim[1]-1):
-                if(cmask[y,x] == 0):
-                    slopdir = np.abs(slopex[y,x]) >= np.abs(slopey[y,x])
-                    if slopdir:#RUNOFF IN Y-DIRECTION
-                        if( cmask[y,x+1] == 1 and slopex[y,x] <= 0 ):
-                            cmask[y,x] = 1
-                            new_p += 1
-                            continue
-                        elif( cmask[y,x-1] == 1 and slopex[y,x] >= 0 ):
-                            cmask[y,x] = 1
-                            new_p += 1
-                            continue
-                    else:
-                        if( cmask[y+1,x] == 1 and slopey[y,x] <= 0 ):
-                            cmask[y,x] = 1
-                            new_p += 1
-                            continue
-                        elif( cmask[y-1,x] == 1 and slopey[y,x] >= 0 ):
-                            cmask[y,x] = 1
-                            new_p += 1
-                            continue
-
-                else:
-                    continue
-        loop += 1
-    np.save('./catchment_mask_old_nonzeroslope', cmask)
-
-def calc_catchment_old_majorslope(slopex, slopey, x, y):
-    cmask = np.zeros_like(slopex)
-    cdim = cmask.shape
-    cmask[y,x] = 1
-    loop = 0
-    max_loop = 10000
-    new_p = 1
-    while (new_p != 0) and (loop < max_loop):
-        print('start loop {} (found {} new points in last loop)'.format(loop, new_p))
-        new_p = 0
-        for y in range(1, cdim[0]-1):
-            for x in range(1, cdim[1]-1):
-                if(cmask[y,x] == 0):
-                    slopdir = np.abs(slopex[y,x]) >= np.abs(slopey[y,x])
-                    if slopdir:#RUNOFF IN Y-DIRECTION
-                        if( cmask[y,x+1] == 1 and slopex[y,x] <= 0 ):
-                            cmask[y,x] = 1
-                            new_p += 1
-                            continue
-                        elif( cmask[y,x-1] == 1 and slopex[y,x] >= 0 ):
-                            cmask[y,x] = 1
-                            new_p += 1
-                            continue
-                    else:
-                        if( cmask[y+1,x] == 1 and slopey[y,x] <= 0 ):
-                            cmask[y,x] = 1
-                            new_p += 1
-                            continue
-                        elif( cmask[y-1,x] == 1 and slopey[y,x] >= 0 ):
-                            cmask[y,x] = 1
-                            new_p += 1
-                            continue
-                else:
-                    continue
-        loop += 1
-    np.save('./catchment_mask_old_majorslope', cmask)
 
 def plot_MappedSubAreas(mapper, fit_name='NotSet', search_rad=3, save_dir='../data'):
     for idx, ID in enumerate(mapper.ObsIDs):
@@ -335,31 +265,26 @@ def createNetCDF(fileName, domain=None, nz=None, author=None,
     history=None, timeCalendar=None, timeUnit=None, NBOUNDCUT=0):
 
     #######################################################################
-    #### Default definitions for domain
+    #### Get domain definitions   
     #######################################################################
-    if domain == 'DE05':
-        # https://icg4geo.icg.kfa-juelich.de/SoftwareTools/prepro_parflowclm_de05_static_fields/blob/master/doc/content/Grid.rst
-        ny = nx = 2000     # [-]
-        dy = dx = 0.0055   # [deg]
-        # Rotated pole geographical coordinates
-        rpol_Y  = 39.25    # [deg]
-        rpol_X  = -162.0   # [deg]
-        # South-West Corner of domain in rotated coordinates
-        SWC_Y = -5.38725   # [deg]
-        SWC_X = -10.82725  # [deg]
-    elif domain == 'EU11':
-        ny = 432           # [-]
-        nx = 444           # [-]
-        dy = dx = 0.110    # [deg]
-        # Rotated pole geographical coordinates
-        rpol_Y  = 39.25    # [deg]
-        rpol_X  = -162.0   # [deg]
-        # South-West Corner of domain in rotated coordinates
-        SWC_Y = -24.4720   # [deg]
-        SWC_X = -29.4713   # [deg]
+    availableCORDEXDomains  = slothHelper.get_listOfCordexGrids()
+    availableGriddesDomains = slothHelper.get_listOfGriddes()
+    if domain in availableCORDEXDomains:
+        domainDef = slothHelper.get_cordexDomDef(domain)
+    elif domain in availableGriddesDomains:
+        domainDef = slothHelper.get_griddesDomDef(domain)
     else:
         print(f'ERROR: passed domain is not supported. domain={domain} --> Exit')
         return False
+
+    nx     = domainDef['Nlon']
+    ny     = domainDef['Nlat']
+    dx     = domainDef['dlon']
+    dy     = domainDef['dlat']
+    rpol_X = domainDef['NPlon']
+    rpol_Y = domainDef['NPlat']
+    SWC_X  = domainDef['SWlon']
+    SWC_Y  = domainDef['SWlat']
 
     #######################################################################
     #### Checking is time- and / or z-axis is used
@@ -543,6 +468,59 @@ def find_nearest_Index_2D(point, coord2D):
 def plusOneMonth(currDate):
     num_days = monthrange(currDate.year, currDate.month)[1]
     return currDate + datetime.timedelta(hours=24*num_days)
-        
+
+def trunc(values, decs=0):
+    """ truncates a passed float value by given floating point digit
+
+    This funciton does truncate a given float value or floting ndarray
+    by the precision defined by `decs`.
+
+    Example: trunc(values=2.12345, decs=3) --> 2.123
+    
+    Input value:
+    ------------
+    values: ndarray
+        A ndarray of any dimension (also scalar).
+    decs: int
+        A integer value defining the truncation precision.
+
+    Return value:
+    -------------
+    values: ndarray
+        A ndarray of same type as input
+
+    """
+    return np.trunc(values*10**decs)/(10**decs)
+
+def fill(data, invalid=None, transkargs={}):
+    """
+    Replace the value of invalid 'data' cells (indicated by 'invalid')
+    by the value of the nearest valid data cell.
+    Source: https://stackoverflow.com/questions/5551286/filling-gaps-in-a-numpy-array
+
+    Input:
+        data:       numpy array of any dimension
+        invalid:    a binary array of same shape as 'data'.
+                    data value are replaced where invalid is True
+                    If None (default), use: invalid  = np.isnan(data)
+        transkargs: optional arguments one want to pass to
+                    distance_transform_edt()
+
+    Output:
+        Return a filled array.
+    """
+    # check if data and invalid shape is equal, as otherwise filling is not
+    # possible
+    if data.shape != invalid.shape:
+        print(f'ERROR: data.shape {data.shape} != invalid.shape (invalid.shape)')
+    if invalid is None: invalid = np.isnan(data)
+
+    ind = nd.distance_transform_edt(invalid,
+                                    return_distances=False,
+                                    return_indices=True,
+                                    **transkargs)
+    return data[tuple(ind)]
+
+
 if __name__ == '__main__':
     print('Im there!')
