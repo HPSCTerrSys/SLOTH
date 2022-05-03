@@ -15,22 +15,33 @@ import sys
 import os
 import glob
 import numpy as np
-import netCDF4 as nc
 import datetime
+import matplotlib.pyplot as plt
 from calendar import monthrange
 from . import pars_ParFlowTCL as ppfl
-from . import ParFlow_IO as pio
-import matplotlib.pyplot as plt
+from . import IO as io
 from scipy import ndimage as nd
 
 import sloth.slothHelper as slothHelper
 
 
 def calc_catchment(slopex, slopey, x, y):
-    """ This function calculates the catchment related to a given pixel
-    based on x- and y-slope files
+    """ This function calculates the catchment related to a given outlet
+    pixel based on x- and y-slope files
 
-    This algorithem is 
+    This algorithem is quiet simple, but I found no faster one, at least
+    not without using other external libs.
+    The idea is to start with a list of pixels belonging to the catchment, for 
+    example with a list with a single entry -- the given outlet pixel. 
+    Than loop over this list, pop (!) the current pixel and 
+    i)  mark the current pixel as catchment and
+    ii) check all sorounding pixels, if those does drain into the current pixel
+    and does not belong to the catchment already.
+    All found sorrounding pixels, which does drain into the current one and
+    does not belong to the catchment already are appended to the list the loop
+    is itterating over. Than the next itteration is started.
+    This way the algorithem does find every pixel belonging to the catchment of
+    the passes initial pixel(s) -- e.g. the outlet pixel.
 
     INPUT: 
     slopex: 2D ndarray
@@ -70,11 +81,9 @@ def calc_catchment(slopex, slopey, x, y):
 
     openEnds = [start]
     while openEnds:
-        # get one open end
+        # Get one open end
         step = openEnds.pop()
-        # print(f'poped: {step}')
-        # print(f'len openEnds: {len(openEnds)}')
-        # mark open end as catchment
+        # Mark open end as catchment
         fc[step] = 1
         # GET surrounding Pixel
         # Nort = step - nx; East = step +1
@@ -82,55 +91,19 @@ def calc_catchment(slopex, slopey, x, y):
         # NEWS = [step-nx, step+1, step-1, step+nx]
         NS = [step-nx, step+nx]
         EW = [step+1, step-1]
-        # print(f'NS: {NS}')
-        # print(f'EW: {EW}')
-        # CHECK if surrounding drain to step (D2S) and are NOT catchment already
+        # CHECK if surrounding drain to step (D2S) and are NOT catchment already.
+        # Step is the current handled open end.
         try:
             NSD2S = [ idx for idx in  NS if (idx + fdy[idx] == step and not fc[idx] ) ] 
             EWD2S = [ idx for idx in  EW if (idx + fdx[idx] == step and not fc[idx] ) ] 
         except IndexError:
             print('FEHLER')
             continue
-        # print(f'NSD2S: {NSD2S}')
-        # print(f'EWD2S: {EWD2S}')
         D2S = NSD2S + EWD2S
-        # print(f'D2S: {D2S}')
-
         # add all found pixes to openEnds
         openEnds += D2S
 
-    # np.save('./catchment_mask', fc.reshape(dims))
     return fc.reshape(dims)
-
-def plot_MappedSubAreas(mapper, fit_name='NotSet', search_rad=3, save_dir='../data'):
-    for idx, ID in enumerate(mapper.ObsIDs):
-        print(f'--- plotting ObsID {ID}')
-        fig = plt.figure()
-        ax = fig.add_subplot(1, 1, 1)
-
-        rawX = mapper.MapXIdx_raw[idx]
-        rawY = mapper.MapYIdx_raw[idx] 
-        data2plot = mapper.SimMeanQ[rawY-search_rad:rawY+search_rad+1, rawX-search_rad:rawX+search_rad+1].copy()
-        data2plot /= np.nanmax(mapper.SimMeanQ[rawY-search_rad:rawY+search_rad+1, rawX-search_rad:rawX+search_rad+1])
-        im = ax.imshow(data2plot, origin='lower')
-        fig.colorbar(im, ax=ax)
-        # raw data is always the centre = search_rad
-        ax.scatter(search_rad ,search_rad, c='red', marker='x', label='raw')
-        x_sliced = mapper.MapXIdx_fit[idx] - ( rawX - search_rad)
-        y_sliced = mapper.MapYIdx_fit[idx] - ( rawY - search_rad)
-        ax.scatter(x_sliced, y_sliced, c='red', marker='o', label='best')
-        ax.legend()
-        title_strs = [
-                   f'GRDC-ID: {ID}',
-                   f'fit-routine used: {fit_name}',
-                   f'ObsMeanQ: {mapper.ObsMeanQ[idx]:.2f} m^3/s',
-                   f'SimMeanQ raw: {mapper.SimMeanQ[mapper.MapYIdx_raw[idx], mapper.MapXIdx_raw[idx]]:.2f} m^3/s',
-                   f'SimMeanQ fit: {mapper.SimMeanQ[mapper.MapYIdx_fit[idx], mapper.MapXIdx_fit[idx]]:.2f} m^3/s',
-                   # f'ObsMeanArea / SimMeanArea: {mapper.ObsMeanArea[idx] / mapper.SimMeanArea[idx]:.2f} m^2/m^2'
-                   ]
-        ax.set_title('\n'.join(title_strs))
-        fig.savefig(f'{save_dir}/MappedSubAreas_{fit_name}_{ID}.png', bbox_inches='tight', pad_inches=0)
-        plt.close('all')
 
 def get_intervalSlice(dates, sliceInterval='month'):
     ''' This functions calculates interval slices of a given time-series
@@ -259,122 +232,6 @@ def get_intervalSlice(dates, sliceInterval='month'):
 
     return Slices 
 
-
-def createNetCDF(fileName, domain=None, nz=None, author=None, 
-    description=None, source=None, contact=None, institution=None, 
-    history=None, timeCalendar=None, timeUnit=None, NBOUNDCUT=0):
-
-    #######################################################################
-    #### Get domain definitions   
-    #######################################################################
-    availableCORDEXDomains  = slothHelper.get_listOfCordexGrids()
-    availableGriddesDomains = slothHelper.get_listOfGriddes()
-    if domain in availableCORDEXDomains:
-        domainDef = slothHelper.get_cordexDomDef(domain)
-    elif domain in availableGriddesDomains:
-        domainDef = slothHelper.get_griddesDomDef(domain)
-    else:
-        print(f'ERROR: passed domain is not supported. domain={domain} --> Exit')
-        return False
-
-    nx     = domainDef['Nlon']
-    ny     = domainDef['Nlat']
-    dx     = domainDef['dlon']
-    dy     = domainDef['dlat']
-    rpol_X = domainDef['NPlon']
-    rpol_Y = domainDef['NPlat']
-    SWC_X  = domainDef['SWlon']
-    SWC_Y  = domainDef['SWlat']
-
-    #######################################################################
-    #### Checking is time- and / or z-axis is used
-    #######################################################################
-    withTime = False
-    if timeUnit is not None and timeCalendar is not None:
-        withTime = True
-    else:
-        print('NOT creating time-axis')
-        print(f'--  timeUnit = {timeUnit}; timeCalendar = {timeCalendar}') 
-
-    withZlvl = False
-    if nz is not None:
-        withZlvl = True
-    else:
-        print('NOT creating z-axis')
-
-    #######################################################################
-    #### Create netCDF file (overwrite if exist)
-    #######################################################################
-    # If no file-extension is passed, add '.nc' as default
-    fileRoot, fileExt = os.path.splitext(fileName)
-    if not fileExt:
-       fileExt = '.nc'
-    fileName = f'{fileRoot}{fileExt}'
-
-    # Create netCDF file
-    nc_file = nc.Dataset(f'{fileName}', 'w', format='NETCDF4')
-    # Add basic information
-    nc_file.author      = f'{author}'
-    nc_file.contact     = f'{contact}'
-    nc_file.institution = f'{institution}' 
-    nc_file.description = f'{description}'
-    nc_file.history     = f'{history}'
-    nc_file.source      = f'{source}'
-
-    # Create dimensions
-    # Take into account to 'cut' pixel at domain border (NBOUNDCUT)
-    drlon = nc_file.createDimension('rlon',nx-2*NBOUNDCUT)
-    drlat = nc_file.createDimension('rlat',ny-2*NBOUNDCUT)
-    if withZlvl:
-        dlvl = nc_file.createDimension('lvl',nz)
-    dtime = nc_file.createDimension('time',None)
-
-    rlon = nc_file.createVariable('rlon', 'f4', ('rlon',),
-                                zlib=True)
-    rlon.standard_name = "grid_longitude"
-    rlon.long_name = "rotated longitude"
-    rlon.units = "degrees"
-    rlon.axis = "X"
-    # Take into account to 'cut' pixel at domain border (NBOUNDCUT)
-    rlon_values = np.array([SWC_X + (i*dx) for i in range(NBOUNDCUT, nx-NBOUNDCUT)])
-    rlon[...] = rlon_values[...]
-
-    rlat = nc_file.createVariable('rlat', 'f4', ('rlat',),
-                                    zlib=True)
-    rlat.standard_name = "grid_latitude"
-    rlat.long_name = "rotated latitude"
-    rlat.units = "degrees"
-    rlat.axis = "Y"
-    # Take into account to 'cut' pixel at domain border (NBOUNDCUT)
-    rlat_values = np.array([SWC_Y + (i*dy) for i in range(NBOUNDCUT, ny-NBOUNDCUT)])
-    rlat[...] = rlat_values[...]
-
-    if withZlvl:
-        lvl = nc_file.createVariable('lvl', 'f4', ('lvl',),
-                      zlib=True)
-        lvl.standard_name = "level"
-        lvl.long_name = "ParFlow layers"
-        lvl.units = "-"
-        lvl.axis = "Z"
-        lvl_values = np.arange(nz)
-        lvl[...] = lvl_values[...]
-
-    if withTime:
-        ncTime = nc_file.createVariable('time', 'i2', ('time',), zlib=True)
-        ncTime.units = f'{timeUnit}'
-        ncTime.calendar = f'{timeCalendar}'
-
-    # Create grid-mapping for rotated-pole grid
-    rotated_pole = nc_file.createVariable('rotated_pole', 'i2', zlib=True)
-    rotated_pole.long_name = "coordinates of the rotated North Pole"
-    rotated_pole.grid_mapping_name = "rotated_latitude_longitude"
-    rotated_pole.grid_north_pole_latitude = rpol_Y
-    rotated_pole.grid_north_pole_longitude = rpol_X
-
-    # Close netCDF file for save and return
-    nc_file.close()
-    return fileName
-
 def mappIndicator(ParFlowNamelist, IndicatorFile):
     ###############################################################################
     ### parse ParFlow-Namelist to get indicators values
@@ -413,7 +270,7 @@ def mappIndicator(ParFlowNamelist, IndicatorFile):
             ###############################################################################
             ### prepare arrays to return
             ###############################################################################
-            Indi3D = pio.read_pfb(f'{IndicatorFile}')
+            Indi3D = io.read_pfb(f'{IndicatorFile}')
             shape3D= Indi3D.shape
             print(f'shape3D: {shape3D}')
             alpha  = np.full(shape3D,vanG_a['domain'])
