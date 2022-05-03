@@ -1,15 +1,10 @@
 """analysis - submodule of SLOTH
 
-author: Nikals WAGNER
-e-mail: n.wagner@fz-juelich.de
-version: 2021-06-24
-
 Description:
-tooBox.py is aimed to hold standalone functions used / developed / found
-within the realm of SLOTH development.
-[...]
+analysis.py is aimed to hold standalone functions used for analysis purpose.
+Basically this are functions calculating some variabels.
 
-Check examples/ to see how this works. 
+[...]
 """
 import sys
 import os
@@ -42,40 +37,6 @@ def calc_wtd(press, cellDepths):
     # but maybe this is not as intuitive as the used if-clause?
     wtd = ht.where((wtd < 0), 0, wtd)
     return wtd
-
-def calc_gwr_v1(spw, wtd, cellCenterDepth3D):
-    nz, ny, nx = cellCenterDepth3D.shape
-    gwr = ht.zeros((ny, nx))
-    # wtd_z_index should contain the z-index of that level which does
-    # contribute to the ground water recharge. To my (NWR) unserstanding
-    # this is the index of the next cell center above the WTD
-    # 1. Calculate diff between WTD and cellCenterDepth
-    tmp_1 = wtd-cellCenterDepth3D
-    # 2. 'mask' those cells where WTD is above (masking = set to large value)
-    tmp_1 = ht.where(tmp_1 <= 0, 1000, tmp_1)
-    # 3. find next / closest cellCenter above WTD
-    wtd_z_index = ht.argmin(tmp_1,axis=0)
-    # 4. get spw at wtd_z_index which is gwr
-    for z in range(nz):
-        gwr = ht.where(wtd_z_index==z, spw[z], gwr)
-    return gwr
-
-def calc_gwr_v2(spw, wtd_z_index):
-    """
-    see also:
-    https://www.mi.fu-berlin.de/en/math/groups/ag-numerik/download/dateien/VL_Engelhardt_3.pdf
-    """
-    spwShape = spw.shape
-    nx = spwShape[-1]
-    ny = spwShape[-2]
-    nz = spwShape[-3]
-    gwr = ht.zeros((ny, nx))
-    # wtd_z_index is the index corrospond to first cell outsid the 
-    # groundwaterbody which is to to my (NWR) unserstanding that lvl
-    # contributing to ground-water-recharge
-    for z in range(nz):
-        gwr = ht.where(wtd_z_index==z, spw[z], gwr)
-    return gwr
 
 def get_3Dgroundwaterbody_mask(satur):
     ''' calculating a 3D mask of the groundwater-body
@@ -111,4 +72,32 @@ def get_3Dgroundwaterbody_mask(satur):
         gwb_mask[z] = ht.where(z<wtd_z_index, 1, 0)
 
     return gwb_mask, wtd_z_index
+
+def vanGenuchten(refP, sSat, sRes, nVanG, aVanG):
+    """  Calculates the degree of saturation as a function of the pressure head.
+
+    The degree of saturation is calculated as a function of the pressure head
+    according to M. Th. van Genuchten.
+    Name: A Closed‐form Equation for Predicting the Hydraulic Conductivity of
+            Unsaturated Soils
+    DOI: https://doi.org/10.2136/sssaj1980.03615995004400050002x
+
+    Parameters:
+    refP:       Pressure head [L]
+    sSat:       Relative saturated water content [-]
+    sRes:       Relative residual saturation [-]
+    nVanG:      Non linearity coefficient of the soil [-]
+    aVanG:      Air entry values of the soil [L^-1]
+
+    Returns:
+    vanG:
+
+    """
+    mVanG = 1 - (1 / nVanG)
+
+    vanG = ( (sSat - sRes) / ( 1 + (aVanG * np.absolute(refP))**(nVanG) )**mVanG ) + sRes
+
+    vanG = np.where(refP>=0., 1., vanG) # avoid unsaturated values where water is ponding
+
+    return vanG
 
