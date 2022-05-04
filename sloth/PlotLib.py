@@ -213,3 +213,33 @@ def plot_ClimateYearMonth(climateData, **kwargs):
     cbar_ax = fig.add_axes([0.95, 0.15, 0.03, 0.7])
     fig.colorbar(im, cax=cbar_ax)
 
+def plot_MappedSubAreas(mapper, fit_name='NotSet', search_rad=3, save_dir='../data'):
+    for idx, ID in enumerate(mapper.ObsIDs):
+        print(f'--- plotting ObsID {ID}')
+        fig = plt.figure()
+        ax = fig.add_subplot(1, 1, 1)
+
+        rawX = mapper.MapXIdx_raw[idx]
+        rawY = mapper.MapYIdx_raw[idx]
+        data2plot = mapper.SimMeanQ[rawY-search_rad:rawY+search_rad+1, rawX-search_rad:rawX+search_rad+1].copy()
+        data2plot /= np.nanmax(mapper.SimMeanQ[rawY-search_rad:rawY+search_rad+1, rawX-search_rad:rawX+search_rad+1])
+        im = ax.imshow(data2plot, origin='lower')
+        fig.colorbar(im, ax=ax)
+        # raw data is always the centre = search_rad
+        ax.scatter(search_rad ,search_rad, c='red', marker='x', label='raw')
+        x_sliced = mapper.MapXIdx_fit[idx] - ( rawX - search_rad)
+        y_sliced = mapper.MapYIdx_fit[idx] - ( rawY - search_rad)
+        ax.scatter(x_sliced, y_sliced, c='red', marker='o', label='best')
+        ax.legend()
+        title_strs = [
+                   f'GRDC-ID: {ID}',
+                   f'fit-routine used: {fit_name}',
+                   f'ObsMeanQ: {mapper.ObsMeanQ[idx]:.2f} m^3/s',
+                   f'SimMeanQ raw: {mapper.SimMeanQ[mapper.MapYIdx_raw[idx], mapper.MapXIdx_raw[idx]]:.2f} m^3/s',
+                   f'SimMeanQ fit: {mapper.SimMeanQ[mapper.MapYIdx_fit[idx], mapper.MapXIdx_fit[idx]]:.2f} m^3/s',
+                   # f'ObsMeanArea / SimMeanArea: {mapper.ObsMeanArea[idx] / mapper.SimMeanArea[idx]:.2f} m^2/m^2'
+                   ]
+        ax.set_title('\n'.join(title_strs))
+        fig.savefig(f'{save_dir}/MappedSubAreas_{fit_name}_{ID}.png', bbox_inches='tight', pad_inches=0)
+        plt.close('all')
+

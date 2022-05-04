@@ -10,7 +10,7 @@ import os
 
 sloth_path='../'
 sys.path.append(sloth_path)
-import sloth
+import sloth.SanityCheck
 
 ###############################################################################
 ### Define some paths, filenames, etc
@@ -30,21 +30,9 @@ fileName    = f'{dataRootDir}/{datasetName}/{procType}/{dataYear}/{varName}_ts.n
 with nc.Dataset(f'{fileName}', 'r') as nc_file:
     nc_var   = nc_file.variables[f'{varName}']
     var      = nc_var[...]
-    # netCDF4 returns masked-array, which is nice, but one should stick to one
-    # way handling missing values and I do prefere np.nan, so filling
-    # var to get pure numpy ndarray
-    # However we can keep the mask, to keep the information where masked values
-    # are / were - can be helpfull
-    var_mask  = var.mask
-    # handling if no values are masked (one aspect why I prefere handling of
-    # missing values via np.nan...
-    if not var_mask.any():
-        var_mask  = np.zeros(var.shape, dtype=bool)
-    var = var.filled(fill_value=np.nan)
-
 
 ###############################################################################
-### Start SanityCheck 3D
+### Start SanityCheck
 ###############################################################################
 # define some title for plot, which can be passed via functionarguments
 # see funciton definition for full potential
@@ -55,11 +43,11 @@ maxax_title  = f'{varName} max'
 kinax_title  = f'{varName} mean'
 hisax_title  = f'{varName} mean - distribution'
 
-# For mor detailed information about how plot_SanityCheck_3D() does work, see
-# sloth/SanityCheck.py --> plot_SanityCheck_3D()
-sloth.SanityCheck.plot_SanityCheck_3D(data=var, 
+# For mor detailed information about how plot_SanityCheck() does work, see
+# sloth/SanityCheck.py --> plot_SanityCheck()
+sloth.SanityCheck.plot_SanityCheck(data=var, 
         # below is optional
-        data_mask=var_mask, kind='mean', figname=figname,
+        kind='mean', figname=figname,
         lowerP=2, upperP=98, interactive=False,
         # below is even more optional (**kwargs)
         fig_title=fig_title, minax_title=minax_title, maxax_title=maxax_title, 

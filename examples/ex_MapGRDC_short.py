@@ -8,8 +8,10 @@ import heat as ht
 
 sloth_path='../'
 sys.path.append(sloth_path)
-import sloth
-import sloth.ParFlow_IO as pio
+import sloth.GRDCdataset
+import sloth.mapper
+import sloth.IO 
+import sloth.PlotLib
 
 
 ###############################################################################
@@ -30,9 +32,9 @@ slopeFileY    = f'{dataRootDir}/{datasetName}/geo/ParFlow_MB3km_SLPY_x1592y1544.
 ###############################################################################
 with nc.Dataset(dischargeFile,'r') as ncFile:
     Q = ncFile.variables['flow'][...]
-    Q = Q.filled(fill_value=np.nan)
+
 print(f'Q.shape: {Q.shape}')
-SimMeanQ = np.nanmean(Q, axis=0)
+SimMeanQ = np.ma.mean(Q, axis=0)
 print(f'SimMeanQ.shape: {SimMeanQ.shape}')
 
 with nc.Dataset(CoordFile,'r') as ncFile:
@@ -41,8 +43,8 @@ with nc.Dataset(CoordFile,'r') as ncFile:
 print(f'SimLons.shape: {SimLons.shape}')
 print(f'SimLats.shape: {SimLats.shape}')
 
-slopex = pio.read_pfb(slopeFileX)[0]
-slopey = pio.read_pfb(slopeFileY)[0]
+slopex = sloth.IO.read_pfb(slopeFileX)[0]
+slopey = sloth.IO.read_pfb(slopeFileY)[0]
 print(f'slopex.shape: {slopex.shape}')
 print(f'slopey.shape: {slopey.shape}')
 
@@ -92,16 +94,16 @@ Mapper  = sloth.mapper.mapper(SimLons=SimLons, SimLats=SimLats,
 # sloth/mapper.py --> MapBestQ()
 Mapper.MapBestQ(search_rad=2)
 # For mor detailed information about how plot_MappedSubAreas() does work, see
-# sloth/toolBox.py --> plot_MappedSubAreas()
-sloth.toolBox.plot_MappedSubAreas(mapper=Mapper, fit_name='BestQ', search_rad=10)
+# sloth/PlotLib.py --> plot_MappedSubAreas()
+sloth.PlotLib.plot_MappedSubAreas(mapper=Mapper, fit_name='BestQ', search_rad=10)
 print(f'Map Catchment')
 Mapper.ObsMeanArea = GRDC_example.meanArea
 # For mor detailed information about how MapBestCatchment() does work, see
 # sloth/mapper.py --> MapBestCatchment()
 Mapper.MapBestCatchment(search_rad=3, dy=3000, dx=3000, slopex=slopex, slopey=slopey)
 # For mor detailed information about how plot_MappedSubAreas() does work, see
-# sloth/toolBox.py --> plot_MappedSubAreas()
-sloth.toolBox.plot_MappedSubAreas(mapper=Mapper, fit_name='BestCatchment', search_rad=10)
+# sloth/PlotLib.py --> plot_MappedSubAreas()
+sloth.PlotLib.plot_MappedSubAreas(mapper=Mapper, fit_name='BestCatchment', search_rad=10)
 MapBestCatchment_X = Mapper.MapXIdx_fit
 MapBestCatchment_Y = Mapper.MapYIdx_fit
 

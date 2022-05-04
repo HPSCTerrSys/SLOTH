@@ -30,7 +30,8 @@ import cftime
 
 sloth_path='../'
 sys.path.append(sloth_path)
-import sloth
+import sloth.toolBox
+import sloth.PlotLib
 
 
 ###############################################################################
@@ -54,7 +55,7 @@ files = sorted(glob.glob(f'{dataRootDir}/{datasetName}/{procType}/*/{fileName}')
 # If the interval we are interested in is 'day', we do compare the same 
 # day between different years.
 # etc.
-# In any case we do have to know how the Number of Intervals (NoI) a year does 
+# In any case we do have to know the Number of Intervals (NoI) a year does 
 # contain. For daily based calculation this usually is NoI=365 (365 days a 
 # year), for monthly based calculations this usually is NoI=12 (12 month a 
 # year).
@@ -71,10 +72,6 @@ NoI = 12
 # Create a tmp lists to append data at. Append data to a list and convert this 
 # list into a ndarray once at the end is much faster than appending to ndarray 
 # (np.append()) at each iteration step.
-# I guess this is because list contains pointers and appending a 
-# pointer is quiet fast, while np.append() open and restructure the
-# entire array which is getting bigger and bigger while reading in more
-# and more data / files.
 tmp_IntervalMean = []
 tmp_IntervalTime = []
 # Loop over all files of our data-set.
@@ -83,7 +80,6 @@ for file in files:
     with nc.Dataset(file, 'r') as nc_file:
         data  = nc_file.variables[varName]
         print(f'data.shape: {data.shape}')
-        # add some chekc here if ndims is correct
         # Extract data, units, time, etc for later usage.
         data         = data[...]
         nc_time      = nc_file.variables['time']
@@ -96,23 +92,23 @@ for file in files:
     # Calculate the slices for the current file based on the choose meanInterval
     # For mor detailed information about how get_intervalSlice() does work, see
     # sloth/toolBox.py --> get_intervalSlice()
-    dailySlices = sloth.toolBox.get_intervalSlice(dates=dates, sliceInterval=meanInterval)
+    Slices = sloth.toolBox.get_intervalSlice(dates=dates, sliceInterval=meanInterval)
     # Loop over all slices, mask 'missing' values with np.nan, and calculate 
     # related mean. The averaged data gets appended for each file and slice.
-    for Slice in dailySlices:
+    for Slice in Slices:
         tmp_time     = timeValues[Slice]
         tmp_time     = tmp_time.filled(fill_value=np.nan)
         tmp_var      = data[Slice]
-        tmp_var_mask = tmp_var.mask
-        if not tmp_var_mask.any():
-            tmp_var_mask  = np.zeros(tmp_var.shape, dtype=bool)
-        tmp_var       = tmp_var.filled(fill_value=np.nan)
+        #tmp_var_mask = tmp_var.mask
+        #if not tmp_var_mask.any():
+        #    tmp_var_mask  = np.zeros(tmp_var.shape, dtype=bool)
+        #tmp_var       = tmp_var.filled(fill_value=np.nan)
 
-        tmp_timeMean  = np.nanmean(tmp_time, axis=0, keepdims=True)
-        # tmp_timeMean  = np.ma.mean(tmp_time, axis=0, keepdims=True)
+        # tmp_timeMean  = np.nanmean(tmp_time, axis=0, keepdims=True)
+        tmp_timeMean  = np.ma.mean(tmp_time, axis=0, keepdims=True)
         tmp_timeMean  = nc.num2date(tmp_timeMean, units=timeUnits,calendar=timeCalendar)
-        tmp_monthMean = np.nanmean(tmp_var, axis=0, keepdims=True, dtype=float)
-        # tmp_monthMean = np.ma.mean(tmp_var, axis=0, keepdims=True, dtype=float)
+        # tmp_monthMean = np.nanmean(tmp_var, axis=0, keepdims=True, dtype=float)
+        tmp_monthMean = np.ma.mean(tmp_var, axis=0, keepdims=True, dtype=float)
 
         tmp_IntervalMean.append(tmp_monthMean)
         tmp_IntervalTime.append(tmp_timeMean)
@@ -139,9 +135,9 @@ climaDim = [NoI]
 climaDim = climaDim + [dim for dim in intervalMean[0].shape]
 clima = np.empty(climaDim)
     
-for curr_day in range(NoI):
+for curr_Interval in range(NoI):
     # The climat mean is simple the mean of all entries with NoI in distance.
-    clima[curr_day] = np.nanmean(intervalMean[curr_day::NoI], axis=0, dtype=float)        
+    clima[curr_Interval] = np.nanmean(intervalMean[curr_Interval::NoI], axis=0, dtype=float)        
 # dump climate data
 with open(f'../data/example_ClimateMeans/climate_{meanInterval}.npy', 'wb') as f:
     np.save(f, clima)

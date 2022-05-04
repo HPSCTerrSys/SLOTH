@@ -642,7 +642,7 @@ class GRDCdataset():
         self.meanArea   = np.asarray(tmp_out_meanArea, dtype=float)
 
     def read_GRDCdate(self, date_str):
-        """ read GRDC data string
+        """ read GRDC date string
 
         It is knowen that some GRDC datasets does contain dates in a form where
         the day is indicated with zero. E.g. 1925-01-00.

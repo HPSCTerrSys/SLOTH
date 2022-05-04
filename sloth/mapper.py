@@ -651,7 +651,7 @@ class mapper:
 
         To save mapped coordinates for later use or better comparison, 
         one can write / dump those to a file.
-        Currently this function does only write data t CSV-format.
+        Currently this function does only write data to CSV-format.
         Currently already existing files are overwritten.
 
         Return value:
