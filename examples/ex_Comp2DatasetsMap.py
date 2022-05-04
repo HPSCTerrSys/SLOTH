@@ -4,6 +4,7 @@ Test-Case: compare tow datasets, as e.g. modifed run vs referenz run.
 """
 import numpy as np
 import matplotlib as mpl
+import matplotlib.cm
 import netCDF4 as nc
 import cftime
 import sys
@@ -12,7 +13,7 @@ import copy
 
 sloth_path='../'
 sys.path.append(sloth_path)
-import sloth
+import sloth.PlotLib
 
 ###############################################################################
 ### Define some paths, filenames, etc
@@ -45,17 +46,17 @@ for idx in range(len(files_D1)):
     print(f'idx: {idx}')
     with nc.Dataset(f'{files_D1[idx]}', 'r') as nc_file_D1, nc.Dataset(f'{files_D2[idx]}', 'r') as nc_file_D2:
         tmp_var1  = nc_file_D1.variables[varName][:,-1,...]
-        tmp_mask1 = tmp_var1.mask
-        if not tmp_mask1.any():
-            tmp_mask1  = np.zeros(tmp_var1.shape, dtype=bool)
-            tmp_var1   = tmp_var1.filled(fill_value=np.nan)
-            tmp_var1[tmp_var1 <= -1e+38] = np.nan
+        #tmp_mask1 = tmp_var1.mask
+        #if not tmp_mask1.any():
+        #    tmp_mask1  = np.zeros(tmp_var1.shape, dtype=bool)
+        #    tmp_var1   = tmp_var1.filled(fill_value=np.nan)
+        #    tmp_var1[tmp_var1 <= -1e+38] = np.nan
         tmp_var2  = nc_file_D2.variables[varName][:,-1,...]
-        tmp_mask2 = tmp_var2.mask
-        if not tmp_mask2.any():
-            tmp_mask2  = np.zeros(tmp_var2.shape, dtype=bool)
-            tmp_var2   = tmp_var2.filled(fill_value=np.nan)
-            tmp_var2[tmp_var2 <= -1e+38] = np.nan
+        #tmp_mask2 = tmp_var2.mask
+        #if not tmp_mask2.any():
+        #    tmp_mask2  = np.zeros(tmp_var2.shape, dtype=bool)
+        #    tmp_var2   = tmp_var2.filled(fill_value=np.nan)
+        #    tmp_var2[tmp_var2 <= -1e+38] = np.nan
 
         var_units = nc_file_D2.variables[varName].units
         nc_time1 = nc_file_D1.variables['time']
@@ -65,24 +66,26 @@ for idx in range(len(files_D1)):
         if idx == 0:
             var_D1   = tmp_var1
             dates_D1 = tmp_dates1
-            mask_D1  = tmp_mask1
+        #    mask_D1  = tmp_mask1
             var_D2   = tmp_var2
             dates_D2 = tmp_dates2
-            mask_D2  = tmp_mask2
+        #    mask_D2  = tmp_mask2
         else:
             var_D1    = np.append(var_D1, tmp_var1, axis=0)
             dates_D1  = np.append(dates_D1, tmp_dates1, axis=0)
-            mask_D1   = np.append(mask_D1, tmp_mask1, axis=0)
+        #    mask_D1   = np.append(mask_D1, tmp_mask1, axis=0)
             var_D2    = np.append(var_D2, tmp_var2, axis=0)
             dates_D2  = np.append(dates_D2, tmp_dates2, axis=0)
-            mask_D2   = np.append(mask_D2, tmp_mask2, axis=0)
+        #    mask_D2   = np.append(mask_D2, tmp_mask2, axis=0)
 
+var_D1  = np.ma.masked_where(var_D1 <= -1e+38, var_D1)
+var_D2  = np.ma.masked_where(var_D2 <= -1e+38, var_D2)
 ### check read in data
 # think about to exit if D1.shape and D2.shape does not match
 print(f'var_D1.shape: {var_D1.shape}')
-print(f'mask_D1.shape: {mask_D1.shape}')
-print(f'var_D1 max: {np.nanmax(var_D1)}')
-print(f'var_D2 min: {np.nanmin(var_D2)}')
+#print(f'mask_D1.shape: {mask_D1.shape}')
+print(f'var_D1 max: {np.ma.max(var_D1)}')
+print(f'var_D2 min: {np.ma.min(var_D2)}')
 print(f'var_D1 has inf: {np.isinf(var_D1).any()}')
 print(f'var_D2 has inf: {np.isinf(var_D2).any()}')
 
@@ -90,8 +93,8 @@ print(f'var_D2 has inf: {np.isinf(var_D2).any()}')
 ### Do some calculation on read in data
 ###############################################################################
 print(f'Do some calculation on read in data')
-var_D1_ave = np.nanmean(var_D1, axis=0)
-var_D2_ave = np.nanmean(var_D2, axis=0)
+var_D1_ave = np.ma.mean(var_D1, axis=0)
+var_D2_ave = np.ma.mean(var_D2, axis=0)
 
 ###############################################################################
 ### Define a special colormap
@@ -122,7 +125,7 @@ kwargs_imshow2PDiff = {
         'diff_vmin': -0.4,
         'var_cmap': cmap,
         'diff_cmap': mpl.cm.get_cmap('coolwarm'),
-        'saveFile': f'./examples_Compare2DatasetsMap.pdf',
+        'saveFile': f'./ex_Comp2DatasetsMap.pdf',
         #'saveFile': f'./Diff_{varName}_{cftime.datetime.strftime(dates_D1[0], "%Y%m%d%H%M")}.pdf',
         #'dpi': 100,
         'figsize': (10, 4),

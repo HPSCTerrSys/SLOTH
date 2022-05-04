@@ -35,9 +35,8 @@ var      = []
 var_mask = []
 for fileName in fileNames:
     with nc.Dataset(f'{fileName}', 'r') as nc_file:
-        nc_var   = nc_file.variables[f'{varName}']
-        tmp_var  = nc_var[...]
-        tmp_var_mask  = tmp_var.mask
+        tmp_var      = nc_file.variables[varName][...]
+        tmp_var_mask = np.ma.getmaskarray(tmp_var)
         var.append(tmp_var)
         var_mask.append(tmp_var_mask)
 var      = np.concatenate(var, axis=0)
@@ -53,7 +52,7 @@ var      = np.ma.masked_where(var_mask, var)
 # define some title for plot, which can be passed via functionarguments
 # see funciton definition for full potential
 fig_title    = f'Sanity-Check for {varName} --- {dataYear} (DJF)'
-figname      = f'./examples_SanityCheck_Season.pdf'
+figname      = f'./ex_SanityCheck_Season.pdf'
 minax_title  = f'{varName} min'
 maxax_title  = f'{varName} max'
 kinax_title  = f'{varName} mean'

@@ -27,10 +27,14 @@ NoI = 12
 
 try:
     intervalMean = np.load(f'../data/example_ClimateMeans/intervalMean_{meanInterval}.npy')
+    intervalMean = np.ma.masked_where(intervalMean==-9999, intervalMean)
+    print(f'np.min(intervalMean): {np.min(intervalMean)}')
     print(f'intervalMean.shape: {intervalMean.shape}')
     intervalTime = np.load(f'../data/example_ClimateMeans/intervalTime_{meanInterval}.npy', allow_pickle=True)
     print(f'intervalTime.dtype: {intervalTime.dtype}')
     clima = np.load(f'../data/example_ClimateMeans/climate_{meanInterval}.npy')
+    clima = np.ma.masked_where(clima==-9999, clima)
+    print(f'np.min(clima): {np.min(clima)}')
 except FileNotFoundError:
     print(f'needed climateMeans files were not found: EXIT')
     sys.exit()
@@ -40,16 +44,19 @@ except FileNotFoundError:
 ###############################################################################
 try:
     intervalAnomalyDomain = np.load(f'../data/example_ClimateMeans/IntervalyAnomalies_{meanInterval}.npy')
+    #intervalAnomalyDomain = np.ma.masked_where(intervalAnomalyDomain==-9999, intervalAnomalyDomain)
     print(f'intervalAnomalyDomain.shape: {intervalAnomalyDomain.shape}')
     print(f'intervalAnomalyDomain.dtype: {intervalAnomalyDomain.dtype}')
 except FileNotFoundError:
     intervalAnomalyDomain = np.empty(intervalMean.shape[0])
     for n, interval in enumerate(intervalMean):
         idx_interval = n%NoI
-        intervalAnomalyDomain[n] = np.nanmean(interval, dtype=float) - np.nanmean(clima[idx_interval], dtype=float)
+        intervalAnomalyDomain[n] = np.ma.mean(interval, dtype=float) - np.ma.mean(clima[idx_interval], dtype=float)
+    #intervalAnomalyDomain = np.ma.masked_where(intervalAnomalyDomain==0, intervalAnomalyDomain)
     # dump anomalies
     with open(f'../data/example_ClimateMeans/IntervalyAnomalies_{meanInterval}.npy', 'wb') as f:
         np.save(f, intervalAnomalyDomain)
+        #np.save(f, intervalAnomalyDomain.filled(fill_value=-9999))
 
 ###############################################################################
 #### Plot stuff
@@ -67,4 +74,4 @@ ax.set_xticklabels(labels)
 x = np.arange(intervalAnomalyDomain.shape[0])
 ax.fill_between(x, 0, intervalAnomalyDomain, where=intervalAnomalyDomain>0, facecolor='red', interpolate=True, alpha=0.75) 
 ax.fill_between(x, 0, intervalAnomalyDomain, where=intervalAnomalyDomain<0, facecolor='blue', interpolate=True, alpha=0.75)
-plt.savefig(f'./examples_CalculateAnomalies.pdf') 
+plt.savefig(f'./ex_CalcAnomalies.pdf') 

@@ -97,7 +97,7 @@ for file in files:
     # related mean. The averaged data gets appended for each file and slice.
     for Slice in Slices:
         tmp_time     = timeValues[Slice]
-        tmp_time     = tmp_time.filled(fill_value=np.nan)
+        #tmp_time     = tmp_time.filled(fill_value=np.nan)
         tmp_var      = data[Slice]
         #tmp_var_mask = tmp_var.mask
         #if not tmp_var_mask.any():
@@ -118,15 +118,16 @@ for file in files:
     print('##################')
     print('##################')
 intervalMean = np.concatenate(tmp_IntervalMean, axis=0)
+intervalMean = np.ma.masked_where(intervalMean==0, intervalMean)
 print(f'intervalMean.shape: {intervalMean.shape}')
 intervalTime = np.concatenate(tmp_IntervalTime, axis=0)
 # save everything for later use         
 if not os.path.exists(f'../data/example_ClimateMeans/'):
             os.makedirs(f'../data/example_ClimateMeans/')
 with open(f'../data/example_ClimateMeans/intervalMean_{meanInterval}.npy', 'wb') as f:
-    np.save(f, intervalMean)
+    np.save(f, intervalMean.filled(fill_value=-9999))
 with open(f'../data/example_ClimateMeans/intervalTime_{meanInterval}.npy', 'wb') as f:
-    np.save(f, intervalTime)
+    np.save(f, intervalTime.filled(fill_value=-9999))
 
 
 # First create an empty array of same shape as intervalMean but with 
@@ -137,13 +138,15 @@ clima = np.empty(climaDim)
     
 for curr_Interval in range(NoI):
     # The climat mean is simple the mean of all entries with NoI in distance.
-    clima[curr_Interval] = np.nanmean(intervalMean[curr_Interval::NoI], axis=0, dtype=float)        
+    clima[curr_Interval] = np.ma.mean(intervalMean[curr_Interval::NoI], axis=0, dtype=float)        
+clima = np.ma.masked_where(clima==0, clima)
 # dump climate data
 with open(f'../data/example_ClimateMeans/climate_{meanInterval}.npy', 'wb') as f:
-    np.save(f, clima)
+    np.save(f, clima.filled(fill_value=-9999))
 
 # plot if meanInterval='month'
 if meanInterval == 'month':
+    print(f'DEBUG: plotting')
     kwargs = {
             'title': 'Test climate plot',
             #'title': '\n'.join(tmp_titlesubstr),
@@ -151,7 +154,7 @@ if meanInterval == 'month':
             #'var_vmax': 1,
             #'var_vmin': 0,
             'var_cmap': mpl.cm.get_cmap('jet'),
-            'saveFile': f'./examples_CalculateClimateMeans.pdf',
+            'saveFile': f'./ex_CalcClimateMeans.pdf',
             #'dpi': 100,
             'figsize': (10, 4),
             }

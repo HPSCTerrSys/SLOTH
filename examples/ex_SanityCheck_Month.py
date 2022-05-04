@@ -37,7 +37,7 @@ with nc.Dataset(f'{fileName}', 'r') as nc_file:
 # define some title for plot, which can be passed via functionarguments
 # see funciton definition for full potential
 fig_title    = f'Sanity-Check for {varName} --- {dataYear}'
-figname      = f'./examples_SanityCheck_Month.pdf'
+figname      = f'./ex_SanityCheck_Month.pdf'
 minax_title  = f'{varName} min'
 maxax_title  = f'{varName} max'
 kinax_title  = f'{varName} mean'

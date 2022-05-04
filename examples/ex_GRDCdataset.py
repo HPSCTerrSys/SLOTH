@@ -13,9 +13,8 @@ import sloth.GRDCdataset
 # 1) Define where your GRDC dataset is located
 file_path = '/p/scratch/cslts/shared_data/tmp_TestDataSet/samples/GRDC'
 # provide list of individual GRDC files
-files     = sorted(glob.glob(f'{file_path}/*.mon'))
+files     = sorted(glob.glob(f'{file_path}/*Month.txt'))
 # daily files are also possible
-#files     = sorted(glob.glob(f'{file_path}/*.day'))
 
 # 2) Initialize GRDC dataset-object
 #    Below step creates a GRDCdataset instance, holding 
@@ -31,10 +30,10 @@ GRDC_example = sloth.GRDCdataset.GRDCdataset(GRDCfiles=files)
 #    Via default settings the internal index of GRDC_example is updated
 #    with this filter-functions, meaning you can apply multiple filters to
 #    your dataset which are all added up.
-#    To be some clear, you can e.g.first filter for a country:
+#    To be some clear, you can e.g.first filter for a river:
 # For more detailed information about how filter_index() does work, see
 # sloth/GRDCdataset.py --> filter_index()
-GRDC_example.filter_index(key='Country', value='DE', operant='==')
+#GRDC_example.filter_index(key='River', value='RUHR', operant='==')
 #    and after this filter for a time-period - BUT DIFFERENT AS YOU THINK
 #    Note here the difference between 'filter-index' and 'filter_index_date':
 #    While 'filter_index' filters according to key-values pair straight forward

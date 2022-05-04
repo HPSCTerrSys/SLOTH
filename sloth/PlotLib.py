@@ -48,10 +48,13 @@ def plot_XY_2VarMean_TwinX(x, y1, y2, ax, **kwargs):
         [ax_twin.axhline(hline, ls='--', lw=0.5, color='grey') for hline in y2_hlines]
     ax_twin.legend(loc='lower right')
 
-def get_PlotMinMaxMid_Percentil(data2plot, lower=2, upper=98):
-    vmin = np.nanpercentile(data2plot, lower)
-    vmax = np.nanpercentile(data2plot, upper)
-    #vmid = np.nanpercentile(data2plot, 50)
+def get_PlotMinMaxMid_Percentil(data, lower=2, upper=98):
+    if isinstance(data, np.ma.MaskedArray):
+        # Compress data to remove masked values, which are not taken into
+        # account by np.percentile
+        data = data.compressed()
+    vmin = np.percentile(data, lower)
+    vmax = np.percentile(data, upper)
     vmid = (vmax+vmin) / 2.
     '''
     tmp_scalFac = 1.5
@@ -62,15 +65,19 @@ def get_PlotMinMaxMid_Percentil(data2plot, lower=2, upper=98):
 
 
 def get_infostr(data, lowerP=2, upperP=98):
+    if isinstance(data, np.ma.MaskedArray):
+        # Compress data to remove masked values, which are not taken into
+        # account by np.percentile
+        data = data.compressed()
     tmp_infostr = [
-        f'min: {np.nanmin(data):.2e}',
-        f'max: {np.nanmax(data):.2e}',
-        f'mean: {np.nanmean(data):.2e}',
-        f'std: {np.nanstd(data):.2e}',
-        f'q_{lowerP}: {np.nanpercentile(data, lowerP):.2e}',
-        f'q_50: {np.nanpercentile(data, 50):.2e}',
-        f'q_{upperP}: {np.nanpercentile(data, upperP):.2e}',
-        f'2D sum: {np.nansum(data):.2e}',
+        f'min: {np.min(data):.2e}',
+        f'max: {np.max(data):.2e}',
+        f'mean: {np.mean(data):.2e}',
+        f'std: {np.std(data):.2e}',
+        f'q_{lowerP}: {np.percentile(data, lowerP):.2e}',
+        f'q_50: {np.percentile(data, 50):.2e}',
+        f'q_{upperP}: {np.percentile(data, upperP):.2e}',
+        f'2D sum: {np.sum(data):.2e}',
         ]
     return '\n'.join(tmp_infostr)
 
@@ -212,6 +219,7 @@ def plot_ClimateYearMonth(climateData, **kwargs):
 
     cbar_ax = fig.add_axes([0.95, 0.15, 0.03, 0.7])
     fig.colorbar(im, cax=cbar_ax)
+    fig.savefig(f'{saveFile}', bbox_inches='tight', pad_inches=0)
 
 def plot_MappedSubAreas(mapper, fit_name='NotSet', search_rad=3, save_dir='../data'):
     for idx, ID in enumerate(mapper.ObsIDs):
