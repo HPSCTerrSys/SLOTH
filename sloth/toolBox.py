@@ -14,7 +14,6 @@ import numpy as np
 import datetime
 import matplotlib.pyplot as plt
 from calendar import monthrange
-from . import pars_ParFlowTCL as ppfl
 from . import IO as io
 from scipy import ndimage as nd
 
@@ -227,77 +226,6 @@ def get_intervalSlice(dates, sliceInterval='month'):
             t_lower = t+1
 
     return Slices 
-
-def mappIndicator(ParFlowNamelist, IndicatorFile):
-    ###############################################################################
-    ### parse ParFlow-Namelist to get indicators values
-    ###############################################################################
-    PFNamelistDict = ppfl.pars_ParFlowNamelist(f'{ParFlowNamelist}')
-
-    nz = int(PFNamelistDict['ComputationalGrid.NZ'])
-    ny = int(PFNamelistDict['ComputationalGrid.NY'])
-    nx = int(PFNamelistDict['ComputationalGrid.NX'])
-    tcl_dz_keys = [f'Cell.{i}.dzScale.Value' for i in range(nz)]
-    dz_mult = [float(PFNamelistDict[tcl_dz_key]) for tcl_dz_key in tcl_dz_keys]
-    dz_mult = np.asarray(dz_mult)
-
-    dx = float(PFNamelistDict['ComputationalGrid.DX'])
-    dy = float(PFNamelistDict['ComputationalGrid.DY'])
-    dz = float(PFNamelistDict['ComputationalGrid.DZ'])
-
-    # indi_input indinput, etc is individual for each namelist...!
-    # maybe read all GeomInputs, stre as list, loop over all and merge.
-    # if one is crashing, skip
-    GeomInputNames = PFNamelistDict['GeomInput.Names']
-    for GeomInputName in GeomInputNames:
-        try:
-            GeomInputs = PFNamelistDict[f'GeomInput.{GeomInputName}.GeomNames']
-
-            IndicatorInput = {GeomInput:int(PFNamelistDict[f'GeomInput.{GeomInput}.Value']) for GeomInput in GeomInputs}
-            # print(f'IndicatorInput: {IndicatorInput}')
-            vanGA_GeomNames = PFNamelistDict['Phase.Saturation.GeomNames']
-            # print(f'vanGA_GeomNames: {vanGA_GeomNames}')
-            tcl_vanGA_keys = [ ]
-            vanG_a = {vanGA_GeomName:float(PFNamelistDict[f'Geom.{vanGA_GeomName}.Saturation.Alpha']) for vanGA_GeomName in vanGA_GeomNames}
-            # print(f'vanG_a: {vanG_a}')
-            vanG_n = {vanGA_GeomName:float(PFNamelistDict[f'Geom.{vanGA_GeomName}.Saturation.N']) for vanGA_GeomName in vanGA_GeomNames}
-            vanG_sres = {vanGA_GeomName:float(PFNamelistDict[f'Geom.{vanGA_GeomName}.Saturation.SRes']) for vanGA_GeomName in vanGA_GeomNames}
-
-            ###############################################################################
-            ### prepare arrays to return
-            ###############################################################################
-            Indi3D = io.read_pfb(f'{IndicatorFile}')
-            shape3D= Indi3D.shape
-            print(f'shape3D: {shape3D}')
-            alpha  = np.full(shape3D,vanG_a['domain'])
-            nvg    = np.full(shape3D,vanG_n['domain'])
-            sres   = np.full(shape3D,vanG_sres['domain'])
-
-            ###############################################################################
-            ### mapp indicators to VanGenuchten parameter according to ParFlow-Namelist
-            ###############################################################################
-            for GeomName in vanGA_GeomNames:
-                if GeomName == 'domain':
-                    continue
-                alpha    = np.where(Indi3D == IndicatorInput[GeomName], vanG_a[GeomName], alpha)
-                nvg      = np.where(Indi3D == IndicatorInput[GeomName], vanG_n[GeomName], nvg)
-                sres     = np.where(Indi3D == IndicatorInput[GeomName], vanG_sres[GeomName], sres)
-        except KeyError:
-            continue
-
-    outDict = {}
-    outDict['alpha']   = alpha
-    outDict['nvg']     = nvg
-    outDict['sres']    = sres
-    outDict['dz_mult'] = dz_mult
-    outDict['dz']      = dz
-    outDict['dy']      = dy
-    outDict['dx']      = dx
-    outDict['nz']      = nz
-    outDict['ny']      = ny
-    outDict['nx']      = nx
-
-    return outDict
 
 def spher_dist_v1(lon1, lat1, lon2, lat2, Rearth=6373):
     """ calculate the spherical / haversine distance
