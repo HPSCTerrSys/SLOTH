@@ -9,6 +9,7 @@ from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 import datetime as dt
 import cftime
 import sys
+import copy
 
 def plot_XY_2VarMean_TwinX(x, y1, y2, ax, **kwargs):
     ''' 
