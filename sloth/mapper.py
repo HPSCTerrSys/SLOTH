@@ -365,7 +365,10 @@ class mapper:
         tmp_MapXIdx_raw = []
         tmp_MapYIdx_raw = []
         # Loop over all ObsIDs stored with the object
+        print('MapRaw start', end='')
+        numObsIDs = len(self.ObsIDs)
         for idx, ObsID in enumerate(self.ObsIDs):
+            print(f'\rMapRaw ObsID: {ObsID} ({idx} / {numObsIDs})', end='', flush=True)
             ObsLon = self.ObsLons[idx]
             ObsLat = self.ObsLats[idx]
             # Calculate distance between Obs and SimGrid on Earth surface
@@ -378,6 +381,7 @@ class mapper:
             # Temporally store found idx in list
             tmp_MapYIdx_raw.append(mapped_idx[0])
             tmp_MapXIdx_raw.append(mapped_idx[1])
+        print('MapRaw done', flush=True)
 
         # update object-variables with found information
         self.MapYIdx_raw = np.array(tmp_MapYIdx_raw)
@@ -586,7 +590,10 @@ class mapper:
         tmp_MapYIdx_fit = []
         tmp_SimManArea = []
         # Loop over all ObsIDs stored with the object
+        print(f'MapBestCatchment ObsID: start',  end='')
+        numObsIDs = len(self.ObsIDs)
         for idx, ObsID in enumerate(self.ObsIDs):
+            print(f'\rMapBestCatchment ObsID: {ObsID} ({idx} / {numObsIDs})', end='', flush=True)
             # Set the original pixel around which to search
             y        = self.MapYIdx_raw[idx]
             x        = self.MapXIdx_raw[idx]
@@ -641,6 +648,7 @@ class mapper:
             tmp_MapXIdx_fit.append(tmp_best_fitting_area_x)
             tmp_SimManArea.append(tmp_best_fitting_area)
 
+        print(f'MapBestCatchment done',  flush=True)
         # update object-variables with found information
         self.MapYIdx_fit = np.array(tmp_MapYIdx_fit)
         self.MapXIdx_fit = np.array(tmp_MapXIdx_fit)
@@ -669,11 +677,15 @@ class mapper:
             header=['ObsID', 
                     'ObsLon', 'ObsLat', 
                     'MapXIdx_raw', 'MapYIdx_raw',
+                    'MapXIdx_fit', 'MapYIdx_fit',
                     'related SimLon', 'related SimLat']
             writer.writerow(header)
             for idx, ObsID in enumerate(self.ObsIDs):
                 row = [ObsID, 
                        self.ObsLons[idx], self.ObsLats[idx], 
                        self.MapXIdx_raw[idx], self.MapYIdx_raw[idx],
-                       self.SimLons[self.MapXIdx_raw[idx], self.MapYIdx_raw[idx]], self.SimLats[self.MapXIdx_raw[idx], self.MapYIdx_raw[idx]]]
+                       self.MapXIdx_fit[idx], self.MapYIdx_fit[idx],
+                       # NWR error? Y=X and X=Y?
+                       self.SimLons[self.MapYIdx_raw[idx], self.MapXIdx_raw[idx]], self.SimLats[self.MapYIdx_raw[idx], self.MapXIdx_raw[idx]]]
+                       #self.SimLons[self.MapXIdx_raw[idx], self.MapYIdx_raw[idx]], self.SimLats[self.MapXIdx_raw[idx], self.MapYIdx_raw[idx]]]
                 writer.writerow(row)
