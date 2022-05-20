@@ -1,5 +1,6 @@
 import numpy as np
 import netCDF4 as nc
+import os
 from struct import pack, unpack
 
 import sloth.slothHelper as slothHelper
