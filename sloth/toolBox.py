@@ -345,6 +345,58 @@ def get_prudenceMask(lat2D, lon2D, prudName):
 
     return prudMask
 
+def stampLLSM(data, invalid, LLSM):
+    """ stamps a LLSM to passed data
+
+    Some times its needed to force different land datasets to use the same Land
+    Lake Sea Mask (LLSM). One example is using different data sets to provide a
+    model with soilindicators and landcover data. If the origin of both
+    datsets is different, most propably the used LLSM is different too. This,
+    for exmple could lead to the situation along the coastline that one dataset
+    is indicating water (ocean) while the other is indicating land.
+    This inconsistency has to be fixe, especially within the ealm of coupled
+    models.
+
+    To achive this, this function is
+    i) masking invalid pixels within the passed data set
+    ii) interpolating remaining data over the maske regions
+    iii) setting pixel to water value according to a passed LLSM
+
+    This way guaranthees each land pixel is holding land informtion and each
+    water pixel is marked as water.
+
+    INPUT:
+      data: ndarray
+            A 2D nd array holding the datset to stamp the LLSM
+      invalid: scalar
+               A scalar witht the value indicating invalid pixel
+      LLSM: ndarray
+            A ndarray of the same shape as data holding the LLSM
+            (Land=2 Lake=1 Sea=0)
+
+    RETURN:
+      out: ndarray MASKED!
+           A ndarray of the same shape as data, with stamped LLSM
+    """
+
+    # some checks to verify we can progress
+    if not isinstance(data, np.ndarray):
+        print(f'data is of type {type(data)} but <class "numpy.ndarray"> is required!')
+        sys.exit(1)
+    if not data.ndim == 2:
+        print(f'data is of dimension {data.ndim} but dimension 2 is required!')
+        sys.exit(1)
+
+    # i)
+    out = np.ma.masked_where(data==invalid, data)
+    # ii)
+    out = fill(data=out, invalid=out.mask)
+    # iii)
+    out = np.ma.masked_where((LLSM < 2), out)
+
+    return out
+
+
 
 if __name__ == '__main__':
     print('Im there!')
