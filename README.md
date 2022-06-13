@@ -55,7 +55,7 @@ python ex_SanityCheck_Season.py
 To use **SLOTH** outside the repository, as for example in you own workflow, you have to extend your local `PYTHONPATH`, to tell python where to find **SLOTH**. You can do this by:  
 ```
 cd SLOTH  
-export PYTHONPATH=$PYTHONPATH:${pwd}
+export PYTHONPATH=$PYTHONPATH:$(pwd)
 ```
 Afterwards you can simply import **SLOTH** inside any of your python scripts by:
 ```
