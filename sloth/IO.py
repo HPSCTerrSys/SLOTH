@@ -272,3 +272,19 @@ def createNetCDF(fileName, domain=None, nz=None, author=None,
     nc_file.close()
     return fileName
 
+def readSa(file):
+    with open(file, 'r') as f:
+        # do things with your file
+        header = f.readline()
+        #print(f'type(header): {type(header)}')
+        #print(f'header: {header}')
+        nx, ny, nz = (int(item) for item in header.split(' '))
+        #print(f'type(nx): {type(nx)}')
+        #print(f'nx, ny, nz: {nx}, {ny}, {nz}')
+
+        data = np.genfromtxt(f, dtype=float)
+        data = data.reshape((nz, ny, nx))
+        #print(f'type(data): {type(data)}')
+        #print(f'data.shape: {data.shape}')
+
+        return data
