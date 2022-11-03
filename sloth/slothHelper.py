@@ -12,7 +12,7 @@ def get_listOfGriddes():
     griddesDomainNames = [ item.split('_')[0] for item in griddesDomainNames]
     return griddesDomainNames
 
-def get_griddesDomDef(GridName, returnRaw=False):
+def get_griddesDomDef(griddesFile, returnRaw=False):
     """ returns a individual domain definition from a cdo griddes file
 
     This function does return a domain defenition from a grides files created
@@ -20,8 +20,8 @@ def get_griddesDomDef(GridName, returnRaw=False):
 
     Input value:
     ------------
-    GridName: str
-        Name of the target grid
+    griddesFile: str
+        Full Path to a griddes file
 
     Return value:
     -------------
@@ -30,13 +30,13 @@ def get_griddesDomDef(GridName, returnRaw=False):
         domain stored in individual keys.
 
     """
-    # Read griddes file from configs dir
-    # Configs is located under `sloth/` (os.path.dirname(__file__))
-    griddesFileName = f'{GridName}_griddes.txt'
-    griddesFile     = f'{os.path.dirname(__file__)}/configs/{griddesFileName}'
-    if not os.path.isfile(griddesFile):
-        print(f'ERROR: There is no griddes file with name {griddesFile} --> EXIT')
-        sys.exit(1)
+    ## Read griddes file from configs dir
+    ## Configs is located under `sloth/` (os.path.dirname(__file__))
+    #griddesFileName = f'{GridName}_griddes.txt'
+    #griddesFile     = f'{os.path.dirname(__file__)}/configs/{griddesFileName}'
+    #if not os.path.isfile(griddesFile):
+    #    print(f'ERROR: There is no griddes file with name {griddesFile} --> EXIT')
+    #    sys.exit(1)
 
     fileDict = {}
     with open(griddesFile) as f:

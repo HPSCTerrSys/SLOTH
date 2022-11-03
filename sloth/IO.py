@@ -166,10 +166,22 @@ def createNetCDF(fileName, domain=None, nz=None, author=None,
     #######################################################################
     availableCORDEXDomains  = slothHelper.get_listOfCordexGrids()
     availableGriddesDomains = slothHelper.get_listOfGriddes()
-    if domain in availableCORDEXDomains:
-        domainDef = slothHelper.get_cordexDomDef(domain)
-    elif domain in availableGriddesDomains:
+    # Check if 'domain' is pointing to a domain path
+    if os.path.exists(domain):
         domainDef = slothHelper.get_griddesDomDef(domain)
+    # Check if 'domain' is a official CORDEX name pattern
+    elif domain in availableCORDEXDomains:
+        domainDef = slothHelper.get_cordexDomDef(domain)
+    # Check if 'domain' is provided by SLOTH
+    elif domain in availableGriddesDomains:
+        # Read griddes file from configs dir
+        # Configs is located under `sloth/` (os.path.dirname(__file__))
+        griddesFileName = f'{domain}_griddes.txt'
+        griddesFile     = f'{os.path.dirname(__file__)}/configs/{griddesFileName}'
+        if not os.path.isfile(griddesFile):
+            print(f'ERROR: There is no griddes file with name {griddesFile} --> EXIT')
+            sys.exit(1)
+        domainDef = slothHelper.get_griddesDomDef(griddesFileName)
     else:
         print(f'ERROR: passed domain is not supported. domain={domain} --> Exit')
         return False
