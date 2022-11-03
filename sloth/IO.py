@@ -4,6 +4,7 @@ import os
 from struct import pack, unpack
 
 import sloth.slothHelper as slothHelper
+import sloth.coordTrafo
 
 ################################################################################
 ################################ PFB ###########################################
@@ -157,7 +158,8 @@ def read_pfbMetaData(filename):
 ############################# netCDF ###########################################
 ################################################################################
 
-def createNetCDF(fileName, domain=None, nz=None, author=None,
+def createNetCDF(fileName, domain=None, nz=None, calcLatLon=False,
+    author=None,
     description=None, source=None, contact=None, institution=None,
     history=None, timeCalendar=None, timeUnit=None, NBOUNDCUT=0):
 
@@ -238,7 +240,7 @@ def createNetCDF(fileName, domain=None, nz=None, author=None,
         dlvl = nc_file.createDimension('lvl',nz)
     dtime = nc_file.createDimension('time',None)
 
-    rlon = nc_file.createVariable('rlon', 'f4', ('rlon',),
+    rlon = nc_file.createVariable('rlon', 'f8', ('rlon',),
                                 zlib=True)
     rlon.standard_name = "grid_longitude"
     rlon.long_name = "rotated longitude"
@@ -248,7 +250,7 @@ def createNetCDF(fileName, domain=None, nz=None, author=None,
     rlon_values = np.array([SWC_X + (i*dx) for i in range(NBOUNDCUT, nx-NBOUNDCUT)])
     rlon[...] = rlon_values[...]
 
-    rlat = nc_file.createVariable('rlat', 'f4', ('rlat',),
+    rlat = nc_file.createVariable('rlat', 'f8', ('rlat',),
                                     zlib=True)
     rlat.standard_name = "grid_latitude"
     rlat.long_name = "rotated latitude"
@@ -257,6 +259,26 @@ def createNetCDF(fileName, domain=None, nz=None, author=None,
     # Take into account to 'cut' pixel at domain border (NBOUNDCUT)
     rlat_values = np.array([SWC_Y + (i*dy) for i in range(NBOUNDCUT, ny-NBOUNDCUT)])
     rlat[...] = rlat_values[...]
+
+    if calcLatLon:
+        lat2D, lon2D = sloth.coordTrafo.undo_grid_rotation(rlat_values, 
+                rlon_values, rpol_Y, rpol_X)
+
+        lat = nc_file.createVariable('lat', 'f8', ('rlat','rlon'),
+                                    zlib=True)
+        lat.standard_name = "latitude"
+        lat.long_name = "latitude"
+        lat.units = "degrees_north"
+        lat[...] = lat2D[...]
+
+        lon = nc_file.createVariable('lon', 'f8', ('rlat','rlon'),
+                                    zlib=True)
+        lon.standard_name = "longitude"
+        lon.long_name = "longitude"
+        lon.units = "degrees_east"
+        lon[...] = lon2D[...]
+    else:
+        print(f'-- no lat lon values used')
 
     if withZlvl:
         lvl = nc_file.createVariable('lvl', 'f4', ('lvl',),
@@ -269,7 +291,7 @@ def createNetCDF(fileName, domain=None, nz=None, author=None,
         lvl[...] = lvl_values[...]
 
     if withTime:
-        ncTime = nc_file.createVariable('time', 'i2', ('time',), zlib=True)
+        ncTime = nc_file.createVariable('time', 'f8', ('time',), zlib=True)
         ncTime.units = f'{timeUnit}'
         ncTime.calendar = f'{timeCalendar}'
 
