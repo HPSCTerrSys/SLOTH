@@ -269,6 +269,8 @@ def createNetCDF(fileName, domain=None, nz=None, calcLatLon=False,
         lat.standard_name = "latitude"
         lat.long_name = "latitude"
         lat.units = "degrees_north"
+        lat.coordinates = "lon lat"
+        lat.grid_mapping = "rotated_pole"
         lat[...] = lat2D[...]
 
         lon = nc_file.createVariable('lon', 'f8', ('rlat','rlon'),
@@ -276,6 +278,8 @@ def createNetCDF(fileName, domain=None, nz=None, calcLatLon=False,
         lon.standard_name = "longitude"
         lon.long_name = "longitude"
         lon.units = "degrees_east"
+        lon.coordinates = "lon lat"
+        lon.grid_mapping = "rotated_pole"
         lon[...] = lon2D[...]
     else:
         print(f'-- no lat lon values used')
