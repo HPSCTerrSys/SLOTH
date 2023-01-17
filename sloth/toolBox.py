@@ -345,7 +345,7 @@ def get_prudenceMask(lat2D, lon2D, prudName):
 
     return prudMask
 
-def stampLLSM(data, invalid, LLSM):
+def stampLLSM(data, invalid, LLSM, LLSMThreshold=2):
     """ stamps a LLSM to passed data
 
     Some times its needed to force different land datasets to use the same Land
@@ -392,7 +392,7 @@ def stampLLSM(data, invalid, LLSM):
     # ii)
     out = fill(data=out, invalid=out.mask)
     # iii)
-    out = np.ma.masked_where((LLSM < 2), out)
+    out = np.ma.masked_where((LLSM < LLSMThreshold), out)
 
     return out
 
