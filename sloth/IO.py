@@ -240,7 +240,7 @@ def createNetCDF(fileName, domain=None, nz=None, calcLatLon=False,
         dlvl = nc_file.createDimension('lvl',nz)
     dtime = nc_file.createDimension('time',None)
 
-    rlon = nc_file.createVariable('rlon', 'f8', ('rlon',),
+    rlon = nc_file.createVariable('rlon', 'f4', ('rlon',),
                                 zlib=True)
     rlon.standard_name = "grid_longitude"
     rlon.long_name = "rotated longitude"
@@ -250,7 +250,7 @@ def createNetCDF(fileName, domain=None, nz=None, calcLatLon=False,
     rlon_values = np.array([SWC_X + (i*dx) for i in range(NBOUNDCUT, nx-NBOUNDCUT)])
     rlon[...] = rlon_values[...]
 
-    rlat = nc_file.createVariable('rlat', 'f8', ('rlat',),
+    rlat = nc_file.createVariable('rlat', 'f4', ('rlat',),
                                     zlib=True)
     rlat.standard_name = "grid_latitude"
     rlat.long_name = "rotated latitude"
@@ -264,7 +264,7 @@ def createNetCDF(fileName, domain=None, nz=None, calcLatLon=False,
         lat2D, lon2D = sloth.coordTrafo.undo_grid_rotation(rlat_values, 
                 rlon_values, rpol_Y, rpol_X)
 
-        lat = nc_file.createVariable('lat', 'f8', ('rlat','rlon'),
+        lat = nc_file.createVariable('lat', 'f4', ('rlat','rlon'),
                                     zlib=True)
         lat.standard_name = "latitude"
         lat.long_name = "latitude"
@@ -273,7 +273,7 @@ def createNetCDF(fileName, domain=None, nz=None, calcLatLon=False,
         lat.grid_mapping = "rotated_pole"
         lat[...] = lat2D[...]
 
-        lon = nc_file.createVariable('lon', 'f8', ('rlat','rlon'),
+        lon = nc_file.createVariable('lon', 'f4', ('rlat','rlon'),
                                     zlib=True)
         lon.standard_name = "longitude"
         lon.long_name = "longitude"
