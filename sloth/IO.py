@@ -198,7 +198,7 @@ def createNetCDF(fileName, domain=None, nz=None, calcLatLon=False,
     SWC_Y  = domainDef['SWlat']
 
     #######################################################################
-    #### Checking is time- and / or z-axis is used
+    #### Checking if time- and / or z-axis is used
     #######################################################################
     withTime = False
     if timeUnit is not None and timeCalendar is not None:

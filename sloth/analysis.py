@@ -79,7 +79,7 @@ def vanGenuchten(refP, sSat, sRes, nVanG, aVanG):
     The degree of saturation is calculated as a function of the pressure head
     according to M. Th. van Genuchten.
     Name: A Closed‐form Equation for Predicting the Hydraulic Conductivity of
-            Unsaturated Soils
+          Unsaturated Soils
     DOI: https://doi.org/10.2136/sssaj1980.03615995004400050002x
 
     Parameters:

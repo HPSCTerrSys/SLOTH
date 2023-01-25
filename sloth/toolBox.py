@@ -1,8 +1,6 @@
 """ toolBox - submodule of SLOTH
 
-author: Nikals WAGNER
-e-mail: n.wagner@fz-juelich.de
-version: 2022-05-04
+Owner / author: Nikals WAGNER, n.wagner@fz-juelich.de
 
 Description:
 [...]
@@ -38,7 +36,8 @@ def calc_catchment(slopex, slopey, x, y):
     This way the algorithem does find every pixel belonging to the catchment of
     the passes initial pixel(s) -- e.g. the outlet pixel.
 
-    INPUT: 
+    Input values:
+    -------------
     slopex: 2D ndarray
         slopes in x-direction
     slopey: 2D ndarray
@@ -48,7 +47,8 @@ def calc_catchment(slopex, slopey, x, y):
     y: int
         index in y-direction to calulate catchment from
 
-    RETURN:
+    Return value:
+    -------------
     catchment: 2D ndarray 
         ndarray of the same size as slopex/y. 0 = not part of catchment; 1 = part of catchment
     """
@@ -230,11 +230,26 @@ def get_intervalSlice(dates, sliceInterval='month'):
 def spher_dist_v1(lon1, lat1, lon2, lat2, Rearth=6373):
     """ calculate the spherical / haversine distance
 
+    This function calculates the real distance (in [km]) between two points on
+    earth given in lat/lon coordinates. 
     Source: https://www.kompf.de/gps/distcalc.html
-    This function is supposed to proper handle different shaped coords
-    latX and lonX is supposed to be passed in rad
 
-    return 2D ndarray
+    Input values:
+    -------------
+    lon1:   ndarray 
+        Longitude value of first point in [rad]. Could be any dim
+    lat1:   ndarray [rad]
+        Latitude value of first point in [rad]. Could be any dim
+    lon2:   ndarray [rad]
+        Longitude value of second point in [rad]. Could be any dim
+    lat2:   ndarray [rad]
+        Latitude value of second point in [rad]. Could be any dim
+    Rearth: int|float 
+        The earth radius in [km].
+
+    Return value:
+    -------------
+    return: ndarray [km]
     """
     term1 = np.sin(lat1) * np.sin(lat2)
     term2 = np.cos(lat1) * np.cos(lat2)
@@ -247,6 +262,26 @@ def find_nearest_Index_2D(point, coord2D):
     return idx[0], idx[1]
 
 def plusOneMonth(currDate):
+    """ return passed date + 1 month
+
+    Sometimes its needed to calculate a date plus one month, as easily possible 
+    with the bash commandline tool date
+    >> `date -d "$(date) + 1 month"`
+    However, datetime objects in python are mainly based on hours or seconds,
+    wherefore '+ 1 month' always needs a special treatment according to the 
+    different month lengths. 
+    So this function is a simple wrapper to clean other code-snipets.
+
+    Input values:
+    -------------
+    currDate:  datetime
+        An arbitrary date
+
+    Return value:
+    -------------
+    return:    datetime 
+        Arbitrary passed date +1month
+    """
     num_days = monthrange(currDate.year, currDate.month)[1]
     return currDate + datetime.timedelta(hours=24*num_days)
 
@@ -254,7 +289,7 @@ def trunc(values, decs=0):
     """ truncates a passed float value by given floating point digit
 
     This funciton does truncate a given float value or floting ndarray
-    by the precision defined by `decs`.
+    by the precision defined with `decs` (decimal digits).
 
     Example: trunc(values=2.12345, decs=3) --> 2.123
     
@@ -267,28 +302,33 @@ def trunc(values, decs=0):
 
     Return value:
     -------------
-    values: ndarray
+    return: ndarray
         A ndarray of same type as input
 
     """
     return np.trunc(values*10**decs)/(10**decs)
 
 def fill(data, invalid=None, transkargs={}):
-    """
+    """ fill invalid data with nearest neighbor interpolation
+
     Replace the value of invalid 'data' cells (indicated by 'invalid')
     by the value of the nearest valid data cell.
     Source: https://stackoverflow.com/questions/5551286/filling-gaps-in-a-numpy-array
 
-    Input:
-        data:       numpy array of any dimension
-        invalid:    a binary array of same shape as 'data'.
-                    data value are replaced where invalid is True
-                    If None (default), use: invalid  = np.isnan(data)
-        transkargs: optional arguments one want to pass to
-                    distance_transform_edt()
+    Input values:
+    -------------
+    data: ndarray       
+        An array of any dimension
+    invalid: ndarray
+        A binary array of same shape as 'data'. Data value are replaced where 
+        invalid is True. If None (default), use: invalid  = np.isnan(data)
+    transkargs: dict
+        Optional arguments one want to pass to `distance_transform_edt()`
 
-    Output:
-        Return a filled array.
+    Return value:
+    -------------
+    return: ndarray
+        Return a filled array (not numpy.masked!).
     """
     # check if data and invalid shape is equal, as otherwise filling is not
     # possible
@@ -311,17 +351,20 @@ def get_prudenceMask(lat2D, lon2D, prudName):
     The shape of the mask-array is set equal to the shape of input lat2D.
     Source: http://prudence.dmi.dk/public/publications/PSICC/Christensen&Christensen.pdf p.38
 
-    INPUT:
-      lat2D:    ndarray
-                2D latitude information for each pixel
-      lon2D:    ndarray
-                2D longitude information for each pixel
-      prudName: str
-                Short name of prudence region
-    RETURN
-      prudMask: ndarray
-                Ndarray of dtype boolean of the same shape as lat2D.
-                True = masked; False = not masked
+    Input values:
+    -------------
+    lat2D:    ndarray
+        2D latitude information for each pixel
+    lon2D:    ndarray
+        2D longitude information for each pixel
+    prudName: str
+        Short name of prudence region
+
+    Return value:
+    -------------
+    prudMask: ndarray
+        Ndarray of dtype boolean of the same shape as lat2D.
+        True = masked; False = not masked
     """
     if (prudName=='BI'):
         prudMask = np.where((lat2D < 50.0) | (lat2D > 59.0)  | (lon2D < -10.0) | (lon2D >  2.0), True, False)
@@ -348,35 +391,37 @@ def get_prudenceMask(lat2D, lon2D, prudName):
 def stampLLSM(data, invalid, LLSM, LLSMThreshold=2):
     """ stamps a LLSM to passed data
 
-    Some times its needed to force different land datasets to use the same Land
+    Some times its needed to force different datasets to use the same Land
     Lake Sea Mask (LLSM). One example is using different data sets to provide a
     model with soilindicators and landcover data. If the origin of both
     datsets is different, most propably the used LLSM is different too. This,
     for exmple could lead to the situation along the coastline that one dataset
     is indicating water (ocean) while the other is indicating land.
-    This inconsistency has to be fixe, especially within the ealm of coupled
+    This inconsistency has to be fixe, especially within the realm of coupled
     models.
 
     To achive this, this function is
-    i) masking invalid pixels within the passed data set
-    ii) interpolating remaining data over the maske regions
-    iii) setting pixel to water value according to a passed LLSM
+    i)   masking invalid pixels within the passed data set
+    ii)  interpolate remaining data over the maske regions
+    iii) set pixel to water value according to a passed LLSM
 
-    This way guaranthees each land pixel is holding land informtion and each
+    This guaranthees each land pixel is holding land informtion and each
     water pixel is marked as water.
 
-    INPUT:
-      data: ndarray
-            A 2D nd array holding the datset to stamp the LLSM
-      invalid: scalar
-               A scalar witht the value indicating invalid pixel
-      LLSM: ndarray
-            A ndarray of the same shape as data holding the LLSM
-            (Land=2 Lake=1 Sea=0)
+    Input values:
+    -------------
+    data: ndarray
+        A 2D nd array holding the datset to stamp the LLSM
+    invalid: scalar
+        A scalar witht the value indicating invalid pixel
+    LLSM: ndarray
+        A ndarray of the same shape as data holding the LLSM
+        (Land=2 Lake=1 Sea=0)
 
-    RETURN:
-      out: ndarray MASKED!
-           A ndarray of the same shape as data, with stamped LLSM
+    Return value:
+    -------------
+    return: ndarray MASKED!
+        A ndarray of the same shape as data, with stamped LLSM
     """
 
     # some checks to verify we can progress
