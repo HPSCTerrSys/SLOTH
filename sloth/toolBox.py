@@ -397,6 +397,50 @@ def stampLLSM(data, invalid, LLSM, LLSMThreshold=2):
     return out
 
 
+def mapDataRange_lin(X, y_min=0, y_max=1):
+    """ Map src data range linear to other data range.
+
+    Mapping a data range to another data range could be quiet usefull. One 
+    example is to normalize a data range (map [x,y] --> [0,1]) to better compare
+    to other data ranges.
+
+    This function is linear mapping arbitrarry source data ranges (X) to 
+    arbitrary target data ranges (Y). 
+    An intermediat step is used by first transform both (X and Y) into data 
+    ranges starting from zero (X' and Y'), as those data range can be easily 
+    mapped with
+    (I)   y' = y'_max / x'_max * x'
+    whereby 
+    (II)  y' = y - y_min   AND   x' = x - x_min
+    Putting together (I) and (II) does lead to
+    (III) y = (y_max-y_min) / (x_max-x_min) * (x-x_min) + y_min
+
+    Input values:
+    -------------
+    X: ndarray
+        Source data range to remap
+    y_min: scalar
+        Min. value of target data range
+    y_max: scalar
+        Max. value of target data range
+    x_min: scalar
+        Min. value of source data range, if this should not be calculated based
+        on X.
+    x_max: scalar
+        Max. value of source data range, if this should not be calculated based
+        on X.
+
+    Return value:
+    -------------
+    return: ndarray
+        The target data range
+    """
+    x_min = np.min(X)
+    x_max = np.max(X)
+
+    Y = (y_max-y_min) / (x_max-x_min) * (X-x_min) + y_min
+
+    return Y
 
 if __name__ == '__main__':
     print('Im there!')
