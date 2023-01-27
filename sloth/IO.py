@@ -326,3 +326,15 @@ def readSa(file):
         #print(f'data.shape: {data.shape}')
 
         return data
+
+def writeSa(file, data):
+    nz, ny, nx = data.shape
+    with open(file, 'w') as f:
+        f.write(f'{nx} {ny} {nz}\n')
+        # Below should be more easy with a flatten array...
+        # But how to flatt? C or F order? 
+        # If knowen and tested change below.
+        for k in range(nz):
+            for j in range(ny):
+                for i in range(nx):
+                    f.write(f'{data[k,j,i]}\n')
