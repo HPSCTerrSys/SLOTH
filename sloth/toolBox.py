@@ -442,7 +442,9 @@ def stampLLSM(data, invalid, LLSM, LLSMThreshold=2):
     return out
 
 
-def mapDataRange_lin(X, y_min=0, y_max=1):
+def mapDataRange_lin(X, y_min=0, y_max=1,
+        x_min=None, x_max=None,
+        cutMinMax=False):
     """ Map src data range linear to other data range.
 
     Mapping a data range to another data range could be quiet usefull. One 
@@ -480,10 +482,19 @@ def mapDataRange_lin(X, y_min=0, y_max=1):
     return: ndarray
         The target data range
     """
-    x_min = np.min(X)
-    x_max = np.max(X)
+    # Calculate x_min and x_max if not passed
+    if x_min is None:
+        x_min = np.min(X)
+    if x_max is None:
+        x_max = np.max(X)
 
+    # Map X to new data range
     Y = (y_max-y_min) / (x_max-x_min) * (X-x_min) + y_min
+
+    # Cut Y for min and max values if wanted
+    if cutMinMax:
+        Y = np.where(Y<=y_min, y_min, Y)
+        Y = np.where(Y>=y_max, y_max, Y)
 
     return Y
 
