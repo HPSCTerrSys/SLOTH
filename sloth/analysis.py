@@ -12,8 +12,6 @@ import heat as ht
 import numpy as np
 import netCDF4 as nc
 import datetime as dt
-from . import pars_ParFlowTCL as ppfl
-from . import ParFlow_IO as pio
 import matplotlib.pyplot as plt
 
 def calc_wtd(press, cellDepths):
