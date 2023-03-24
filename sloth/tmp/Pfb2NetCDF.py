@@ -5,7 +5,7 @@ import argparse
 import sys
 import os
 import datetime as dt
-import ParFlow_IO as pio
+import sloth.IO as pio
 
 def Pfb2NetCDF(infiles, varname, outfile):
     """ Converts given ParFlow output (.pfb) into netCDF format(.nc)
@@ -52,26 +52,26 @@ def Pfb2NetCDF(infiles, varname, outfile):
     #pfbFile = pio.read_pfb(pfbFileName)
     
     outFile = f'{outfile}'
-    ncfile = nc.Dataset(outFile,'w')
+    ncfile = nc.Dataset(outFile,'w',format='NETCDF4')
 
     if pfbFile.ndim == 2:
         ny, nx = pfbFile.shape
         yDim = ncfile.createDimension('y', ny)
         xDim = ncfile.createDimension('x', nx)
-        ncVar = ncfile.createVariable(f'{varname}','f4',('y', 'x',))
+        ncVar = ncfile.createVariable(f'{varname}','f4',('y', 'x',),zlib=True)
     elif pfbFile.ndim == 3:
         nz, ny, nx = pfbFile.shape
         zDim = ncfile.createDimension('z', nz)
         yDim = ncfile.createDimension('y', ny)
         xDim = ncfile.createDimension('x', nx)
-        ncVar = ncfile.createVariable(f'{varname}','f4',('z', 'y', 'x',))
+        ncVar = ncfile.createVariable(f'{varname}','f4',('z', 'y', 'x',),zlib=True)
     elif pfbFile.ndim == 4:
         nt, nz, ny, nx = pfbFile.shape
         tDim = ncfile.createDimension('time', nt)
         zDim = ncfile.createDimension('z', nz)
         yDim = ncfile.createDimension('y', ny)
         xDim = ncfile.createDimension('x', nx)
-        ncVar = ncfile.createVariable(f'{varname}','f4',('time', 'z', 'y', 'x',))
+        ncVar = ncfile.createVariable(f'{varname}','f4',('time', 'z', 'y', 'x',),zlib=True)
 
     ncVar[...] = pfbFile[...]
     ncfile.close()
