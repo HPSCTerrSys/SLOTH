@@ -25,6 +25,7 @@ jobs:
           pip install matplotlib
           pip install netCDF4
           pip install numpy
+          pip install scipy
       # Build documentation with sphinx in _build
       - name: Sphinx build
         run: |
