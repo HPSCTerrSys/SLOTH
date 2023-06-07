@@ -1,6 +1,6 @@
 # Welcome to SLOTH
 
-Check also our **[ocumentation](https://hpscterrsys.github.io/SLOTH/README.html)!**  
+Check also our **[documentation](https://hpscterrsys.github.io/SLOTH/README.html)!**  
 
 This repository does holed smaller and bigger **helper** scripts for simulations 
 based on [TSMP](https://www.terrsysmp.org/). The overall idea is to support the 

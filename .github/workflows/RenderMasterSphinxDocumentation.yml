@@ -37,7 +37,8 @@ jobs:
       # Build documentation with sphinx in _build
       - name: Sphinx build
         run: |
-          sphinx-build -a doc _build
+          cd doc
+          sphinx-build -a . _build
       # Deploy new rendered documentation by pushing to branch gh-pages
       # The actual GiHub Page is refreshed by GitHub if the branch 
       # gh-pages is updated automatically.
