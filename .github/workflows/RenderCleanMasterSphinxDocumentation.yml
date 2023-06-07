@@ -22,6 +22,9 @@ jobs:
           pip install --upgrade myst-parser
           pip install sphinx sphinx_rtd_theme
           pip install sphinx-copybutton
+          pip install matplotlib
+          pip install netCDF4
+          pip install numpy
       # Build documentation with sphinx in _build
       - name: Sphinx build
         run: |
