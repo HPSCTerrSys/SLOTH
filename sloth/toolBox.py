@@ -1,9 +1,4 @@
 """ toolBox - submodule of SLOTH
-
-Owner / author: Nikals WAGNER, n.wagner@fz-juelich.de
-
-Description:
-[...]
 """
 import sys
 import os
@@ -26,31 +21,31 @@ def calc_catchment(slopex, slopey, x, y):
     not without using other external libs.
     The idea is to start with a list of pixels belonging to the catchment, for 
     example with a list with a single entry -- the given outlet pixel. 
-    Than loop over this list, pop (!) the current pixel and 
-    i)  mark the current pixel as catchment and
+    Than loop over this list, pop (!) the current pixel and     
+    i)  mark the current pixel as catchment and   
     ii) check all sorounding pixels, if those does drain into the current pixel
-    and does not belong to the catchment already.
+    and does not belong to the catchment already.   
     All found sorrounding pixels, which does drain into the current one and
     does not belong to the catchment already are appended to the list the loop
-    is itterating over. Than the next itteration is started.
+    is itterating over. Than the next itteration is started.    
     This way the algorithem does find every pixel belonging to the catchment of
     the passes initial pixel(s) -- e.g. the outlet pixel.
 
-    Input values:
-    -------------
-    slopex: 2D ndarray
-        slopes in x-direction
-    slopey: 2D ndarray
-        slopes in y-direction
-    x: int
+    Parameters
+    ----------
+    slopex : ndarray
+        2D slopes in x-direction
+    slopey : ndarray
+        2D slopes in y-direction
+    x : int
         index in x-direction to calulate catchment from 
-    y: int
+    y : int
         index in y-direction to calulate catchment from
 
-    Return value:
-    -------------
-    catchment: 2D ndarray 
-        ndarray of the same size as slopex/y. 0 = not part of catchment; 1 = part of catchment
+    Returns
+    -------
+    catchment : ndarray
+        2D ndarray of the same size as slopex/y. 0 = not part of catchment; 1 = part of catchment
     """
     dims = slopey.shape
     nx = dims[1]
@@ -105,35 +100,37 @@ def get_intervalSlice(dates, sliceInterval='month'):
 
     This function calculates interval slices of a given time-series, 
     aiming to mimic pythons default slice notation `array[start:stop:step]`
-    to also enable multi dimensional slicing. 
+    to also enable multi dimensional slicing.    
     The calculation takes the models dumpintervall into account, wherefore 
-    this function is working for (nearly) every time-resolution.
+    this function is working for (nearly) every time-resolution.   
     The calculation is based on datetime-objects and therefore really 
     calculates the slice of individual interval, even if the time-series 
-    does not start or end at the first or last of a given interval.
+    does not start or end at the first or last of a given interval.  
 
-    Use case:
+    Use case:   
     You got a time-series of hourly data points and want to calculate the
     monthly mean. This functions returns the slices needed to divide your
     data into monthly peaces.
-
-    Return value:
-    -------------
-    Slices: list
-        A list with length of found intervals with related slices
-
-    This function assumes:
-    ----------------------
-    -) The passed time-series covers at least on intervall!
-    -) At least hourly steps / dumpIntervals! 
-    -) No seconds in dates - model output is at least on full minutes!
 
     Parameters
     ----------
     dates : NDarray 
         the time-series as datetime-object. 
-    sliceInterval: str
+    sliceInterval : str
         defining the interval. Supported are: 'day', 'month'
+
+    Returns
+    -------
+    Slices : list
+        A list with length of found intervals with related slices
+
+    Notes 
+    -----
+    This function assumes:   
+    i) The passed time-series covers at least on intervall!
+    ii) At least hourly steps / dumpIntervals! 
+    iii) No seconds in dates - model output is at least on full minutes!
+
     '''
 
     # Check is passed sliceInterval is supported and exit if not.
@@ -232,24 +229,29 @@ def spher_dist_v1(lon1, lat1, lon2, lat2, Rearth=6373):
 
     This function calculates the real distance (in [km]) between two points on
     earth given in lat/lon coordinates. 
-    Source: https://www.kompf.de/gps/distcalc.html
 
-    Input values:
-    -------------
-    lon1:   ndarray 
-        Longitude value of first point in [rad]. Could be any dim
-    lat1:   ndarray [rad]
-        Latitude value of first point in [rad]. Could be any dim
-    lon2:   ndarray [rad]
-        Longitude value of second point in [rad]. Could be any dim
-    lat2:   ndarray [rad]
-        Latitude value of second point in [rad]. Could be any dim
-    Rearth: int|float 
+    Parameters
+    ----------
+    lon1 : ndarray
+        Longitude value in [rad] of first point in [rad]. Could be any dim
+    lat1 : ndarray
+        Latitude value in [rad] of first point in [rad]. Could be any dim
+    lon2 : ndarray
+        Longitude value in [rad] of second point in [rad]. Could be any dim
+    lat2 : ndarray
+        Latitude value in [rad] of second point in [rad]. Could be any dim
+    Rearth : int or float 
         The earth radius in [km].
 
-    Return value:
-    -------------
-    return: ndarray [km]
+    Returns
+    -------
+    ndarray
+        The distance is returned in [km]
+
+    Notes
+    -----
+    Source: https://www.kompf.de/gps/distcalc.html
+
     """
     term1 = np.sin(lat1) * np.sin(lat2)
     term2 = np.cos(lat1) * np.cos(lat2)
@@ -257,6 +259,10 @@ def spher_dist_v1(lon1, lat1, lon2, lat2, Rearth=6373):
     return Rearth * np.arccos(term1+term2*term3)
 
 def find_nearest_Index_2D(point, coord2D):
+    """ Find the nerest index in 2D 
+
+    [TBE]
+    """
     dist = np.abs(coord2D - point)
     idx = np.unravel_index(np.argmin(dist, axis=None),dist.shape)
     return idx[0], idx[1]
@@ -265,21 +271,22 @@ def plusOneMonth(currDate):
     """ return passed date + 1 month
 
     Sometimes its needed to calculate a date plus one month, as easily possible 
-    with the bash commandline tool date
-    >> `date -d "$(date) + 1 month"`
+    with the bash commandline tool date 
+    >> `date -d "$(date) + 1 month"` 
     However, datetime objects in python are mainly based on hours or seconds,
     wherefore '+ 1 month' always needs a special treatment according to the 
-    different month lengths. 
-    So this function is a simple wrapper to clean other code-snipets.
+    different month lengths.  
+    So this function is a simple wrapper for this task to clean other 
+    code-snipets.
 
-    Input values:
-    -------------
-    currDate:  datetime
+    Parameters
+    ----------
+    currDate : datetime
         An arbitrary date
 
-    Return value:
-    -------------
-    return:    datetime 
+    Returns
+    -------
+    datetime 
         Arbitrary passed date +1month
     """
     num_days = monthrange(currDate.year, currDate.month)[1]
@@ -288,47 +295,53 @@ def plusOneMonth(currDate):
 def trunc(values, decs=0):
     """ truncates a passed float value by given floating point digit
 
-    This funciton does truncate a given float value or floting ndarray
-    by the precision defined with `decs` (decimal digits).
+    This funciton does truncate a given float value or floting ndarray by a 
+    given truncation precision (decimal digits).
 
     Example: trunc(values=2.12345, decs=3) --> 2.123
     
-    Input value:
-    ------------
-    values: ndarray
+    Parameters
+    ----------
+    values : ndarray
         A ndarray of any dimension (also scalar).
-    decs: int
+    decs : int
         A integer value defining the truncation precision.
 
-    Return value:
-    -------------
-    return: ndarray
+    Returns
+    -------
+    ndarray
         A ndarray of same type as input
 
     """
     return np.trunc(values*10**decs)/(10**decs)
 
 def fill(data, invalid=None, transkargs={}):
-    """ fill invalid data with nearest neighbor interpolation
+    """ Fill invalid data with nearest neighbor interpolation
 
-    Replace the value of invalid 'data' cells (indicated by 'invalid')
-    by the value of the nearest valid data cell.
+    Replace invalid data points by the value of the nearest valid data point.
+    Invalid data points are thereby indicated by the function argument 
+    `invalid`
+
+    Parameters
+    ----------
+    data : ndarray       
+        An array of any dimension
+    invalid : ndarray, optional
+        A binary array of same shape as 'data'. Data value are replaced where 
+        invalid is True. If None (default), `invalid = np.isnan(data)` is used
+    transkargs : dict, optional
+        Further rguments one want to pass to `distance_transform_edt()`. 
+        (Default={})
+
+    Returns
+    -------
+    ndarray
+        Return a filled ndrray (not numpy.masked!).
+
+    Notes
+    -----
     Source: https://stackoverflow.com/questions/5551286/filling-gaps-in-a-numpy-array
 
-    Input values:
-    -------------
-    data: ndarray       
-        An array of any dimension
-    invalid: ndarray
-        A binary array of same shape as 'data'. Data value are replaced where 
-        invalid is True. If None (default), use: invalid  = np.isnan(data)
-    transkargs: dict
-        Optional arguments one want to pass to `distance_transform_edt()`
-
-    Return value:
-    -------------
-    return: ndarray
-        Return a filled array (not numpy.masked!).
     """
     # check if data and invalid shape is equal, as otherwise filling is not
     # possible
@@ -347,24 +360,28 @@ def get_prudenceMask(lat2D, lon2D, prudName):
 
     Return a boolean mask-array (True = masked, False = not masked) based on
     a passed set of longitude and latitude values and the name of the prudence
-    region.
+    region.  
     The shape of the mask-array is set equal to the shape of input lat2D.
-    Source: http://prudence.dmi.dk/public/publications/PSICC/Christensen&Christensen.pdf p.38
 
-    Input values:
-    -------------
-    lat2D:    ndarray
+    Parameters
+    ----------
+    lat2D : ndarray
         2D latitude information for each pixel
-    lon2D:    ndarray
+    lon2D : ndarray
         2D longitude information for each pixel
-    prudName: str
+    prudName : str
         Short name of prudence region
 
-    Return value:
-    -------------
-    prudMask: ndarray
-        Ndarray of dtype boolean of the same shape as lat2D.
+    Returns
+    -------
+    prudMask : ndarray
+        Ndarray of dtype boolean of the same shape as lat2D. 
         True = masked; False = not masked
+
+    Notes
+    -----
+    Source: http://prudence.dmi.dk/public/publications/PSICC/Christensen&Christensen.pdf p.38
+
     """
     if (prudName=='BI'):
         prudMask = np.where((lat2D < 50.0) | (lat2D > 59.0)  | (lon2D < -10.0) | (lon2D >  2.0), True, False)
@@ -391,37 +408,38 @@ def get_prudenceMask(lat2D, lon2D, prudName):
 def stampLLSM(data, invalid, LLSM, LLSMThreshold=2):
     """ stamps a LLSM to passed data
 
-    Some times its needed to force different datasets to use the same Land
-    Lake Sea Mask (LLSM). One example is using different data sets to provide a
-    model with soilindicators and landcover data. If the origin of both
-    datsets is different, most propably the used LLSM is different too. This,
-    for exmple could lead to the situation along the coastline that one dataset
-    is indicating water (ocean) while the other is indicating land.
-    This inconsistency has to be fixe, especially within the realm of coupled
-    models.
+    Some times its needed to force different datasets to use the same 
+    Land-Lake-Sea-Mask (LLSM). One example is combining different data sets to 
+    force a model with. If the datasets are taken fomr different sources, most 
+    propably the used LLSM is different too. This, for exmple, could lead to the 
+    situation along the coastline that one dataset is indicating water (ocean) 
+    while the other is indicating land. This inconsistency has to be fixe, 
+    especially within the realm of coupled models.
 
-    To achive this, this function is
-    i)   masking invalid pixels within the passed data set
-    ii)  interpolate remaining data over the maske regions
-    iii) set pixel to water value according to a passed LLSM
+
+    To achive this, this function is\n
+    i)   masking invalid pixels within the passed data set  
+    ii)  interpolate remaining data over the maske regions  
+    iii) set pixel to water value according to a passed LLSM  
 
     This guaranthees each land pixel is holding land informtion and each
     water pixel is marked as water.
 
-    Input values:
-    -------------
-    data: ndarray
+    Parameters
+    ----------
+    data : ndarray
         A 2D nd array holding the datset to stamp the LLSM
-    invalid: scalar
+    invalid : scalar
         A scalar witht the value indicating invalid pixel
-    LLSM: ndarray
+    LLSM : ndarray
         A ndarray of the same shape as data holding the LLSM
         (Land=2 Lake=1 Sea=0)
 
-    Return value:
-    -------------
-    return: ndarray MASKED!
-        A ndarray of the same shape as data, with stamped LLSM
+    Returns
+    -------
+    ndarray
+        A (MASKED!) ndarray of the same shape as data, with stamped LLSM
+
     """
 
     # some checks to verify we can progress
@@ -462,25 +480,26 @@ def mapDataRange_lin(X, y_min=0, y_max=1,
     Putting together (I) and (II) does lead to
     (III) y = (y_max-y_min) / (x_max-x_min) * (x-x_min) + y_min
 
-    Input values:
-    -------------
-    X: ndarray
+    Parameters
+    ----------
+    X : ndarray
         Source data range to remap
-    y_min: scalar
+    y_min : scalar
         Min. value of target data range
-    y_max: scalar
+    y_max : scalar
         Max. value of target data range
-    x_min: scalar
+    x_min : scalar
         Min. value of source data range, if this should not be calculated based
         on X.
-    x_max: scalar
+    x_max : scalar
         Max. value of source data range, if this should not be calculated based
         on X.
 
-    Return value:
-    -------------
-    return: ndarray
+    Returns
+    -------
+    ndarray
         The target data range
+
     """
     # Calculate x_min and x_max if not passed
     if x_min is None:
