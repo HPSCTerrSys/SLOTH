@@ -14,22 +14,16 @@ import sloth.slothHelper as slothHelper
 
 
 def calc_catchment(slopex, slopey, x, y):
-    """ This function calculates the catchment related to a given outlet
-    pixel based on x- and y-slope files
+    """ Calculate the catchment area associated with a given outlet pixel 
+    using x- and y-slope data.
 
-    This algorithem is quiet simple, but I found no faster one, at least
-    not without using other external libs.
-    The idea is to start with a list of pixels belonging to the catchment, for 
-    example with a list with a single entry -- the given outlet pixel. 
-    Than loop over this list, pop (!) the current pixel and     
-    i)  mark the current pixel as catchment and   
-    ii) check all sorounding pixels, if those does drain into the current pixel
-    and does not belong to the catchment already.   
-    All found sorrounding pixels, which does drain into the current one and
-    does not belong to the catchment already are appended to the list the loop
-    is itterating over. Than the next itteration is started.    
-    This way the algorithem does find every pixel belonging to the catchment of
-    the passes initial pixel(s) -- e.g. the outlet pixel.
+    This function implements a simple yet efficient algorithm to determine the 
+    catchment area by starting with a list of pixels that initially contains 
+    only the outlet pixel(s). It iteratively processes the pixels in the list, 
+    marking them as part of the catchment and identifying the surrounding pixels 
+    that drain into the current pixel and are not already included in the 
+    catchment. Foun pixels are added to the list and the algorithm continues 
+    until all pixels belonging to the catchment area are discovered.
 
     Parameters
     ----------
@@ -259,88 +253,173 @@ def spher_dist_v1(lon1, lat1, lon2, lat2, Rearth=6373):
     return Rearth * np.arccos(term1+term2*term3)
 
 def find_nearest_Index_2D(point, coord2D):
-    """ Find the nerest index in 2D 
+    """
+    Find the nearest index in a 2D array.
 
-    [TBE]
+    Given a 2D array `coord2D` and a specific `point` value, this function returns
+    the index of the 2D array that holds the closest values to the `point`.
+
+    Parameters
+    ----------
+    point : scalar
+        The value for which to find the nearest index in the 2D array.
+    coord2D : ndarray
+        The 2D array in which to search for the nearest index.
+
+    Returns
+    -------
+    (int, int)
+        The index in the first and second dimensions of `coord2D` that holds the
+        closest values to the `point`.
+
+    Notes
+    -----
+    This function calculates the absolute differences between `coord2D` and `point`
+    using `np.abs()`. It then determines the index of the minimum value in the
+    differences array using `np.argmin()`. The resulting flattened index is converted
+    into a tuple of indices representing the original shape of `coord2D` using
+    `np.unravel_index()`.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> arr = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+    >>> find_nearest_Index_2D(5, arr)
+    (1, 1)
+
+    >>> arr = np.array([[0.1, 0.2, 0.3], [0.4, 0.5, 0.6], [0.7, 0.8, 0.9]])
+    >>> find_nearest_Index_2D(0.25, arr)
+    (0, 1)
+
     """
     dist = np.abs(coord2D - point)
     idx = np.unravel_index(np.argmin(dist, axis=None),dist.shape)
     return idx[0], idx[1]
 
 def plusOneMonth(currDate):
-    """ return passed date + 1 month
+    """
+    Return the passed date incremented by one month.
 
-    Sometimes its needed to calculate a date plus one month, as easily possible 
-    with the bash commandline tool date 
-    >> `date -d "$(date) + 1 month"` 
-    However, datetime objects in python are mainly based on hours or seconds,
-    wherefore '+ 1 month' always needs a special treatment according to the 
-    different month lengths.  
-    So this function is a simple wrapper for this task to clean other 
-    code-snipets.
+    This function provides a simple way to calculate a date that is one month ahead
+    of the given `currDate`. Unlike the bash command-line tool `date`, which can
+    handle this calculation easily, Python's `datetime` objects are based on hours
+    or seconds, requiring special treatment for adding one month due to varying
+    month lengths. This function serves as a wrapper to handle this task in a clean
+    manner, facilitating usage in other code snippets.
 
     Parameters
     ----------
     currDate : datetime
-        An arbitrary date
+        An arbitrary date.
 
     Returns
     -------
-    datetime 
-        Arbitrary passed date +1month
+    datetime
+        The passed date incremented by one month.
+
+    Notes
+    -----
+    This function determines the number of days in the month of `currDate` using
+    `monthrange()` from the `calendar` module. It then returns `currDate` incremented
+    by a timedelta calculated as `24 * num_days` hours. This ensures that the returned
+    date correctly reflects one month ahead while accounting for varying month lengths.
+
+    Examples
+    --------
+    >>> import datetime
+    >>> currDate = datetime.datetime(2023, 5, 15)
+    >>> plusOneMonth(currDate)
+    datetime.datetime(2023, 6, 15, 0, 0)
+
+    >>> currDate = datetime.datetime(2023, 12, 31)
+    >>> plusOneMonth(currDate)
+    datetime.datetime(2024, 1, 31, 0, 0)
+
     """
     num_days = monthrange(currDate.year, currDate.month)[1]
     return currDate + datetime.timedelta(hours=24*num_days)
 
 def trunc(values, decs=0):
-    """ truncates a passed float value by given floating point digit
+    """
+    Truncate a passed float value or floating ndarray.
 
-    This funciton does truncate a given float value or floting ndarray by a 
-    given truncation precision (decimal digits).
+    This function truncates a given float value or floating ndarray by a 
+    specified truncation precision (decimal digits).
 
-    Example: trunc(values=2.12345, decs=3) --> 2.123
-    
     Parameters
     ----------
     values : ndarray
-        A ndarray of any dimension (also scalar).
-    decs : int
-        A integer value defining the truncation precision.
+        A ndarray of any dimension (including scalar) containing float values to be truncated.    
+    decs : int, optional
+        An integer value defining the truncation precision. It specifies the number of decimal places to keep (default is 0).
 
     Returns
     -------
     ndarray
-        A ndarray of same type as input
+        A ndarray of the same type as the input, with the specified number of decimal places truncated from the original values.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> values = np.array([2.12345, 3.45678, 4.56789])
+    >>> trunc(values, decs=3)
+    array([2.123, 3.456, 4.567])
+
+    >>> value = 2.98765
+    >>> trunc(value, decs=2)
+    2.98
 
     """
     return np.trunc(values*10**decs)/(10**decs)
 
 def fill(data, invalid=None, transkargs={}):
-    """ Fill invalid data with nearest neighbor interpolation
+    """
+    Fill invalid data points with nearest neighbor interpolation.
 
-    Replace invalid data points by the value of the nearest valid data point.
-    Invalid data points are thereby indicated by the function argument 
-    `invalid`
+    This function replaces invalid data points in the input array (`data`) with the
+    value of the nearest valid data point. Invalid data points are indicated by the
+    `invalid` array or, if not provided, by NaN (Not a Number) values in `data`.
 
     Parameters
     ----------
-    data : ndarray       
-        An array of any dimension
+    data : ndarray
+        An array containing the data to be filled.
     invalid : ndarray, optional
-        A binary array of same shape as 'data'. Data value are replaced where 
-        invalid is True. If None (default), `invalid = np.isnan(data)` is used
+        A binary array of the same shape as `data`. Data values are replaced where
+        `invalid` is True. If not provided, invalid data points are identified using
+        `np.isnan(data)` (default).
     transkargs : dict, optional
-        Further rguments one want to pass to `distance_transform_edt()`. 
-        (Default={})
+        Additional arguments to pass to the `distance_transform_edt()` function.
+        Default is an empty dictionary.
 
     Returns
     -------
     ndarray
-        Return a filled ndrray (not numpy.masked!).
+        A filled ndarray, where invalid data points have been replaced by the value
+        of the nearest valid data point.
 
     Notes
     -----
-    Source: https://stackoverflow.com/questions/5551286/filling-gaps-in-a-numpy-array
+    This function uses nearest neighbor interpolation to fill invalid data points in
+    the input array. It calculates the Euclidean distance transform of the `invalid`
+    array to find the indices of the nearest valid data points. The original `data`
+    array is then updated with the values from the nearest valid data points.
+
+    If the shapes of `data` and `invalid` are not equal, an error is raised, as filling
+    is not possible. 
+    
+    See also: https://stackoverflow.com/questions/5551286/filling-gaps-in-a-numpy-array
+
+    Example
+    -------
+    >>> import numpy as np
+    >>> data = np.array([1.0, 2.0, np.nan, 4.0, np.nan])
+    >>> fill(data)
+    array([1., 2., 4., 4., 4.])
+
+    >>> invalid = np.isnan(data)
+    >>> fill(data, invalid)
+    array([1., 2., 4., 4., 4.])
 
     """
     # check if data and invalid shape is equal, as otherwise filling is not
@@ -356,31 +435,51 @@ def fill(data, invalid=None, transkargs={}):
     return data[tuple(ind)]
 
 def get_prudenceMask(lat2D, lon2D, prudName):
-    """ return a prudance mask
+    """
+    Return a Prudence mask based on latitude and longitude values.
 
-    Return a boolean mask-array (True = masked, False = not masked) based on
-    a passed set of longitude and latitude values and the name of the prudence
-    region.  
-    The shape of the mask-array is set equal to the shape of input lat2D.
+    This function generates a boolean mask array where True represents masked areas
+    and False represents non-masked areas. The mask is determined based on a set of
+    latitude and longitude values and the name of the Prudence region.
 
     Parameters
     ----------
     lat2D : ndarray
-        2D latitude information for each pixel
+        2D array containing latitude information for each pixel.
     lon2D : ndarray
-        2D longitude information for each pixel
+        2D array containing longitude information for each pixel.
     prudName : str
-        Short name of prudence region
+        Short name of the Prudence region.
 
     Returns
     -------
     prudMask : ndarray
-        Ndarray of dtype boolean of the same shape as lat2D. 
-        True = masked; False = not masked
+        Boolean ndarray of the same shape as `lat2D`, indicating masked and
+        non-masked areas.
+        True = masked; False = not masked.
 
     Notes
     -----
-    Source: http://prudence.dmi.dk/public/publications/PSICC/Christensen&Christensen.pdf p.38
+    The Prudence mask is created based on specific latitude and longitude ranges
+    for each Prudence region. The function checks the `prudName` parameter and
+    generates the corresponding mask using NumPy's `np.where()` function.
+
+    The available Prudence region names and their corresponding latitude and
+    longitude ranges are as follows (True is masked, Fals is not masked):
+
+    - 'BI': Latitude: <50.0 or >59.0, Longitude: <-10.0 or >2.0
+    - 'IP': Latitude: <36.0 or >44.0, Longitude: <-10.0 or >3.0
+    - 'FR': Latitude: <44.0 or >50.0, Longitude: <-5.0 or >5.0
+    - 'ME': Latitude: <48.0 or >55.0, Longitude: <2.0 or >16.0
+    - 'SC': Latitude: <55.0 or >70.0, Longitude: <5.0 or >30.0
+    - 'AL': Latitude: <44.0 or >48.0, Longitude: <5.0 or >15.0
+    - 'MD': Latitude: <36.0 or >44.0, Longitude: <3.0 or >25.0
+    - 'EA': Latitude: <44.0 or >55.0, Longitude: <16.0 or >30.0
+
+    If an unsupported Prudence region name is provided, an error message is printed,
+    and the program exits.
+
+    For reference see also: http://prudence.dmi.dk/public/publications/PSICC/Christensen&Christensen.pdf p.38
 
     """
     if (prudName=='BI'):
@@ -463,42 +562,54 @@ def stampLLSM(data, invalid, LLSM, LLSMThreshold=2):
 def mapDataRange_lin(X, y_min=0, y_max=1,
         x_min=None, x_max=None,
         cutMinMax=False):
-    """ Map src data range linear to other data range.
+    """Map a source data range linearly to a target data range.
 
-    Mapping a data range to another data range could be quiet usefull. One 
-    example is to normalize a data range (map [x,y] --> [0,1]) to better compare
-    to other data ranges.
-
-    This function is linear mapping arbitrarry source data ranges (X) to 
-    arbitrary target data ranges (Y). 
-    An intermediat step is used by first transform both (X and Y) into data 
-    ranges starting from zero (X' and Y'), as those data range can be easily 
-    mapped with
-    (I)   y' = y'_max / x'_max * x'
-    whereby 
-    (II)  y' = y - y_min   AND   x' = x - x_min
-    Putting together (I) and (II) does lead to
-    (III) y = (y_max-y_min) / (x_max-x_min) * (x-x_min) + y_min
+    Perform a linear mapping of a source data range (X) to a target data range (Y). The
+    function calculates the mapping using the formula: y = (y_max - y_min) / (x_max - x_min) * (x - x_min) + y_min.
 
     Parameters
     ----------
     X : ndarray
-        Source data range to remap
-    y_min : scalar
-        Min. value of target data range
-    y_max : scalar
-        Max. value of target data range
-    x_min : scalar
-        Min. value of source data range, if this should not be calculated based
-        on X.
-    x_max : scalar
-        Max. value of source data range, if this should not be calculated based
-        on X.
-
+        Source data range to remap.
+    y_min : scalar, optional
+        Minimum value of the target data range (default is 0).
+    y_max : scalar, optional
+        Maximum value of the target data range (default is 1).
+    x_min : scalar, optional
+        Minimum value of the source data range. If not provided, it is calculated based on X.
+    x_max : scalar, optional
+        Maximum value of the source data range. If not provided, it is calculated based on X.
+    cutMinMax : bool, optional
+        If True, cut the mapped values outside the target data range to the minimum and maximum values.
+    
     Returns
     -------
     ndarray
-        The target data range
+        The target data range after linear mapping.
+
+    Notes
+    -----
+    This function is useful for mapping a source data range to a different target data range. It can be
+    used for various purposes, such as normalizing data ranges to facilitate comparison with other ranges.
+    An intermediat step is used by first transform both (X and Y) into data 
+    ranges starting from zero (X' and Y'), as those data range can be easily 
+    mapped with
+
+    i)   y' = y'_max / x'_max * x'
+    ii)  y' = y - y_min   AND   x' = x - x_min
+    iii) y = (y_max-y_min) / (x_max-x_min) * (x-x_min) + y_min
+
+    Examples
+    --------
+    >>> X = np.array([0, 1, 2, 3, 4, 5])
+    >>> mapped = mapDataRange_lin(X, y_min=10, y_max=20)
+    >>> print(mapped)
+    [10. 12. 14. 16. 18. 20.]
+
+    >>> X = np.array([100, 200, 300, 400, 500])
+    >>> mapped = mapDataRange_lin(X, y_min=-1, y_max=1, x_min=100, x_max=500)
+    >>> print(mapped)
+    [-1.  -0.5  0.   0.5  1. ]
 
     """
     # Calculate x_min and x_max if not passed

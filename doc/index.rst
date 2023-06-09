@@ -14,6 +14,14 @@ Welcome to SLOTH's documentation!
 
    coordTrafo.rst
    toolBox.rst
+   SanityCheck.rst
+   IO.rst
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Classes:
+
+   mapper.rst
 
 
 

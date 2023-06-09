@@ -1,28 +1,28 @@
 #!/usr/bin/env python
 """
-author: Nikals WAGNER
-e-mail: n.wagner@fz-juelich.de
-version: 2021-03-05
+SanityCheck.py is a script aimed at quickly validating the validity of data by 
+providing simple statistical information.
 
-Description:
-SanityCheck.py is aimed to quickly proof if data show valid results or not.
+Often, it is necessary to inspect data, such as model output, to determine if 
+the results are reasonable or not. Instead of elaborate plots, the script 
+focuses on presenting relevant statistics to avoid confusion while conveying 
+as much information about the data as possible.
 
-Often it is required, to quick inspect data (e.g. modeloutput) to validate if
-the modelresults are reasonable or not. No nice plots are required, simple
-some stats showing as much information as possible about the inspected data
-without getting confused.
-This script is aimed to handle whatever data it gets and is adjusting
-at some upper and lower percentile (default 2% adn 98%) of the passed data
-to prevent outliers destroing the colorbar or histogram (check number with the
-colorbar! Those do change from plot to plot!).
-One usecase of this script could be to run automatically after each individual 
-simulation of a long-term climate simulation to easily check if the simulation
-results stay reasonable or if some problmes (time shift, instable simualtion, ) 
-show up.
-Another usecase would be to run manually for some specific data-set, using this
-script standalone passing data via command line arguments.
+The script can handle various types of data and automatically adjusts the 
+colorbar according to upper and lower percentiles to account for outliers. This 
+prevents outliers from distorting the colorbar or histogram. Therefore it is 
+important to check the values on on each colorbar, as they may vary from plot 
+to plot.
 
-Check examples/ to see how this works. 
+One use case for this script is to run it automatically after each individual 
+simulation in a long-term climate simulation. This allows for easy verification 
+of the simulation results' reasonableness, detecting problems like time shifts 
+or instability.
+
+Another use case is to run the script manually on specific data sets by passing 
+them as command line arguments.
+
+For examples of how to use this script, refer to the 'examples/' directory.
 """
 import numpy as np
 import matplotlib as mpl
@@ -40,6 +40,37 @@ import copy
 import cftime
 
 def get_PlotMinMaxMid_Percentil(data, lower=5, upper=95):
+    """
+    Calculate the minimum, maximum, and midpoint values based on percentiles of the input data.
+
+    Parameters
+    ----------
+    data : numpy.ma.MaskedArray
+		Input data array.
+    lower : int, optional
+		Lower percentile value. Default is 5.
+    upper : int, optional
+		Upper percentile value. Default is 95.
+
+    Returns
+    -------
+    tuple : 
+		A tuple containing the minimum, maximum, and midpoint values.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> import numpy.ma as ma
+    >>> data = ma.masked_array([1.2, 3.4, 5.6, 7.8, 9.0], mask=[False, False, True, False, False])
+    >>> min_val, max_val, mid_val = get_PlotMinMaxMid_Percentil(data, lower=10, upper=90)
+    >>> print("Minimum value:", min_val)
+    Minimum value: 1.86
+    >>> print("Maximum value:", max_val)
+    Maximum value: 8.64
+    >>> print("Midpoint value:", mid_val)
+    Midpoint value: 5.25
+
+    """
     # Compress data to remove masked values, which are not taken into account.
     # Note that ma.compressed() is returning a 1D array! So pay attantion 
     # when to use!
@@ -68,6 +99,56 @@ def plot_SanityCheck(data, kind='sum',
     figname='./SanityCheck_3D.pdf', fig_title=None, minax_title=None, 
     maxax_title=None, kinax_title=None, hisax_title=None,
     lowerP=2, upperP=98, interactive=False, cmapName='Spectral'):
+    """
+    Plot a sanity check for given data.
+    
+    The Sanity Plot is a plot consisting of 4 sub-plots, trying to visualise 
+    some important statistics in a compact way, aimed to determine if the data 
+    set inspected is plausible or not (sanity).
+
+    Parameters
+    ----------
+    data : numpy.ma.MaskedArray
+        3D array of data.
+    kind : {'sum', 'mean'}, optional
+        Calculation type for the data statistics. Default is 'sum'.
+    figname : str, optional
+        File name to save the plot. Default is './SanityCheck_3D.pdf'.
+    fig_title : str, optional
+        Title of the plot.
+    minax_title : str, optional
+        Title of the subplot for minimum data.
+    maxax_title : str, optional
+        Title of the subplot for maximum data.
+    kinax_title : str, optional
+        Title of the subplot for kind (sum or mean) data.
+    hisax_title : str, optional
+        Title of the histogram subplot.
+    lowerP : int, optional
+        Lower percentile value for plot limits. Default is 2.
+    upperP : int, optional
+        Upper percentile value for plot limits. Default is 98.
+    interactive : bool, optional
+        If True, display the plot interactively. If False, save the plot to 
+        'figname'. Default is False.
+    cmapName : str, optional
+        Name of the colormap. Default is 'Spectral'.
+
+    Returns
+    -------
+    None
+
+    Notes
+    -----
+    - The 'data' input must be a 3D numpy masked array.
+    - The 'kind' parameter specifies whether to calculate the sum or mean of the data.
+    - The function generates a plot with subplots for the minimum, maximum, kind (sum or mean), and histogram of the data.
+    - The colormap normalization is determined based on the percentiles of the data.
+    - The plot can be displayed interactively or saved to a file.
+    - If the 'interactive' parameter is set to True, the plot is displayed using plt.show().
+      If False, the plot is saved to the file specified by 'figname'.
+
+    """
 
     ###########################################################################
     #### Small check if data fits requirements

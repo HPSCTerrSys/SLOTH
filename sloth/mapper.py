@@ -5,11 +5,15 @@ import os
 from . import toolBox
 
 class mapper:
-    ''' [...]
-        Due to several reasons (e.g. coarse resolutions) the river corridors
-        within TSMP (as all other models) does not have to match the real corridor
-        for all pixels along the river. 
-        [...]
+    ''' 
+
+    **TBE**
+
+    Due to several reasons (e.g. coarse resolutions) the river corridors
+    within TSMP (as all other models) does not have to match the real corridor
+    for all pixels along the river. 
+    [...]
+
     '''
 
     ###########################################################################
@@ -22,34 +26,34 @@ class mapper:
                        SimMeanArea=None, ObsMeanArea=None):
         ''' Default constructor of mapper-class
 
-        Object-variables:
-        -----------------
-        SimLons: 2D ndarray
+        Parameters
+        ----------
+        SimLons : 2D ndarray
             Two dimensional ndarray containing the lon value for each point of 
             SimGrid
-        SimLats: 2D ndarray
+        SimLats : 2D ndarray
             Two dimensional ndarray containing the lat value for each point of 
             SimGrid
-        ObsLons: 1D ndarray
+        ObsLons : 1D ndarray
             One dimensional ndarray containing the lon values for each individual 
             GRDC station stored with the object
-        ObsLats: 1D ndarray
+        ObsLats : 1D ndarray
             One dimensional ndarray containing the lat values for each individual 
             GRDC station stored with the object
-        ObsID: 1D ndarray
+        ObsID : 1D ndarray
             One dimensional ndarray containing the station ID for each individual 
             GRDC station stored with the object
-        SimMeanQ: 2D ndarray
+        SimMeanQ : 2D ndarray
             Two dimensional ndarray containing the mean discharge for each point
             of SimGrid (mean Q for entire period or ref period) 
-        ObsMeanQ: 1D ndarray
+        ObsMeanQ : 1D ndarray
             One dimensional ndarray containing the mean discharge for each individual 
             GRDC station stored with the object
-        SimMeanArea: 1D ndarray
+        SimMeanArea : 1D ndarray
             One dimensional ndarray containing the best fitting catchment area
             for each individual GRDC station stored with the object (calculation 
             based on Sim data)
-        ObsMeanArea: 1D ndarray
+        ObsMeanArea : 1D ndarray
             One dimensional ndarray containing the mean catchment area of each individual 
             GRDC station stored with the object
         '''
@@ -259,7 +263,7 @@ class mapper:
     ###########################################################################
     ########################## Auxiliary tools ################################
     ###########################################################################
-    def spher_dist_v1(self, lon1, lat1, lon2, lat2, Rearth=6373):
+    def spher_dist(self, lon1, lat1, lon2, lat2, Rearth=6373):
         """ calculate the spherical / haversine distance
 
         Source: https://www.kompf.de/gps/distcalc.html
@@ -275,27 +279,12 @@ class mapper:
         # print(f'arccos: {tmp_bool}')
         return Rearth * np.arccos(term1+term2*term3)
 
-    def spher_dist_v2(self, lon1, lat1, lon2, lat2, Rearth=6373):
-        """ calculate the spherical / haversine distance
-
-        Source: WSH
-        This function is supposed to proper handle different shaped coords
-        latX and lonX is supposed to be passed in rad
-
-        return 2D ndarray
-        """
-        dlon = lon2 - lon1
-        dlat = lat2 - lat1
-        a = np.sin(dlat / 2)**2 + np.cos(lat1) * np.cos(lat2) * np.sin(dlon / 2)**2
-        c = 2 * np.arctan2(np.sqrt(a), np.sqrt(1 - a))  
-        return Rearth * c
-
 
     ###########################################################################
     ########################### Core functions ################################
     ########################################################################### 
 
-    def checkt4MapRaw(self):
+    def __checkt4MapRaw(self):
         ''' This is a separate function to keep MapRaw() functions readable.
 
         This function checks if the passed data fulfills some basic 
@@ -303,9 +292,9 @@ class mapper:
         SimMeanQ and SimLons are of same shape.
         This is basically to avoid trivial errors while using this class.
 
-        Return value:
-        -------------
-        __: boolean 
+        Returns
+        -------
+        boolean 
             True if check is passed, False if some errors are detected.
 
         '''
@@ -348,16 +337,19 @@ class mapper:
         The 'real' distance is hereby the distance in [m] between OBS and SimGrind 
         calculated on a sphere.
 
-        Return value:
+        Returns
         -------------
-        No return value!
+        None
+
+        Notes
+        -----
         This function sets / updates the object variables self.MapYIdx_fit, 
         and self.MapXIdx_fit directly
 
         '''
 
         #check if all needed data are already defined
-        if not self.checkt4MapRaw():
+        if not self.__checkt4MapRaw():
             print('checkt4MapRaw() failed --> self.MapRaw() canceled!')
             return None
 
@@ -372,7 +364,7 @@ class mapper:
             ObsLon = self.ObsLons[idx]
             ObsLat = self.ObsLats[idx]
             # Calculate distance between Obs and SimGrid on Earth surface
-            dist = self.spher_dist_v1(np.deg2rad(self.SimLons),
+            dist = self.spher_dist(np.deg2rad(self.SimLons),
                                       np.deg2rad(self.SimLats),
                                       np.deg2rad(ObsLon),
                                       np.deg2rad(ObsLat))
@@ -387,7 +379,7 @@ class mapper:
         self.MapYIdx_raw = np.array(tmp_MapYIdx_raw)
         self.MapXIdx_raw = np.array(tmp_MapXIdx_raw)
 
-    def check4MapQ(self):
+    def __check4MapQ(self):
         ''' This is a separate function to keep MapXXX functions readable.
 
         This function checks if the passed data fulfills some basic 
@@ -396,9 +388,9 @@ class mapper:
         Because self.MapRaw() is called as part of all self.MapBestXXX() 
         functions, this function only checks additional requirements
 
-        Return value:
-        -------------
-        __: boolean 
+        Returns
+        -------
+        boolean 
             True if check is passed, False if some errors are detected.
 
         '''
@@ -427,22 +419,26 @@ class mapper:
         The origin pixel is hereby defined by MapRaw().
         That pixel with Q closes to GRDC data is than set.
 
-        Return value:
-        -------------
-        No return value!
-        This function sets / updates the object variables self.MapYIdx_fit, 
-        and self.MapXIdx_fit directly
-
         Parameters
         ----------
         search_rad : int 
             defining the radius around the origin pixel to search for best fitting Q. 
+
+        Returns
+        -------
+        None
+
+        Notes
+        -----
+        This function sets / updates the object variables self.MapYIdx_fit, 
+        and self.MapXIdx_fit directly
+
         '''
 
         # First MapRaw(), than adjust according to best fitting Q
         self.MapRaw()
         #check if all needed data are already defined
-        if not self.check4MapQ():
+        if not self.__check4MapQ():
             print('check4MapQ() failed --> self.MapBestQ() canceled!')
             return None
 
@@ -482,22 +478,26 @@ class mapper:
         the subset (search_rad around origin pixel) of SimMeanQ.
         The origin pixel is hereby defined by MapRaw()
         SimMeanQ is part of the objects-variables
-
-        Return value:
-        -------------
-        No return value!
-        This function sets / updates the object variables self.MapYIdx_fit, 
-        and self.MapXIdx_fit directly
-
+        
         Parameters
         ----------
         search_rad : int 
             defining the radius around the origin pixel to search for highest Q. 
+
+        Returns
+        -------
+        None
+
+        Notes
+        -----
+        This function sets / updates the object variables self.MapYIdx_fit, 
+        and self.MapXIdx_fit directly
+
         '''
         # First MapRaw(), than adjust according to highest Q
         self.MapRaw()
         #check if all needed data are already defined
-        if not self.check4MapQ():
+        if not self.__check4MapQ():
             print('check4MapQ() failed --> self.MapBestQ() canceled!')
             return None
 
@@ -527,7 +527,7 @@ class mapper:
         self.MapYIdx_fit = np.array(tmp_MapYIdx_fit)
         self.MapXIdx_fit = np.array(tmp_MapXIdx_fit)
 
-    def check4MapArea(self):
+    def __check4MapArea(self):
         ''' This is a separate function to keep MapXXX functions readable.
 
         This function checks if the passed data fulfills some basic 
@@ -536,9 +536,9 @@ class mapper:
         Because self.MapRaw() is called as part of all self.MapBestXXX() 
         functions, this function only checks additional requirements
 
-        Return value:
-        -------------
-        __: boolean 
+        Returns
+        -------
+        boolean 
             True if check is passed, False if some errors are detected.
 
         '''
@@ -557,13 +557,7 @@ class mapper:
         each pixel within a given radius around the origin pixel.
         The origin pixel is hereby defined by MapRaw().
         That pixel with catchment area closes to GRDC data is than set.
-
-        Return value:
-        -------------
-        No return value!
-        This function sets / updates the object variables self.MapYIdx_fit, 
-        self.MapXIdx_fit, and self.SimMeanArea directly
-
+        
         Parameters
         ----------
         search_rad : int 
@@ -576,12 +570,22 @@ class mapper:
             defining the ParFlow slopes in y-direction used to calculate the catchment
         slopex: 2D ndarray
             defining the ParFlow slopes in x-direction used to calculate the catchment
+
+        Returns
+        -------
+        None
+
+        Notes
+        -----
+        This function sets / updates the object variables self.MapYIdx_fit, 
+        self.MapXIdx_fit, and self.SimMeanArea directly
+
         '''
 
         # First MapRaw(), than adjust according to best fitting catchment-size
         self.MapRaw()
         #check if all needed data are already defined
-        if not self.check4MapArea():
+        if not self.__check4MapArea():
             print('check4MapArea() failed --> self.MapBestCatchment() canceled!')
             return None
 
@@ -661,15 +665,16 @@ class mapper:
         one can write / dump those to a file.
         Currently this function does only write data to CSV-format.
         Currently already existing files are overwritten.
-
-        Return value:
-        -------------
-        No return value!
-
+        
         Parameters
         ----------
         file : str 
             defining the file-path to which data should be written.
+
+        Returns
+        -------
+        None
+
 
         '''
         with open(file,'w', newline='') as outFile:

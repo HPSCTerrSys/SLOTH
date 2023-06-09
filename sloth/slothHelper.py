@@ -18,14 +18,14 @@ def get_griddesDomDef(griddesFile, returnRaw=False):
     This function does return a domain defenition from a grides files created
     with CDO
 
-    Input value:
-    ------------
-    griddesFile: str
+    Parameters
+    ----------
+    griddesFile : str
         Full Path to a griddes file
 
-    Return value:
-    -------------
-    domainDefinition: dict
+    Returns
+    -------
+    domainDefinition : dict
         A dict containing all parameters needed to describe the requested
         domain stored in individual keys.
 
@@ -82,14 +82,14 @@ def get_cordexDomDef(GridName):
     http://is-enes-data.github.io/cordex_archive_specifications.pdf
     The related table is stored under `sloth/configs/`
 
-    Input value:
-    ------------
-    GridName: str
+    Parameters
+    ----------
+    GridName : str
         A valid name of a cordex domain
 
-    Return value:
-    -------------
-    domainDefinition: dict
+    Returns
+    -------
+    domainDefinition : dict
         A dict containing all parameters needed to describe the requested
         cordex domain stored in individual keys.
 

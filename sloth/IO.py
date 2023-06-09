@@ -13,7 +13,30 @@ def write_packed(f, fmt, val):
     f.write(pack(fmt, val))
 
 def create_pfb(filename, var, delta=(1, 1, 1), subgrids=(1, 1, 1)):
-    print(var.shape)
+    """
+    Create a ParFlow PFB file from a 3D array of variable data.
+
+    Parameters
+    ----------
+    filename : str
+        Name of the PFB file to be created.
+    var : ndarray
+        3D array of variable data to be stored in the PFB file.
+    delta : tuple of float, optional
+        Grid spacing values in the x, y, and z directions. Default is (1, 1, 1).
+    subgrids : tuple of int, optional
+        Number of subgrids in the x, y, and z directions. Default is (1, 1, 1).
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> data = np.random.rand(10, 20, 30)
+    >>> create_pfb('output.pfb', data, delta=(0.5, 0.5, 0.5))
+    ...
+    This creates a PFB file named 'output.pfb' from a 3D array 'data' with 
+    custom delta settings.
+
+    """
     nz, ny, nx = var.shape
     dz, dy, dx = delta
     sz, sy, sx = subgrids
@@ -53,7 +76,8 @@ def create_pfb(filename, var, delta=(1, 1, 1), subgrids=(1, 1, 1)):
                 write_packed(filepfb, '>i', int(iy))
                 write_packed(filepfb, '>i', int(iz))
 
-                # Write number of grid points in x, y and z direction for this subgrid
+                # Write number of grid points in x, y and z direction for this 
+                # subgrid
                 write_packed(filepfb, '>i', nnx)
                 write_packed(filepfb, '>i', nny)
                 write_packed(filepfb, '>i', nnz)
@@ -64,7 +88,8 @@ def create_pfb(filename, var, delta=(1, 1, 1), subgrids=(1, 1, 1)):
                 write_packed(filepfb, '>i', 0)
                 write_packed(filepfb, '>i', 0)
 
-                # Assuming the data is stored in 3D array called varArray of global size nz*ny*nx
+                # Assuming the data is stored in 3D array called varArray of 
+                # global size nz*ny*nx
                 fmt = ">%dd" % (nnz*nny*nnx)
                 filepfb.write(pack(fmt, *var[iz:iz+nnz,
                                                iy:iy+nny,
@@ -73,6 +98,28 @@ def create_pfb(filename, var, delta=(1, 1, 1), subgrids=(1, 1, 1)):
     filepfb.close()
 
 def read_pfb(filename):
+    """
+    Read a ParFlow PFB file and return the data as a numpy ndarray.
+
+    Parameters
+    ----------
+    filename : str
+        Name of the PFB file to be read.
+
+    Returns
+    -------
+    data : ndarray
+        3D array containing the data read from the PFB file.
+
+    Examples
+    --------
+    >>> data = read_pfb('input.pfb')
+    >>> print(data.shape)
+    (10, 20, 30)
+    ...
+    This reads a PFB file named 'input.pfb' and returns the data as a 3D array.
+
+    """
     with open(filename, "rb") as f:
         # read meta informations of datafile
         meta_inf = np.fromfile(f, dtype='>f8', count = 3)
@@ -162,6 +209,54 @@ def createNetCDF(fileName, domain=None, nz=None, calcLatLon=False,
     author=None,
     description=None, source=None, contact=None, institution=None,
     history=None, timeCalendar=None, timeUnit=None, NBOUNDCUT=0):
+    """
+    Create a NetCDF file with typical metadata and dimensions.
+
+    Parameters
+    ----------
+    fileName : str
+        Name of the output NetCDF file.
+    domain : str or None, optional
+        Path to the domain definition file or a valid CORDEX/Griddes domain name.
+        If None, default domain definitions will be used.
+    nz : int or None, optional
+        Number of vertical levels. If None, no z-axis will be created.
+    calcLatLon : bool, optional
+        Flag indicating whether to calculate latitude and longitude values.
+        If True, lat and lon variables will be created.
+    author : str or None, optional
+        Name of the author.
+    description : str or None, optional
+        Description of the NetCDF file.
+    source : str or None, optional
+        Source of the data.
+    contact : str or None, optional
+        Contact information.
+    institution : str or None, optional
+        Institution associated with the data.
+    history : str or None, optional
+        History information.
+    timeCalendar : str or None, optional
+        Calendar type for the time-axis.
+    timeUnit : str or None, optional
+        Unit of measurement for the time-axis.
+    NBOUNDCUT : int, optional
+        Number of pixels to cut at the domain border.
+
+    Returns
+    -------
+    fileName : str
+        Name of the created NetCDF file.
+
+    Example
+    -------
+    >>> # Create a NetCDF file with default domain definitions and no z-axis
+    >>> createNetCDF("output.nc")
+    
+    >>> # Create a NetCDF file with a specific domain and 10 vertical levels
+    >>> createNetCDF("output.nc", domain="my_domain.txt", nz=10, calcLatLon=True)
+
+    """
 
     #######################################################################
     #### Get domain definitions
@@ -204,14 +299,16 @@ def createNetCDF(fileName, domain=None, nz=None, calcLatLon=False,
     if timeUnit is not None and timeCalendar is not None:
         withTime = True
     else:
-        print('NOT creating time-axis')
-        print(f'--  timeUnit = {timeUnit}; timeCalendar = {timeCalendar}')
+        #print('NOT creating time-axis')
+        #print(f'--  timeUnit = {timeUnit}; timeCalendar = {timeCalendar}')
+        pass
 
     withZlvl = False
     if nz is not None:
         withZlvl = True
     else:
-        print('NOT creating z-axis')
+        #print('NOT creating z-axis')
+        pass
 
     #######################################################################
     #### Create netCDF file (overwrite if exist)
@@ -282,7 +379,8 @@ def createNetCDF(fileName, domain=None, nz=None, calcLatLon=False,
         lon.grid_mapping = "rotated_pole"
         lon[...] = lon2D[...]
     else:
-        print(f'-- no lat lon values used')
+        #print(f'-- no lat lon values used')
+        pass
 
     if withZlvl:
         lvl = nc_file.createVariable('lvl', 'f4', ('lvl',),
@@ -311,23 +409,57 @@ def createNetCDF(fileName, domain=None, nz=None, calcLatLon=False,
     return fileName
 
 def readSa(file):
+    """
+    Reads data from a file in ASCI format and returns a NumPy array.
+
+    Parameters
+    ----------
+    file : str
+        The file path to read the data from.
+
+    Returns
+    -------
+    numpy.ndarray
+        A NumPy array containing the data read from the file.
+
+    Example
+    -------
+    >>> data = readSa('data.txt')
+    >>> print(data)
+    [[1.2 3.4]
+     [5.6 7.8]]
+
+    """
     with open(file, 'r') as f:
-        # do things with your file
         header = f.readline()
-        #print(f'type(header): {type(header)}')
-        #print(f'header: {header}')
         nx, ny, nz = (int(item) for item in header.split(' '))
-        #print(f'type(nx): {type(nx)}')
-        #print(f'nx, ny, nz: {nx}, {ny}, {nz}')
 
         data = np.genfromtxt(f, dtype=float)
         data = data.reshape((nz, ny, nx))
-        #print(f'type(data): {type(data)}')
-        #print(f'data.shape: {data.shape}')
 
         return data
 
 def writeSa(file, data):
+    """
+    Writes data to a file in ASCI format.
+
+    Parameters
+    ----------
+    file : str
+        The file path to write the data to.
+    data : numpy.ndarray
+        The NumPy array containing the data to be written.
+
+    Returns
+    -------
+    None
+
+    Example
+    -------
+    >>> data = np.array([[1.2, 3.4], [5.6, 7.8]])
+    >>> writeSa('output.txt', data)
+
+    """
     nz, ny, nx = data.shape
     with open(file, 'w') as f:
         f.write(f'{nx} {ny} {nz}\n')
