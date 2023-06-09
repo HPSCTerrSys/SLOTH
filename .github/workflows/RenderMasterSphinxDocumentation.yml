@@ -19,14 +19,6 @@ jobs:
       - uses: actions/checkout@v3
         with:
           ref: 'master'
-      # Also check out the gh-pages branch (under _build/).
-      # This is a small workaround to avoid completely overwriting the gh-pages 
-      # branch and thus killing existing documentation. 
-      # Changes will still be rendered, so the documentation will be up to date.
-      - uses: actions/checkout@v3
-        with:
-          ref: gh-pages
-          path: _build/
       # Use python env. and install dependencies
       - uses: actions/setup-python@v3
       - name: Install dependencies
