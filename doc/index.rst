@@ -16,6 +16,7 @@ Welcome to SLOTH's documentation!
    toolBox.rst
    SanityCheck.rst
    IO.rst
+   analysis.rst
 
 .. toctree::
    :maxdepth: 2
