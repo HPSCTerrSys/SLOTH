@@ -23,8 +23,12 @@ extensions = [
         'sphinx.ext.napoleon',
         'sphinx.ext.mathjax',
         'sphinx_copybutton',
-        'myst_parser'
+        'myst_nb',
+#        'myst_parser'
         ]
+
+# nb settings
+nb_kernel_rgx_aliases = {'default_nwa': 'python3'}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

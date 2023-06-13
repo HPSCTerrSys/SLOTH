@@ -1,15 +1,16 @@
 # Name of the action
-name: RenderMasterSphinxDocumentation
+name: RenderCleanMasterSphinxDocumentation
 # Events on which this action should trigger
 on:
-  push:
-    branches:
-      # run on push event, but if branch is master only
-      - master
+  workflow_dispatch:
+    #push:
+    #branches:
+    #  # run on push event, but if branch is master only
+    #  - master
 
 # List of jobs to do
 jobs:
-  # Job name
+  # Job name 
   makeDoc:
     # Wich OS / docker image to be used
     runs-on: ubuntu-latest
@@ -30,11 +31,12 @@ jobs:
           pip install netCDF4
           pip install numpy
           pip install scipy
+          pip install cartopy
+          pip install myst-nb
       # Build documentation with sphinx in _build
       - name: Sphinx build
         run: |
-          cd doc
-          sphinx-build -a . _build
+          sphinx-build -a doc _build
       # Deploy new rendered documentation by pushing to branch gh-pages
       # The actual GiHub Page is refreshed by GitHub if the branch 
       # gh-pages is updated automatically.
@@ -45,3 +47,4 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: _build/
           force_orphan: true
+          

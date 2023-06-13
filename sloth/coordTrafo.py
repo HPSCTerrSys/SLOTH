@@ -13,7 +13,7 @@ def undo_grid_rotation(rlat,rlon,np_lat,np_lon):
     Parameters
     ----------
     rlat, rlon : ndarray
-        1d arrays of rotated latitude/longitude values (in degree)
+        ndarrays of rotated latitude/longitude values (in degree)
 
     np_lat, np_lon: ndarray
         geographical latitude/longitude of rotated north pole (in degree) 
@@ -21,7 +21,7 @@ def undo_grid_rotation(rlat,rlon,np_lat,np_lon):
     Returns
     -------
     lat, lon : ndarray
-        2d arrays of geographical latitude/longitude values (in degree) 
+        ndarrays of geographical latitude/longitude values (in degree) 
 
     Notes
     -----
@@ -33,7 +33,8 @@ def undo_grid_rotation(rlat,rlon,np_lat,np_lon):
     '''
     np_lon = np.radians(np_lon)
     np_lat = np.radians(np_lat)
-    rlon,rlat = np.meshgrid(np.radians(rlon),np.radians(rlat))
+    rlon = np.radians(rlon)
+    rlat = np.radians(rlat)
 
     lon = np.degrees(np_lon - np.arctan2(np.cos(rlat)*np.sin(rlon),np.sin(rlat)*np.cos(np_lat)-np.sin(np_lat)*np.cos(rlat)*np.cos(rlon)))
     lon[lon<-180] += 360		#To ensure values in the range [-180,180]
@@ -48,14 +49,14 @@ def rotate_grid(lat, lon, np_lat, np_lon):
     Parameters
     ----------
     lat, lon : ndarray
-        1d arrays of geographical latitude/longitude values (in degree)
+        ndarrays of geographical latitude/longitude values (in degree)
     np_lat, np_lon : double
         geographical latitude/longitude of rotated north pole (in degree) 
 
     Returns
     -------
     rlat, rlon : ndarray
-        2d arrays of rotated latitude/longitude values (in degree) 
+        ndarrays of rotated latitude/longitude values (in degree) 
 
     Notes
     -----
@@ -67,7 +68,8 @@ def rotate_grid(lat, lon, np_lat, np_lon):
     '''
     np_lon = np.radians(np_lon)
     np_lat = np.radians(np_lat)
-    lon, lat = np.meshgrid(np.radians(lon),np.radians(lat))
+    lon = np.radians(lon)
+    lat = np.radians(lat)
 
     rlon = np.degrees(np.arctan2(-np.cos(lat)*np.sin(lon - np_lon),
                                  -np.cos(lat)*np.sin(np_lat)*np.cos(lon-np_lon)+np.sin(lat)*np.cos(np_lat)

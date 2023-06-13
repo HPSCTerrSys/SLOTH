@@ -24,6 +24,13 @@ Welcome to SLOTH's documentation!
 
    mapper.rst
 
+.. toctree::
+   :maxdepth: 2
+   :caption: Examples:
+
+   examples/README.md
+   examples/ex_coordTrafo.ipynb  
+
 
 
 Indices and tables

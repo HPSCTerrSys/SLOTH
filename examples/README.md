@@ -1,7 +1,11 @@
-# examples/
-## example scripts showing what is possible with **SLOTH**
-This directory (`examples/`) is the heart of the **SLOTH** repository.  
-Each script located within this directory does show a real usecase and introcudes how to use individual methods of **SLOTH** to solve the indicates problem.  
+# Examples
+
+**Example scripts showing what is possible with SLOTH**   
+
+**To be changed! Use .ipynb!**
+
+Each script located within this directory does show a usecase and introcudes 
+how to use individual methods of **SLOTH** to solve the indicates problem.  
 In all scripts a lot of comments are used serving as tutorial / user-guide.  
 Next to many scripts a equal named plot is placed, created by the scritp itself and showing what to expect from the script -- kind of helping to brows through the availabale scritps.  
 
