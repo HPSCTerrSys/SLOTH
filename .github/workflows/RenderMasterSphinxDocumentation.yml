@@ -1,5 +1,5 @@
 # Name of the action
-name: RenderCleanMasterSphinxDocumentation
+name: RenderMasterSphinxDocumentation
 # Events on which this action should trigger
 on:
   workflow_dispatch:
@@ -24,6 +24,7 @@ jobs:
       - uses: actions/setup-python@v3
       - name: Install dependencies
         run: |
+          sudo apt -y install libgeos-dev
           pip install --upgrade myst-parser
           pip install sphinx sphinx_rtd_theme
           pip install sphinx-copybutton
