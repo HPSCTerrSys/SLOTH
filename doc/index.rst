@@ -30,6 +30,7 @@ Welcome to SLOTH's documentation!
 
    examples/README.md
    examples/ex_RotatedCoordinates.ipynb
+   examples/ex_SanityCheck.ipynb
 
 
 

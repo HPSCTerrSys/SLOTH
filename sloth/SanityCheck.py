@@ -95,9 +95,8 @@ def get_infostr(data, lowerP=2, upperP=98):
         ]
     return '\n'.join(tmp_infostr)
 
-def plot_SanityCheck(data, kind='sum', 
-    figname='./SanityCheck_3D.pdf', fig_title=None, minax_title=None, 
-    maxax_title=None, kinax_title=None, hisax_title=None,
+def plot_SanityCheck(data, kind='mean', 
+    figname='./SanityCheck_3D.pdf', fig_title=None,
     lowerP=2, upperP=98, interactive=False, cmapName='Spectral'):
     """
     Plot a sanity check for given data.
@@ -111,19 +110,11 @@ def plot_SanityCheck(data, kind='sum',
     data : numpy.ma.MaskedArray
         3D array of data.
     kind : {'sum', 'mean'}, optional
-        Calculation type for the data statistics. Default is 'sum'.
+        Calculation type for the data statistics. Default is 'mean'.
     figname : str, optional
         File name to save the plot. Default is './SanityCheck_3D.pdf'.
     fig_title : str, optional
         Title of the plot.
-    minax_title : str, optional
-        Title of the subplot for minimum data.
-    maxax_title : str, optional
-        Title of the subplot for maximum data.
-    kinax_title : str, optional
-        Title of the subplot for kind (sum or mean) data.
-    hisax_title : str, optional
-        Title of the histogram subplot.
     lowerP : int, optional
         Lower percentile value for plot limits. Default is 2.
     upperP : int, optional
@@ -140,13 +131,12 @@ def plot_SanityCheck(data, kind='sum',
 
     Notes
     -----
-    - The 'data' input must be a 3D numpy masked array.
+    - The 'data' input must be a 3D numpy masked array (t, y, x).
     - The 'kind' parameter specifies whether to calculate the sum or mean of the data.
     - The function generates a plot with subplots for the minimum, maximum, kind (sum or mean), and histogram of the data.
     - The colormap normalization is determined based on the percentiles of the data.
     - The plot can be displayed interactively or saved to a file.
-    - If the 'interactive' parameter is set to True, the plot is displayed using plt.show().
-      If False, the plot is saved to the file specified by 'figname'.
+    - If the 'interactive' parameter is set to True, the plot is displayed using plt.show(). If False, the plot is saved to the file specified by 'figname'.
 
     """
 
@@ -192,7 +182,7 @@ def plot_SanityCheck(data, kind='sum',
     ###########################################################################
     #### Handling min-plot
     ###########################################################################
-    min_ax.set_title(minax_title)
+    min_ax.set_title('min')
     tmp_vmin, tmp_vmax, tmp_vmid = get_PlotMinMaxMid_Percentil(data_min_T, lower=lowerP, upper=upperP)
     if tmp_vmin == tmp_vmax:
         tmp_norm = None
@@ -214,7 +204,7 @@ def plot_SanityCheck(data, kind='sum',
     ###########################################################################
     #### Handling max-plot
     ###########################################################################
-    max_ax.set_title(maxax_title)
+    max_ax.set_title('max')
     tmp_vmin, tmp_vmax, tmp_vmid = get_PlotMinMaxMid_Percentil(data_max_T, lower=lowerP, upper=upperP)
     if tmp_vmin == tmp_vmax:
         tmp_norm = None
@@ -236,7 +226,7 @@ def plot_SanityCheck(data, kind='sum',
     ###########################################################################
     #### Handling kind-plot (mean or sum)
     ###########################################################################
-    kin_ax.set_title(kinax_title)
+    kin_ax.set_title(kind)
     tmp_vmin, tmp_vmax, tmp_vmid = get_PlotMinMaxMid_Percentil(data_kin_T, lower=lowerP, upper=upperP)
     if tmp_vmin == tmp_vmax:
         tmp_norm = None
@@ -258,7 +248,7 @@ def plot_SanityCheck(data, kind='sum',
     ###########################################################################
     #### Handling histogram of kind-plot
     ###########################################################################
-    his_ax.set_title(hisax_title)
+    his_ax.set_title(f'histogram of {kind}')
     his_ax.set_ylabel(f'# of occurrence')
     hist_data = data_kin_T[~np.isnan(data_kin_T)].flatten()
     range_min = np.nanpercentile(hist_data, lowerP)
