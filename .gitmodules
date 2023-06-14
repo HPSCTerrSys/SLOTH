@@ -1,6 +1,3 @@
 [submodule "extern/ana_parflow-diagnostics_pythonheat"]
 	path = extern/ana_parflow-diagnostics_pythonheat
 	url = https://icg4geo.icg.kfa-juelich.de/SoftwareTools/ana_parflow-diagnostics_pythonheat.git
-[submodule "extern/transform_rotated_pole"]
-	path = extern/transform_rotated_pole
-	url = https://icg4geo.icg.kfa-juelich.de/SoftwareTools/transform_rotated_pole.git
