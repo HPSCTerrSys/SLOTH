@@ -29,7 +29,7 @@ Welcome to SLOTH's documentation!
    :caption: Examples:
 
    examples/README.md
-   examples/ex_coordTrafo.ipynb  
+   examples/ex_RotatedCoordinates.ipynb
 
 
 
