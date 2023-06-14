@@ -96,7 +96,7 @@ def get_cordexDomDef(GridName):
     """
     # read CORDEX definition from config-file
     config = configparser.ConfigParser()
-    config.read('./configs/CordexGrid.conf')
+    config.read(f'{os.path.dirname(__file__)}/configs/CordexGrid.conf')
     domainDefinition = {}
     domainDefinition['SWlon'] = float(config[GridName]['West'])
     domainDefinition['SWlat'] = float(config[GridName]['South'])
