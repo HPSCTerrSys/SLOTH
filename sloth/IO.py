@@ -358,8 +358,10 @@ def createNetCDF(fileName, domain=None, nz=None, calcLatLon=False,
     rlat[...] = rlat_values[...]
 
     if calcLatLon:
-        lat2D, lon2D = sloth.coordTrafo.undo_grid_rotation(rlat_values, 
-                rlon_values, rpol_Y, rpol_X)
+        rlon2D, rlat2D = np.meshgrid(rlon_values, rlat_values)
+        lat2D, lon2D = sloth.coordTrafo.undo_grid_rotation(
+                rlat = rlat2D, rlon = rlon2D, 
+                np_lat = rpol_Y, np_lon = rpol_X)
 
         lat = nc_file.createVariable('lat', 'f4', ('rlat','rlon'),
                                     zlib=True)
