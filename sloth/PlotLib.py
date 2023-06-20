@@ -252,3 +252,11 @@ def plot_MappedSubAreas(mapper, fit_name='NotSet', search_rad=3, save_dir='../da
         fig.savefig(f'{save_dir}/MappedSubAreas_{fit_name}_{ID}.png', bbox_inches='tight', pad_inches=0)
         plt.close('all')
 
+def drawStatBox(data, ax):
+    t = ax.text(0.03, 0.97, get_infostr(data),
+            verticalalignment='top', transform=ax.transAxes,
+            fontsize=10)
+    t.set_bbox(dict(facecolor='white', alpha=0.5, edgecolor='grey'))
+
+    return True
+
