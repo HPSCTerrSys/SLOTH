@@ -32,6 +32,12 @@ Welcome to SLOTH's documentation!
    examples/ex_RotatedCoordinates.ipynb
    examples/ex_SanityCheck.ipynb
 
+.. toctree:: 
+   :maxdepth: 2
+   :caption: Maintenance:
+
+   content/maintenance.md 
+
 
 
 Indices and tables
