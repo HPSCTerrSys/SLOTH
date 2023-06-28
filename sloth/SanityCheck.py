@@ -251,10 +251,8 @@ def plot_SanityCheck(data, kind='mean',
     his_ax.set_title(f'histogram of {kind}')
     his_ax.set_ylabel(f'# of occurrence')
     hist_data = data_kin_T[~np.isnan(data_kin_T)].flatten()
-    range_min = np.nanpercentile(hist_data, lowerP)
-    range_max = np.nanpercentile(hist_data, upperP)
-    bins = 200   
-    his_ax.hist(hist_data, log=True, range=(range_min, range_max), bins=bins)
+    bins = 100   
+    his_ax.hist(hist_data, log=True, range=(tmp_vmin, tmp_vmax), bins=bins)
 
     ###########################################################################
     #### If interactive --> show plot now
