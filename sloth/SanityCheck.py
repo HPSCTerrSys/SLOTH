@@ -36,8 +36,8 @@ import argparse
 import sys
 import os
 import copy
-
 import cftime
+import sloth.colormaps
 
 def get_PlotMinMaxMid_Percentil(data, lower=5, upper=95):
     """
@@ -97,7 +97,9 @@ def get_infostr(data, lowerP=2, upperP=98):
 
 def plot_SanityCheck(data, kind='mean', 
     figname='./SanityCheck_3D.pdf', fig_title=None,
-    lowerP=2, upperP=98, interactive=False, cmapName='Spectral'):
+    lowerP=2, upperP=98, 
+    fixValueRange = None,
+    interactive=False, cmapName='Spectral'):
     """
     Plot a sanity check for given data.
     
@@ -119,6 +121,8 @@ def plot_SanityCheck(data, kind='mean',
         Lower percentile value for plot limits. Default is 2.
     upperP : int, optional
         Upper percentile value for plot limits. Default is 98.
+    fixValueRange : list
+        A list of values to define a fix value range.
     interactive : bool, optional
         If True, display the plot interactively. If False, save the plot to 
         'figname'. Default is False.
@@ -163,9 +167,17 @@ def plot_SanityCheck(data, kind='mean',
     ###########################################################################
     #### Defining cmap extend (values below min and above max)
     ###########################################################################
-    cmap = copy.copy(mpl.cm.get_cmap(f'{cmapName}'))
-    cmap.set_under('black')
-    cmap.set_over('magenta')
+    # Try to use cmap from external lib `colormaps`
+    try:
+        cmap = copy.copy(sloth.colormaps.colormaps.__getattribute__(f'{cmapName}'))
+        cmap.set_under('black')
+        cmap.set_over('magenta')
+    # Use cmap from matplotlib if `colormaps` is not there
+    except AttributeError:
+        cmap = copy.copy(mpl.cm.get_cmap(f'{cmapName}'))
+        cmap.set_under('black')
+        cmap.set_over('magenta')
+
 
     ###########################################################################
     #### Create figure
@@ -183,15 +195,18 @@ def plot_SanityCheck(data, kind='mean',
     #### Handling min-plot
     ###########################################################################
     min_ax.set_title('min')
-    tmp_vmin, tmp_vmax, tmp_vmid = get_PlotMinMaxMid_Percentil(data_min_T, lower=lowerP, upper=upperP)
-    if tmp_vmin == tmp_vmax:
-        tmp_norm = None
-        tmp_vmin = None
-        tmp_vmax = None
-    elif np.sign(tmp_vmin)*np.sign(tmp_vmax) < 0.0:
-        tmp_norm = mcolors.TwoSlopeNorm(vmin=tmp_vmin, vcenter=0, vmax=tmp_vmax)
+    if fixValueRange is None:
+        tmp_vmin, tmp_vmax, tmp_vmid = get_PlotMinMaxMid_Percentil(data_min_T, lower=lowerP, upper=upperP)
+        if tmp_vmin == tmp_vmax:
+            tmp_norm = None
+            tmp_vmin = None
+            tmp_vmax = None
+        elif np.sign(tmp_vmin)*np.sign(tmp_vmax) < 0.0:
+            tmp_norm = mcolors.TwoSlopeNorm(vmin=tmp_vmin, vcenter=0, vmax=tmp_vmax)
+        else:
+            tmp_norm = mcolors.TwoSlopeNorm(vmin=tmp_vmin, vcenter=tmp_vmid, vmax=tmp_vmax)
     else:
-        tmp_norm = mcolors.TwoSlopeNorm(vmin=tmp_vmin, vcenter=tmp_vmid, vmax=tmp_vmax)
+        tmp_norm = mpl.colors.BoundaryNorm(fixValueRange, cmap.N)
     tmp_infostr = get_infostr(data_min_T, lowerP=lowerP, upperP=upperP)
     t = min_ax.text(0.01, 0.99, tmp_infostr,
                  verticalalignment='top', transform=min_ax.transAxes,
@@ -205,21 +220,24 @@ def plot_SanityCheck(data, kind='mean',
     #### Handling max-plot
     ###########################################################################
     max_ax.set_title('max')
-    tmp_vmin, tmp_vmax, tmp_vmid = get_PlotMinMaxMid_Percentil(data_max_T, lower=lowerP, upper=upperP)
-    if tmp_vmin == tmp_vmax:
-        tmp_norm = None
-        tmp_vmin = None
-        tmp_vmax = None
-    elif np.sign(tmp_vmin)*np.sign(tmp_vmax) < 0.0:
-        tmp_norm = mcolors.TwoSlopeNorm(vmin=tmp_vmin, vcenter=0, vmax=tmp_vmax)
+    if fixValueRange is None:
+        tmp_vmin, tmp_vmax, tmp_vmid = get_PlotMinMaxMid_Percentil(data_max_T, lower=lowerP, upper=upperP)
+        if tmp_vmin == tmp_vmax:
+            tmp_norm = None
+            tmp_vmin = None
+            tmp_vmax = None
+        elif np.sign(tmp_vmin)*np.sign(tmp_vmax) < 0.0:
+            tmp_norm = mcolors.TwoSlopeNorm(vmin=tmp_vmin, vcenter=0, vmax=tmp_vmax)
+        else:
+            tmp_norm = mcolors.TwoSlopeNorm(vmin=tmp_vmin, vcenter=tmp_vmid, vmax=tmp_vmax)
     else:
-        tmp_norm = mcolors.TwoSlopeNorm(vmin=tmp_vmin, vcenter=tmp_vmid, vmax=tmp_vmax)
+        tmp_norm = mpl.colors.BoundaryNorm(fixValueRange, cmap.N)
     tmp_infostr = get_infostr(data_max_T, lowerP=lowerP, upperP=upperP)
     t = max_ax.text(0.01, 0.99, tmp_infostr,
                  verticalalignment='top', transform=max_ax.transAxes,
                  fontsize=8)
     t.set_bbox(dict(facecolor='white', alpha=0.5, edgecolor='grey'))
-    img_max = max_ax.imshow(data_max_T, origin='lower', #vmin=tmp_vmin, vmax=tmp_vmax,
+    img_max = max_ax.imshow(data_max_T, origin='lower',
                             interpolation='none', cmap=cmap, norm=tmp_norm)
     fig.colorbar(img_max, ax=max_ax, extend='both')
 
@@ -227,21 +245,24 @@ def plot_SanityCheck(data, kind='mean',
     #### Handling kind-plot (mean or sum)
     ###########################################################################
     kin_ax.set_title(kind)
-    tmp_vmin, tmp_vmax, tmp_vmid = get_PlotMinMaxMid_Percentil(data_kin_T, lower=lowerP, upper=upperP)
-    if tmp_vmin == tmp_vmax:
-        tmp_norm = None
-        tmp_vmin = None
-        tmp_vmax = None
-    elif np.sign(tmp_vmin)*np.sign(tmp_vmax) < 0.0:
-        tmp_norm = mcolors.TwoSlopeNorm(vmin=tmp_vmin, vcenter=0, vmax=tmp_vmax)
+    if fixValueRange is None:
+        tmp_vmin, tmp_vmax, tmp_vmid = get_PlotMinMaxMid_Percentil(data_kin_T, lower=lowerP, upper=upperP)
+        if tmp_vmin == tmp_vmax:
+            tmp_norm = None
+            tmp_vmin = None
+            tmp_vmax = None
+        elif np.sign(tmp_vmin)*np.sign(tmp_vmax) < 0.0:
+            tmp_norm = mcolors.TwoSlopeNorm(vmin=tmp_vmin, vcenter=0, vmax=tmp_vmax)
+        else:
+            tmp_norm = mcolors.TwoSlopeNorm(vmin=tmp_vmin, vcenter=tmp_vmid, vmax=tmp_vmax)
     else:
-        tmp_norm = mcolors.TwoSlopeNorm(vmin=tmp_vmin, vcenter=tmp_vmid, vmax=tmp_vmax)
+        tmp_norm = mpl.colors.BoundaryNorm(fixValueRange, cmap.N)
     tmp_infostr = get_infostr(data_kin_T, lowerP=lowerP, upperP=upperP)
     t = kin_ax.text(0.01, 0.99, tmp_infostr,
                  verticalalignment='top', transform=kin_ax.transAxes,
                  fontsize=8)
     t.set_bbox(dict(facecolor='white', alpha=0.5, edgecolor='grey'))
-    img_kin = kin_ax.imshow(data_kin_T, origin='lower', #vmin=tmp_vmin, vmax=tmp_vmax,
+    img_kin = kin_ax.imshow(data_kin_T, origin='lower', 
                             interpolation='none', cmap=cmap, norm=tmp_norm)
     fig.colorbar(img_kin, ax=kin_ax, extend='both')
 
@@ -252,7 +273,10 @@ def plot_SanityCheck(data, kind='mean',
     his_ax.set_ylabel(f'# of occurrence')
     hist_data = data_kin_T[~np.isnan(data_kin_T)].flatten()
     bins = 100   
-    his_ax.hist(hist_data, log=True, range=(tmp_vmin, tmp_vmax), bins=bins)
+    if fixValueRange is None:
+        his_ax.hist(hist_data, log=True, range=(tmp_vmin, tmp_vmax), bins=bins)
+    else:
+        his_ax.hist(hist_data, log=True, range=(fixValueRange[0], fixValueRange[-1]), bins=bins)
 
     ###########################################################################
     #### If interactive --> show plot now
