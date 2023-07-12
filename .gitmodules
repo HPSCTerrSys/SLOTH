@@ -1,6 +1,6 @@
 [submodule "extern/ana_parflow-diagnostics_pythonheat"]
-	path = extern/ana_parflow-diagnostics_pythonheat
-	url = https://icg4geo.icg.kfa-juelich.de/SoftwareTools/ana_parflow-diagnostics_pythonheat.git
+	path = extern/ParFlowDiagnostics
+	url = https://github.com/HPSCTerrSys/ParFlowDiagnostics.git
 [submodule "extern/colormaps"]
 	path = extern/colormaps
 	url = https://github.com/pratiman-91/colormaps.git
