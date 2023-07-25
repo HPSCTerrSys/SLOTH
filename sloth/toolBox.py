@@ -632,11 +632,12 @@ def mapDataRange_lin(X, y_min=0, y_max=1,
 
     return Y
 
-def intersection_calculations(df_data, corners, area_of_interest, nr_yr, nr_entries, save_dir):
+def intersection_calculations(df_data, corners, area_of_interest, crs_utm, nr_yr, nr_entries, save_dir):
     """ Calculate spatial mean values for a shapefile in interest.
 
-    This function calculates spatial mean values (example for a specific region or province) taking into account how much (ratio) of the gridpoint is 
-    actually being intersected inside our region of interest.
+    This function calculates spatial mean values (example for a specific 
+    region or province) taking into account how much (ratio) of the 
+    gridpoint is actually being intersected inside our region of interest.
     
     Parameters
     -------------
@@ -644,10 +645,13 @@ def intersection_calculations(df_data, corners, area_of_interest, nr_yr, nr_entr
          dataframe containing infromation about each gridpoint
     
     corners: dataframe (can also be a nectdf or any other data type)
-         containing infromation on the four longitudes and latitudes that surrounds each gridpoint in the source dataframe
+         containing infromation on the four longitudes and latitudes 
+         that surrounds each gridpoint in the source dataframe
     
     area_of_interest: a shapefile or geodataframe
     	shapefile of the area of interest
+     
+    crs_utm: projected coordinate reference system (utm)
     
     nr_yr: variable
     	number of years of interest
@@ -656,12 +660,9 @@ def intersection_calculations(df_data, corners, area_of_interest, nr_yr, nr_entr
     	number of hours/days/or months etc..
     
     save_dir: path
-    	path for saving the output
+    	path for saving the output 
+     """
     
-    Returns
-    ---------
-    a shapefile of the area of interest including its corresponding spatial mean values
-    """
 
     # create a geodataframe from the dataframe that we want to work with
     df_data = pd.read_csv(df_data)
@@ -670,7 +671,8 @@ def intersection_calculations(df_data, corners, area_of_interest, nr_yr, nr_entr
                                                                      df_data.lat))
     ds_corners = xr.open_dataset(corners)
 
-    # convert the netcdf to dataframe in order to be able to convert it to geopandas and create polygons
+    # convert the netcdf to dataframe in order to be able 
+    # to convert it to geopandas and create polygons
     df_corners = ds_corners.to_dataframe()
     df_corners = df_corners.reset_index()
     df_corners = df_corners.iloc[:, 4:]
@@ -685,54 +687,67 @@ def intersection_calculations(df_data, corners, area_of_interest, nr_yr, nr_entr
     # create a geodataframe from the polygon list that was created
     print("creating a geodataframe with the polygons")
     gdf_polygons = gpd.GeoDataFrame(geometry=list_poly)
-    gdf_polygons = gdf_polygons.drop_duplicates() #for some reason the polygons were doubled so a drop_duplicates() was used
+    # for some reason the polygons were doubled so a drop_duplicates() was used
+    gdf_polygons = gdf_polygons.drop_duplicates() 
 
-    # if the two goedataframes are do not have a coordinate systems, we have to set it first before going further setting the crs
+    # if the two goedataframes are do not have a coordinate systems
+    # we have to set it first before going further setting the crs
 
     gdf_data_wgs = gdf_data.set_crs('EPSG:4326') # setting the crs to WGS84
-    gdf_data_utm32N = gdf_data_wgs.to_crs('epsg:25832') # UTM N32 (This is in case of Germany, it will differ for other countries) 
-     #in order to calculate the area later, it is needed to convert the geodataframe to UTM
+    # in order to calculate the area later, it is needed to convert 
+    # the geodataframe to UTM
+    gdf_data_utm32N = gdf_data_wgs.to_crs(crs_utm) 
 
     gdf_polygons_wgs = gdf_polygons.set_crs('EPSG:4326')  # setting the crs to WGS84
-    gdf_polygons_utm32N = gdf_polygons_wgs.to_crs('epsg:25832')
+    gdf_polygons_utm32N = gdf_polygons_wgs.to_crs(crs_utm)
     print("Geodataframes are created")
 
-    # calculate the area of the polygons (it is important for calculating the ratio (weight) of the area of each polygon interscted )
+    # calculate the area of the polygons.
+    # it is important for calculating the ratio (weight) of the area of 
+    # each polygon interscted
     gdf_polygons_utm32N['area'] = gdf_polygons_utm32N.area
 
-    # after calculating the area, in come cases (when calculating for whole Germany), the area of polygons will differ for example in
-    # Munich when comparing it to Hamburg (changes along the meridian lines), the difference was around 0.1%.
+    # after calculating the area, in come cases (when calculating for whole country)
+    # the area of polygons will differ for example in when comparing cities along 
+    # the meridian lines, there will be slight difference in the area
 
-    # joining thw two geodataframe using sjoin, in order to join the dataframe that has the values with its corresponding polygons
+    # joining thw two geodataframe using sjoin, in order to join the dataframe 
+    # that has the values with its corresponding polygons
     print("Joining the two geodataframes")
     join_within_right_gdf_utm32N = gdf_data_utm32N.sjoin(gdf_polygons_utm32N, how="right", predicate="within")
     
     shapefile_gdf = gpd.read_file(shapefile)
-    print(shapefile_gdf.crs)   # to check wether it has the same crs as the geodataframe that we created, if not convert it to utm (to be able to calculate the area)
+    print(shapefile_gdf.crs)   # to check wether it has the same crs as the geodataframe that we created
+    # if not convert it to utm (to be able to calculate the area)
 
     print("intersecting")
     overlay_gdf = gpd.overlay(join_within_right_gdf_utm32N, shapefile_gdf, how='intersection')
     overlay_gdf['area_intersected'] = overlay_gdf.area
-    overlay_gdf['weight'] = overlay_gdf['area_intersected']/overlay_gdf['area'] # this weight represent how much area is inside the shapefile after intesection
+    # the weight calculated below represents how much area from each polygon
+    # is inside the shapefile after intesection
+    overlay_gdf['weight'] = overlay_gdf['area_intersected']/overlay_gdf['area'] 
 
 
-    # after this step we should have a geodataframe for the intersected polygons that are inside the shapefile of interest
-    # the geodataframe will have the lon,lat, with the corresponding values for each date (each date in a column), 
+    # after this step we should have a geodataframe for the intersected polygons 
+    # that are inside the shapefile of interest the geodataframe will have
+    # the lon,lat, with the corresponding values for each date (each date in a column), 
     # area of the polygon before intersection, area after intersection,
     # and the ratio (area_intersected/area) and it can also include the names of the 
     # regions (in order to be able to dissolve it into mean values for each region)
 
-    # in the next step, a dataframe was created to add the values of each polygon (gridpoint) after calculating
-    # its weight inside the intersection for each date
+    # in the next step, a dataframe was created to add the values of each 
+    # polygon (gridpoint) after calculating its weight inside 
+    # the intersection for each date
     nr_yr = nr_yr
     nr_entries = nr_entries # ex: number of dates :hourly, daily, monthly..etc
     nr_column = nr_yr*nr_entries
     df_data_inter = overlay_gdf.iloc[:,3:nr_column+2].multiply(overlay_gdf['weight'], axis="index")
 
-    # copy the geometry column (important for creating a geodataframe) and other relevant data to the new dataframe
+    # copy the geometry column (important for creating a geodataframe) and other 
+    # relevant data to the new dataframe
     # like the name of the regions (important for calculating the mean values for each region)
     Name_area = 'insert name of the area of interest'
-    df_data_inter[Name_area] = overlay_gdf[Name_area] # this is only an example and should be adapted according to the information in the shapefile
+    df_data_inter[Name_area] = overlay_gdf[Name_area] # this sould be adapted depending on the shapefile available
     df_data_inter['geometry'] = overlay_gdf['geometry']
     geometry = df_data_inter['geometry']
     gdf_data_inter = gpd.GeoDataFrame(df_data_inter, crs="epsg:25832", geometry=geometry)
