@@ -753,11 +753,11 @@ def intersection_calculations(df_data, corners, area_of_interest, crs_utm, nr_yr
     gdf_data_inter = gpd.GeoDataFrame(df_data_inter, crs="epsg:25832", geometry=geometry)
 
     print("calculating the mean value for each region of interest")
-    dissolve_anomaly_gdf = gdf_data.dissolve(by=Name_area, aggfunc='mean', as_index=True, level=None, sort=True, observed=False, dropna=True)
-    dissolve_anomaly_gdf_wgs = dissolve_anomaly_gdf.to_crs('EPSG:4326') # convert back to wgs 1984
+    dissolve_gdf = gdf_data_inter.dissolve(by=Name_area, aggfunc='mean', as_index=True, level=None, sort=True, observed=False, dropna=True)
+    dissolve_gdf_wgs = dissolve_gdf.to_crs('EPSG:4326') # convert back to wgs 1984
     
     print("saving as a shapefile")
-    dissolve_anomaly_gdf_wgs.to_file(save_dir)
+    dissolve_gdf_wgs.to_file(save_dir)
 
     
 
