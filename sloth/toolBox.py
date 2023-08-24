@@ -632,7 +632,7 @@ def mapDataRange_lin(X, y_min=0, y_max=1,
 
     return Y
 
-def intersection_calculations(df_data, corners, area_of_interest, crs_utm, nr_yr, nr_entries, save_dir):
+def intersection_calculations(df_data, corners, area_of_interest, Name_area, crs_utm, nr_yr, nr_entries, save_dir):
     """ Calculate spatial mean values for a shapefile in interest.
 
     This function calculates spatial mean values (example for a specific 
@@ -650,6 +650,8 @@ def intersection_calculations(df_data, corners, area_of_interest, crs_utm, nr_yr
     
     area_of_interest: a shapefile or geodataframe
     	shapefile of the area of interest
+
+    Name_area: the field name in the shapefile, that the dissolve will be based on
      
     crs_utm: projected coordinate reference system (utm)
     
@@ -746,7 +748,7 @@ def intersection_calculations(df_data, corners, area_of_interest, crs_utm, nr_yr
     # copy the geometry column (important for creating a geodataframe) and other 
     # relevant data to the new dataframe
     # like the name of the regions (important for calculating the mean values for each region)
-    Name_area = 'insert name of the area of interest'
+    Name_area = Name_area
     df_data_inter[Name_area] = overlay_gdf[Name_area] # this sould be adapted depending on the shapefile available
     df_data_inter['geometry'] = overlay_gdf['geometry']
     geometry = df_data_inter['geometry']
