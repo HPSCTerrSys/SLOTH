@@ -718,7 +718,7 @@ def intersection_calculations(df_data, corners, area_of_interest, Name_area, crs
     print("Joining the two geodataframes")
     join_within_right_gdf_utm32N = gdf_data_utm32N.sjoin(gdf_polygons_utm32N, how="right", predicate="within")
     
-    shapefile_gdf = gpd.read_file(shapefile)
+    shapefile_gdf = gpd.read_file(area_of_interest)
     print(shapefile_gdf.crs)   # to check wether it has the same crs as the geodataframe that we created
     # if not convert it to utm (to be able to calculate the area)
 
