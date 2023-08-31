@@ -19,6 +19,7 @@ jobs:
       # Checkout the master branch
       - uses: actions/checkout@v3
         with:
+          submodules: recursive
           ref: 'master'
       # Use python env. and install dependencies
       - uses: actions/setup-python@v3
@@ -33,6 +34,10 @@ jobs:
           pip install numpy
           pip install scipy
           pip install cartopy
+          pip install geopandas
+          pip install xarray
+          pip install pandas
+          pip install shapely
           pip install myst-nb
       # Build documentation with sphinx in _build
       - name: Sphinx build
