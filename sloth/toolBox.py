@@ -9,6 +9,10 @@ import matplotlib.pyplot as plt
 from calendar import monthrange
 from . import IO as io
 from scipy import ndimage as nd
+import geopandas as gpd
+import xarray as xr
+import pandas as pd
+from shapely.geometry import Polygon
 
 import sloth.slothHelper as slothHelper
 
@@ -627,6 +631,137 @@ def mapDataRange_lin(X, y_min=0, y_max=1,
         Y = np.where(Y>=y_max, y_max, Y)
 
     return Y
+
+def intersection_calculations(df_data, corners, area_of_interest, Name_area, crs_utm, nr_yr, nr_entries, save_dir):
+    """ Calculate spatial mean values for a shapefile in interest.
+
+    This function calculates spatial mean values (example for a specific 
+    region or province) taking into account how much (ratio) of the 
+    gridpoint is actually being intersected inside our region of interest.
+    
+    Parameters
+    -------------
+    df_data: dataframe
+         dataframe containing infromation about each gridpoint
+    
+    corners: dataframe (can also be a nectdf or any other data type)
+         containing infromation on the four longitudes and latitudes 
+         that surrounds each gridpoint in the source dataframe
+    
+    area_of_interest: a shapefile or geodataframe
+    	shapefile of the area of interest
+
+    Name_area: the field name in the shapefile, that the dissolve will be based on
+     
+    crs_utm: projected coordinate reference system (utm)
+    
+    nr_yr: variable
+    	number of years of interest
+    
+    nr_entries:variable
+    	number of hours/days/or months etc..
+    
+    save_dir: path
+    	path for saving the output 
+     """
+    
+
+    # create a geodataframe from the dataframe that we want to work with
+    df_data = pd.read_csv(df_data)
+    print("creating a geodataframe of the given dataframe")
+    gdf_data = gpd.GeoDataFrame(df_data, geometry=gpd.points_from_xy(df_data.lon,
+                                                                     df_data.lat))
+    ds_corners = xr.open_dataset(corners)
+
+    # convert the netcdf to dataframe in order to be able 
+    # to convert it to geopandas and create polygons
+    df_corners = ds_corners.to_dataframe()
+    df_corners = df_corners.reset_index()
+    df_corners = df_corners.iloc[:, 4:]
+
+    # create a list of the four pairs (lon,lat) that creates the polygons
+    print("creating a list of four pairs (lon,lat) to create polygons")
+    list_poly = []
+    polygon_geom = list(zip(df_corners.grid_corner_lon, df_corners.grid_corner_lat))
+    for i in range(0, len(polygon_geom), 4):
+        list_poly.append(Polygon(polygon_geom[i:i + 4]))
+
+    # create a geodataframe from the polygon list that was created
+    print("creating a geodataframe with the polygons")
+    gdf_polygons = gpd.GeoDataFrame(geometry=list_poly)
+    # for some reason the polygons were doubled so a drop_duplicates() was used
+    gdf_polygons = gdf_polygons.drop_duplicates() 
+
+    # if the two goedataframes are do not have a coordinate systems
+    # we have to set it first before going further setting the crs
+
+    gdf_data_wgs = gdf_data.set_crs('EPSG:4326') # setting the crs to WGS84
+    # in order to calculate the area later, it is needed to convert 
+    # the geodataframe to UTM
+    gdf_data_utm32N = gdf_data_wgs.to_crs(crs_utm) 
+
+    gdf_polygons_wgs = gdf_polygons.set_crs('EPSG:4326')  # setting the crs to WGS84
+    gdf_polygons_utm32N = gdf_polygons_wgs.to_crs(crs_utm)
+    print("Geodataframes are created")
+
+    # calculate the area of the polygons.
+    # it is important for calculating the ratio (weight) of the area of 
+    # each polygon interscted
+    gdf_polygons_utm32N['area'] = gdf_polygons_utm32N.area
+
+    # after calculating the area, in come cases (when calculating for whole country)
+    # the area of polygons will differ for example in when comparing cities along 
+    # the meridian lines, there will be slight difference in the area
+
+    # joining thw two geodataframe using sjoin, in order to join the dataframe 
+    # that has the values with its corresponding polygons
+    print("Joining the two geodataframes")
+    join_within_right_gdf_utm32N = gdf_data_utm32N.sjoin(gdf_polygons_utm32N, how="right", predicate="within")
+    
+    shapefile_gdf = gpd.read_file(area_of_interest)
+    print(shapefile_gdf.crs)   # to check wether it has the same crs as the geodataframe that we created
+    # if not convert it to utm (to be able to calculate the area)
+
+    print("intersecting")
+    overlay_gdf = gpd.overlay(join_within_right_gdf_utm32N, shapefile_gdf, how='intersection')
+    overlay_gdf['area_intersected'] = overlay_gdf.area
+    # the weight calculated below represents how much area from each polygon
+    # is inside the shapefile after intesection
+    overlay_gdf['weight'] = overlay_gdf['area_intersected']/overlay_gdf['area'] 
+
+
+    # after this step we should have a geodataframe for the intersected polygons 
+    # that are inside the shapefile of interest the geodataframe will have
+    # the lon,lat, with the corresponding values for each date (each date in a column), 
+    # area of the polygon before intersection, area after intersection,
+    # and the ratio (area_intersected/area) and it can also include the names of the 
+    # regions (in order to be able to dissolve it into mean values for each region)
+
+    # in the next step, a dataframe was created to add the values of each 
+    # polygon (gridpoint) after calculating its weight inside 
+    # the intersection for each date
+    nr_yr = nr_yr
+    nr_entries = nr_entries # ex: number of dates :hourly, daily, monthly..etc
+    nr_column = nr_yr*nr_entries
+    df_data_inter = overlay_gdf.iloc[:,3:nr_column+2].multiply(overlay_gdf['weight'], axis="index")
+
+    # copy the geometry column (important for creating a geodataframe) and other 
+    # relevant data to the new dataframe
+    # like the name of the regions (important for calculating the mean values for each region)
+    Name_area = Name_area
+    df_data_inter[Name_area] = overlay_gdf[Name_area] # this sould be adapted depending on the shapefile available
+    df_data_inter['geometry'] = overlay_gdf['geometry']
+    geometry = df_data_inter['geometry']
+    gdf_data_inter = gpd.GeoDataFrame(df_data_inter, crs="epsg:25832", geometry=geometry)
+
+    print("calculating the mean value for each region of interest")
+    dissolve_gdf = gdf_data_inter.dissolve(by=Name_area, aggfunc='mean', as_index=True, level=None, sort=True, observed=False, dropna=True)
+    dissolve_gdf_wgs = dissolve_gdf.to_crs('EPSG:4326') # convert back to wgs 1984
+    
+    print("saving as a shapefile")
+    dissolve_gdf_wgs.to_file(save_dir)
+
+    
 
 if __name__ == '__main__':
     print('Im there!')
