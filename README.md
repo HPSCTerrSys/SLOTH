@@ -49,20 +49,19 @@ git clone --recurse-submodules https://github.com/HPSCTerrSys/SLOTH.git
 ### Use the SLOTH repository  
 All scripts inside of the **SLOTH**-repository are developed and tested on 
 [JURECA-DC](https://www.fz-juelich.de/en/ias/jsc/systems/supercomputers/jureca) 
-with a default tool-chain based on `Stage2020`, which is provided under  
-`/p/project/cslts/local/jureca/env_ini.JURECA.stage2020.GCC`.  
+with a default tool-chain, which is provided under `/p/project/cslts/local/jureca/`.  
 So to use **SLOTH** you first have to source this environment file:  
 ```
-source /p/project/cslts/local/jureca/env_ini.JURECA.stage2020.GCC
+source /p/project/cslts/local/jureca/ONEOFTHEDEFAULTENVFILES
 ```
   
 To use **SLOTH** within other projects, you have to extend your local 
-`PYTHONPATH`, to tell python where to find **SLOTH**. You can do this by:  
+[PYTHONPATH](https://docs.python.org/3/using/cmdline.html#envvar-PYTHONPATH), to tell python where to find **SLOTH**. You can do this by:  
 ```
 cd SLOTH  
 export PYTHONPATH=$PYTHONPATH:$(pwd)
 ```
-Afterwards you can simply import **SLOTH** inside any of your python scripts 
+Afterwards you can simply import **SLOTH** components from inside any of your python scripts 
 e.g. by:
 ```
 import sloth.IO
@@ -70,24 +69,4 @@ import sloth.IO
 You find this also within the example-scripts.
 
 ## How to contribute
-You can contribute to **SLOTH** with your own functions, methods, and classes.  
-To do so, simply create a new branch and upload an example script to the 
-`examples/` directory within the new branch. This way everything stays clean 
-and the master-branch is not messed up. Within this new branch you can develop 
-whatever you want, as you are not interfering with the master branch.   
-If you are done with developing open a PR (Pull Request), and someone from the 
-maintaining team wil check your request and decide if your development is ready 
-to go to the master-branch and therefore to be part of **SLOTH**.  
-
-To do so:  
-```
-# clone SLOTH as described within the 'Getting Started' section
-cd SLOTH
-git checkout -b YOURDEVELOPBRANCHNAME
-# Start developing
-# [...]
-# If ready push to GitLab (ALWAYS PULL BEFORE!)
-git pull origin YOURDEVELOPBRANCHNAME
-git push origin YOURDEVELOPBRANCHNAME
-# And open a PR from the GitHUb website.
-```
+You can contribute to **SLOTH** with your own functions, methods, and classes. How to do so is explained withtin the [How to contribute](./content/maintenance.md#how-to-contribute) section. 
