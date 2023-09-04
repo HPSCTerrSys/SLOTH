@@ -278,7 +278,7 @@ def createNetCDF(fileName, domain=None, nz=None, calcLatLon=False,
         if not os.path.isfile(griddesFile):
             print(f'ERROR: There is no griddes file with name {griddesFile} --> EXIT')
             sys.exit(1)
-        domainDef = slothHelper.get_griddesDomDef(griddesFileName)
+        domainDef = slothHelper.get_griddesDomDef(griddesFile)
     else:
         print(f'ERROR: passed domain is not supported. domain={domain} --> Exit')
         return False
