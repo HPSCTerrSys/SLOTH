@@ -2,28 +2,19 @@
 
 Check also our **[documentation](https://hpscterrsys.github.io/SLOTH/README.html)!**  
 
-This repository does holed smaller and bigger **helper** scripts for simulations 
-based on [TSMP](https://www.terrsysmp.org/). The overall idea is to support the 
-analysis progress of [TSMP](https://www.terrsysmp.org/)-simulations by providing  
-easy accessible functions and methods helping the user to focus on the real 
-analysis task. Further, example-scripts should provide ideas and hints of how to 
-tackle different analysis steps if those are not easily mapped within a modular 
-function or method.  
+This repository does holed smaller and bigger **helper** scripts for simulations based on [TSMP](https://www.terrsysmp.org/). The overall idea is to support the analysis progress of [TSMP](https://www.terrsysmp.org/)-simulations by providing easy accessible functions and methods helping the user to focus on the real analysis task. Further, example-scripts should provide ideas and hints of how to tackle different analysis steps if those are not easily mapped within a modular function or method.  
 
 In general it is to be noted, that the **SLOTH**-repository is not a full 
 collection of analysis-scripts, but a living repository, aimed to grow with 
-upcoming tasks and providing the found solutions in a prepared and documented 
-way for everyone who is facing a similar task at a later time.    
-Further, the **SLOTH**-repository is not aimed to act as a single solution for 
-analysis tasks, but as supporting lib.
+upcoming tasks and providing the found solutions in a prepared and ocumented way for everyone who is facing a similar task at a later time.    
+Further, the **SLOTH**-repository is not aimed to act as a single solution for analysis tasks, but as supporting lib.
 
 
 ## Getting Started
 
 ### Prepare the SLOTH repository
 As this repository could make use of submodules (repositories inside of 
-repositories are called submodules) a little extra treatment is needed to clone 
-this repo. Basically there are two options:
+repositories are called submodules) a little extra treatment is needed to clone this repo. Basically there are two options:
 
 **Option 1**
 Clone the repository as usual 
@@ -48,8 +39,7 @@ git clone --recurse-submodules https://github.com/HPSCTerrSys/SLOTH.git
 
 ### Use the SLOTH repository  
 All scripts inside of the **SLOTH**-repository are developed and tested on 
-[JURECA-DC](https://www.fz-juelich.de/en/ias/jsc/systems/supercomputers/jureca) 
-with a default tool-chain, which is provided under `/p/project/cslts/local/jureca/`.  
+[JURECA-DC](https://www.fz-juelich.de/en/ias/jsc/systems/supercomputers/jureca) with a default tool-chain, which is provided under `/p/project/cslts/local/jureca/`.  
 So to use **SLOTH** you first have to source this environment file:  
 ```
 source /p/project/cslts/local/jureca/ONEOFTHEDEFAULTENVFILES

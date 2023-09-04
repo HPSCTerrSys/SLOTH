@@ -101,6 +101,8 @@ As we chose Ubuntu as the operating system, we can run all available linux comma
   
 To properly contribute to **SLOTH** with your own functions, methods and classes, create a local clone of this repository, open a new branch and commit your changes. That way everything stays clean and the master branch is not messed up. Within this new branch, you can develop whatever you like, as you are not interfering with the master branch.  
 
+When you are finished developing, commit your changes with a meaningful commit message, push the new commits to the remote, and create a PR (pull request) to start merging your changes into the master branch. Someone from the maintenance team will review your request and decide whether your development is ready to move to the master branch and become part of **SLOTH**.
+
 To do this:
 ``` bash
 # clone SLOTH as described within the 'Getting Started' section
@@ -113,8 +115,6 @@ git pull origin YOURDEVELOPBRANCHNAME
 git push origin YOURDEVELOPBRANCHNAME
 # And open a PR from the GitHub website.
 ```
-
-When you are finished developing, commit your changes with a meaningful commit message, push the new commits to the remote, and create a PR (pull request) to start merging your changes into the master branch. Someone from the maintenance team will review your request and decide whether your development is ready to move to the master branch and become part of **SLOTH**.
 
 It is always welcome to provide an example of your new development, to help other users better understand your methods.  
 The easiest and most useful way is to write a small example in a Jupyter notebook, e.g. using the [JSC Jupyter Hub](https://jupyter-jsc.fz-juelich.de/hub/home). You can download this Jupyter notebook as an `.ipynb` file, which contains all the generated output and can be easily included in your documentation. To include the example in SLOTH, put the example files in `examples/` and link the new file with the `index.rst` (see examples already included). Render the documentation and the new example will be included.

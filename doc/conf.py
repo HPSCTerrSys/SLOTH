@@ -41,6 +41,11 @@ nb_execution_mode = "off"
 # below to force MyST-NB to use the kernel named `python3` (most likely the 
 # default) instead of any other kernel name (`.*`).
 #nb_kernel_rgx_aliases = {'.*': 'python3'}
+myst_heading_anchors = 4
+myst_enable_extensions = [
+    "amsmath",                  # LaTeX equations
+    "dollarmath",               # Inline LaTex
+]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
