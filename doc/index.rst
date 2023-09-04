@@ -31,6 +31,7 @@ Welcome to SLOTH's documentation!
    examples/README.md
    examples/ex_RotatedCoordinates.ipynb
    examples/ex_SanityCheck.ipynb
+   examples/ex_WriteDataToNetCDF.ipynb
    examples/ex_intersection_calculations.ipynb
 
 .. toctree:: 
