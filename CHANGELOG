@@ -15,8 +15,18 @@ straightforward as possible.
  
 ### Fixed
 
+## [1.1.0] - 2023-09-06
+ 
+### Added
+- add online documentation
+- publish on GitHub
+- add .ipynb example scripts
+
+### Changed
+
+### Fixed
+
 ## [1.0.0] - 2021-05-11
-attached commit: 8b720d6dcf0bad09d8021c1919c2c8b9e967ac53
  
 ### Added
 
