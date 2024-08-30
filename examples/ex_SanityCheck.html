@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SanityCheck &mdash; SLOTH  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="How to write data in netCDF format." href="ex_WriteDataToNetCDF.html" />
+    <link rel="prev" title="Rotated Coordinates" href="ex_RotatedCoordinates.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            SLOTH
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">SLOTH:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../README.html">Welcome to SLOTH</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Functions:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../coordTrafo.html">coordTrafo.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../toolBox.html">toolBox.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../SanityCheck.html">SanityCheck.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../IO.html">IO.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../analysis.html">analysis.py</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Classes:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../mapper.html">mapper.py</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="README.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ex_RotatedCoordinates.html">Rotated Coordinates</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">SanityCheck</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#preparation">Preparation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#example">Example</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ex_WriteDataToNetCDF.html">How to write data in netCDF format.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ex_intersection_calculations.html">Calculating the total subsurface storage anomalies using geopandas</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Maintenance:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../content/maintenance.html">Maintenance</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">SLOTH</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">SanityCheck</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/examples/ex_SanityCheck.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section class="tex2jax_ignore mathjax_ignore" id="sanitycheck">
+<h1>SanityCheck<a class="headerlink" href="#sanitycheck" title="Link to this heading"></a></h1>
+<p>It is often necessary to perform a quick sanity check on some of the data you are working with. For example, you may be running a long term simulation and want some automated plots to give you a quick insight into whether the simulation is stable and producing plausible results. Or you want to get an overview of a data set you are going to analyse, but you do not yet have a feel for the data ranges.</p>
+<p>Command line tools such as <code class="docutils literal notranslate"><span class="pre">ncview</span></code> and <code class="docutils literal notranslate"><span class="pre">ncdump</span></code> give a good first look, but lack of some statistics, individual behaviour, and automation.</p>
+<p>The SanityCheck.py provided with <code class="docutils literal notranslate"><span class="pre">SLOTH</span></code> provides a tool for this purpose, both as a standalone command line tool and as a Python library suitable for inclusion in any Python workflow.</p>
+<p>Folowing an example of how to use SanityCheck.py and what the results does look like.</p>
+<section id="preparation">
+<h2>Preparation<a class="headerlink" href="#preparation" title="Link to this heading"></a></h2>
+<p>First, we have to make <code class="docutils literal notranslate"><span class="pre">SLOTH</span></code> available to import by Python. If you already have added <code class="docutils literal notranslate"><span class="pre">SLOTH</span></code> to your <code class="docutils literal notranslate"><span class="pre">PYHTONPATH</span></code>, below step is not needed.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="n">cwd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+<span class="n">sloth_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">cwd</span><span class="si">}</span><span class="s2">/../&quot;</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sloth_path</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Second, we need to import all libraries needed in the following example.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="kn">import</span> <span class="nn">matplotlib</span> <span class="k">as</span> <span class="nn">mpl</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">netCDF4</span> <span class="k">as</span> <span class="nn">nc</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">import</span> <span class="nn">sloth.SanityCheck</span>
+<span class="n">cwd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="example">
+<h2>Example<a class="headerlink" href="#example" title="Link to this heading"></a></h2>
+<p>First we have to read in some data we can apply the SanityCheck. For this example we take some of the <code class="docutils literal notranslate"><span class="pre">SLOTH</span></code> example data provided under the <code class="docutils literal notranslate"><span class="pre">data/</span></code> directory. In particular we rad in the <code class="docutils literal notranslate"><span class="pre">T_2M</span></code> variable stored in <code class="docutils literal notranslate"><span class="pre">T_2M_COSMO.nc</span></code></p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">FileName</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">cwd</span><span class="si">}</span><span class="s1">/../data/T_2M_COSMO.nc&#39;</span>
+
+<span class="k">with</span> <span class="n">nc</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span><span class="n">FileName</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">nc_file</span><span class="p">:</span>
+    <span class="c1"># print some information about the variable we are going to read in</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;nc_file.variables[&quot;T_2M&quot;]: </span><span class="se">\n</span><span class="si">{</span><span class="n">nc_file</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s2">&quot;T_2M&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">T_2M</span> <span class="o">=</span> <span class="n">nc_file</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;T_2M&#39;</span><span class="p">][</span><span class="o">...</span><span class="p">]</span>
+    <span class="n">T_2M_long_name</span> <span class="o">=</span> <span class="n">nc_file</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;T_2M&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">long_name</span>
+    <span class="n">T_2M_units</span>     <span class="o">=</span> <span class="n">nc_file</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;T_2M&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">units</span>
+    
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>nc_file.variables[&quot;T_2M&quot;]: 
+&lt;class &#39;netCDF4._netCDF4.Variable&#39;&gt;
+float32 T_2M(time, rlat, rlon)
+    standard_name: air_temperature
+    long_name: 2m temperature
+    units: K
+    grid_mapping: rotated_pole
+    coordinates: height_2m lat lon
+unlimited dimensions: time
+current shape = (8, 438, 450)
+filling off
+</pre></div>
+</div>
+</div>
+</div>
+<p>To run the sanity check, we simply have to pass <code class="docutils literal notranslate"><span class="pre">T_2M</span></code> to the <code class="docutils literal notranslate"><span class="pre">plot_SanityCheck()</span></code> function.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sloth</span><span class="o">.</span><span class="n">SanityCheck</span><span class="o">.</span><span class="n">plot_SanityCheck</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">T_2M</span><span class="p">,</span> <span class="n">interactive</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/p/software/jurecadc/stages/2023/software/SciPy-bundle/2022.05-gcccoremkl-11.3.0-2022.1.0/lib/python3.10/site-packages/numpy/lib/function_base.py:4650: UserWarning: Warning: &#39;partition&#39; will ignore the &#39;mask&#39; of the MaskedArray.
+  arr.partition(
+</pre></div>
+</div>
+<img alt="../_images/f4c5dffe0d43cd328742db42ad2f31ad1bd4c1a242d76f0753ebab63c98d4a5c.png" src="../_images/f4c5dffe0d43cd328742db42ad2f31ad1bd4c1a242d76f0753ebab63c98d4a5c.png" />
+</div>
+</div>
+<p>What we get is a quiet simple plot consisting of 4 subplots, labeled as ‘min’, ‘max’, ‘mean’, and ‘histogram of mean’. We do not see any further explanation, units, or geographical coordinates, but if we know what we put in, we already have a rough idea of what is plotted there. And this is what <code class="docutils literal notranslate"><span class="pre">plot_SanityCheck()</span></code> was written for, to be robust and to plot whatever data is passed.</p>
+<p>However, we can  get some more information if we take a look at the internal documentation of <code class="docutils literal notranslate"><span class="pre">plot_SanityCheck()</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">sloth</span><span class="o">.</span><span class="n">SanityCheck</span><span class="o">.</span><span class="n">plot_SanityCheck</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>    Plot a sanity check for given data.
+    
+    The Sanity Plot is a plot consisting of 4 sub-plots, trying to visualise 
+    some important statistics in a compact way, aimed to determine if the data 
+    set inspected is plausible or not (sanity).
+
+    Parameters
+    ----------
+    data : numpy.ma.MaskedArray
+        3D array of data.
+    kind : {&#39;sum&#39;, &#39;mean&#39;}, optional
+        Calculation type for the data statistics. Default is &#39;sum&#39;.
+    figname : str, optional
+        File name to save the plot. Default is &#39;./SanityCheck_3D.pdf&#39;.
+    fig_title : str, optional
+        Title of the plot.
+    lowerP : int, optional
+        Lower percentile value for plot limits. Default is 2.
+    upperP : int, optional
+        Upper percentile value for plot limits. Default is 98.
+    interactive : bool, optional
+        If True, display the plot interactively. If False, save the plot to 
+        &#39;figname&#39;. Default is False.
+    cmapName : str, optional
+        Name of the colormap. Default is &#39;Spectral&#39;.
+
+    Returns
+    -------
+    None
+
+    Notes
+    -----
+    - The &#39;data&#39; input must be a 3D numpy masked array (t, y, x).
+    - The &#39;kind&#39; parameter specifies whether to calculate the sum or mean of the data.
+    - The function generates a plot with subplots for the minimum, maximum, kind (sum or mean), and histogram of the data.
+    - The colormap normalization is determined based on the percentiles of the data.
+    - The plot can be displayed interactively or saved to a file.
+    - If the &#39;interactive&#39; parameter is set to True, the plot is displayed using plt.show(). If False, the plot is saved to the file specified by &#39;figname&#39;.
+
+    
+</pre></div>
+</div>
+</div>
+</div>
+<p>We see that we can pass a title (<code class="docutils literal notranslate"><span class="pre">fig_title</span></code>), but no other descriptive arguments. So lets take the information from the netCDF attributes, and plot to the title.<br />
+Further we can pass a colormap (<code class="docutils literal notranslate"><span class="pre">cmapName</span></code>), so lets use a colormap where hot temperature are plotted reddish and cool temperature are plotted bluish.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig_title_list</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="sa">f</span><span class="s1">&#39;SanityCheck plot for the variable&#39;</span><span class="p">,</span>
+    <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">T_2M_long_name</span><span class="si">}</span><span class="s1"> [</span><span class="si">{</span><span class="n">T_2M_units</span><span class="si">}</span><span class="s1">]&#39;</span><span class="p">,</span>
+<span class="p">]</span>
+<span class="n">fig_title</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">fig_title_list</span><span class="p">)</span>
+
+<span class="n">sloth</span><span class="o">.</span><span class="n">SanityCheck</span><span class="o">.</span><span class="n">plot_SanityCheck</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">T_2M</span><span class="p">,</span> <span class="n">interactive</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">fig_title</span><span class="o">=</span><span class="n">fig_title</span><span class="p">,</span> <span class="n">cmapName</span><span class="o">=</span><span class="s1">&#39;Spectral_r&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/e16ba642ede14506285f81c76c9b48255b1c245b275374b2409570e6c62b379d.png" src="../_images/e16ba642ede14506285f81c76c9b48255b1c245b275374b2409570e6c62b379d.png" />
+</div>
+</div>
+<p>Now we know that we are looking at a SanityCheck plot for the <code class="docutils literal notranslate"><span class="pre">2m</span> <span class="pre">temperature</span></code>, which is given in <code class="docutils literal notranslate"><span class="pre">[K]</span></code>.<br />
+The top left plot shows the minimum temperature for each pixel for the entire time period passed.<br />
+The top right plot shows the maximum temperature for each pixel for the entire time period passed.<br />
+The bottom left plot shows the average temperature for each pixel for the entire time period passed.<br />
+And the lower right plot shows the histogram of the mean temperature.</p>
+<p>This gives us some information to help us decide whether or not the results are reasonable.<br />
+Does the value range fit our expectations? Are we seeing warm temperatures in the south and cold temperatures in the north? Is the temperature distribution of temperatures between land and sea reasonable? Are the extremes within a valid range or or is the temperature dropping too much at night, for example?</p>
+<p>The colorbar range is controlled by an upper and an lower percentile (in plot above the 2% and 98% percentiles) of the data values within each subplot. So the lower percentile defines the minimum value of the colorbar and the upper percentile defines the maximum value of the colorbar. Values outside the colorbar range are plotted with an extra colour that is well distinguished from the main colorbar. This behaviour is chosen, to make the colorbar robust against outliers.</p>
+<p>In order to capture values outside this truncated data range, there is a small box in the upper left corner of each subplot that displays some additional numbers, calculated based on the data values plotted within the subplot. These are respectively the minimum, mean, and maximum values, the standard deviation and the 2%, 50%, and 98% percentiles, to give a better feel for the plotted data and to catch outliers. The lower and upper percentiles thereby can be controlled by the function arguments <code class="docutils literal notranslate"><span class="pre">lowerP</span></code> and <code class="docutils literal notranslate"><span class="pre">upperP</span></code>.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="ex_RotatedCoordinates.html" class="btn btn-neutral float-left" title="Rotated Coordinates" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="ex_WriteDataToNetCDF.html" class="btn btn-neutral float-right" title="How to write data in netCDF format." accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Niklas WAGNER.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

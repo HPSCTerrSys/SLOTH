@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>sloth.coordTrafo &mdash; SLOTH  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            SLOTH
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">SLOTH:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../README.html">Welcome to SLOTH</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Functions:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../coordTrafo.html">coordTrafo.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../toolBox.html">toolBox.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../SanityCheck.html">SanityCheck.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../IO.html">IO.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../analysis.html">analysis.py</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Classes:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../mapper.html">mapper.py</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/README.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/ex_RotatedCoordinates.html">Rotated Coordinates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/ex_SanityCheck.html">SanityCheck</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/ex_WriteDataToNetCDF.html">How to write data in netCDF format.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/ex_intersection_calculations.html">Calculating the total subsurface storage anomalies using geopandas</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Maintenance:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../content/maintenance.html">Maintenance</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">SLOTH</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">sloth.coordTrafo</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for sloth.coordTrafo</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot; coordTrafo - submodule of SLOTH</span>
+
+<span class="sd">This sub-module contains two inverse functions to switch between rotated and </span>
+<span class="sd">non-rotated coordinates. The original version of these functions was written </span>
+<span class="sd">by Tobias TESCH at FZJ-IBG3, but was migrated to SLOTH for easier handling and </span>
+<span class="sd">less dependencies.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<div class="viewcode-block" id="undo_grid_rotation">
+<a class="viewcode-back" href="../../coordTrafo.html#sloth.coordTrafo.undo_grid_rotation">[docs]</a>
+<span class="k">def</span> <span class="nf">undo_grid_rotation</span><span class="p">(</span><span class="n">rlat</span><span class="p">,</span><span class="n">rlon</span><span class="p">,</span><span class="n">np_lat</span><span class="p">,</span><span class="n">np_lon</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;Undo the rotated pole grid transformation </span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    rlat, rlon : ndarray</span>
+<span class="sd">        ndarrays of rotated latitude/longitude values (in degree)</span>
+
+<span class="sd">    np_lat, np_lon: ndarray</span>
+<span class="sd">        geographical latitude/longitude of rotated north pole (in degree) </span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    lat, lon : ndarray</span>
+<span class="sd">        ndarrays of geographical latitude/longitude values (in degree) </span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    For reference see</span>
+<span class="sd">    M. Baldauf et al. &quot;Kurze Beschreibung des Lokal-Modells Kürzestfrist </span>
+<span class="sd">    COSMO-DE (LMK) und seiner Datenbanken auf dem Datenserver des DWD&quot;, pp. </span>
+<span class="sd">    21-22 https://www.dwd.de/SharedDocs/downloads/DE/modelldokumentationen/nwv/cosmo_de/cosmo_de_dbbeschr_version_2_4_161124.pdf?__blob=publicationFile&amp;v=4 </span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">np_lon</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">np_lon</span><span class="p">)</span>
+    <span class="n">np_lat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">np_lat</span><span class="p">)</span>
+    <span class="n">rlon</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">rlon</span><span class="p">)</span>
+    <span class="n">rlat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">rlat</span><span class="p">)</span>
+
+    <span class="n">lon</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">np_lon</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">arctan2</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">rlat</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">rlon</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">rlat</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np_lat</span><span class="p">)</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np_lat</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">rlat</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">rlon</span><span class="p">)))</span>
+    <span class="n">lon</span><span class="p">[</span><span class="n">lon</span><span class="o">&lt;-</span><span class="mi">180</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">360</span>		<span class="c1">#To ensure values in the range [-180,180]</span>
+    <span class="n">lon</span><span class="p">[</span><span class="n">lon</span><span class="o">&gt;</span><span class="mi">180</span><span class="p">]</span> <span class="o">-=</span> <span class="mi">360</span>
+    <span class="n">lat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arcsin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">rlat</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np_lat</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">rlat</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">rlon</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np_lat</span><span class="p">)))</span> 
+
+    <span class="k">return</span> <span class="n">lat</span><span class="p">,</span><span class="n">lon</span></div>
+
+
+<div class="viewcode-block" id="rotate_grid">
+<a class="viewcode-back" href="../../coordTrafo.html#sloth.coordTrafo.rotate_grid">[docs]</a>
+<span class="k">def</span> <span class="nf">rotate_grid</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">np_lat</span><span class="p">,</span> <span class="n">np_lon</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39; Transform to rotated pole grid </span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    lat, lon : ndarray</span>
+<span class="sd">        ndarrays of geographical latitude/longitude values (in degree)</span>
+<span class="sd">    np_lat, np_lon : double</span>
+<span class="sd">        geographical latitude/longitude of rotated north pole (in degree) </span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    rlat, rlon : ndarray</span>
+<span class="sd">        ndarrays of rotated latitude/longitude values (in degree) </span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    For reference see </span>
+<span class="sd">    M. Baldauf et al. &quot;Kurze Beschreibung des Lokal-Modells Kürzestfrist </span>
+<span class="sd">    COSMO-DE (LMK) und seiner Datenbanken auf dem Datenserver des DWD&quot;, pp. </span>
+<span class="sd">    21-22 https://www.dwd.de/SharedDocs/downloads/DE/modelldokumentationen/nwv/cosmo_de/cosmo_de_dbbeschr_version_2_4_161124.pdf?__blob=publicationFile&amp;v=4</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">np_lon</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">np_lon</span><span class="p">)</span>
+    <span class="n">np_lat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">np_lat</span><span class="p">)</span>
+    <span class="n">lon</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">lon</span><span class="p">)</span>
+    <span class="n">lat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">lat</span><span class="p">)</span>
+
+    <span class="n">rlon</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arctan2</span><span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">lat</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">lon</span> <span class="o">-</span> <span class="n">np_lon</span><span class="p">),</span>
+                                 <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">lat</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np_lat</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">lon</span><span class="o">-</span><span class="n">np_lon</span><span class="p">)</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">lat</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np_lat</span><span class="p">)</span>
+                      <span class="p">))</span> 
+    <span class="c1"># Ensure values in the range [-180,180]</span>
+    <span class="n">rlon</span><span class="p">[</span><span class="n">rlon</span><span class="o">&lt;-</span><span class="mi">180</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">360</span> 
+    <span class="n">rlon</span><span class="p">[</span><span class="n">rlon</span><span class="o">&gt;</span><span class="mi">180</span><span class="p">]</span>  <span class="o">-=</span> <span class="mi">360</span>
+
+    <span class="n">rlat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arcsin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">lat</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np_lat</span><span class="p">)</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">lat</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np_lat</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">lon</span> <span class="o">-</span> <span class="n">np_lon</span><span class="p">)))</span>
+
+    <span class="k">return</span> <span class="n">rlat</span><span class="p">,</span> <span class="n">rlon</span></div>
+
+
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Niklas WAGNER.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

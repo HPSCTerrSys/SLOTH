@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>sloth.IO &mdash; SLOTH  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            SLOTH
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">SLOTH:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../README.html">Welcome to SLOTH</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Functions:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../coordTrafo.html">coordTrafo.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../toolBox.html">toolBox.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../SanityCheck.html">SanityCheck.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../IO.html">IO.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../analysis.html">analysis.py</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Classes:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../mapper.html">mapper.py</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/README.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/ex_RotatedCoordinates.html">Rotated Coordinates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/ex_SanityCheck.html">SanityCheck</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/ex_WriteDataToNetCDF.html">How to write data in netCDF format.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/ex_intersection_calculations.html">Calculating the total subsurface storage anomalies using geopandas</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Maintenance:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../content/maintenance.html">Maintenance</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">SLOTH</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">sloth.IO</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for sloth.IO</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">netCDF4</span> <span class="k">as</span> <span class="nn">nc</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">struct</span> <span class="kn">import</span> <span class="n">pack</span><span class="p">,</span> <span class="n">unpack</span>
+
+<span class="kn">import</span> <span class="nn">sloth.slothHelper</span> <span class="k">as</span> <span class="nn">slothHelper</span>
+<span class="kn">import</span> <span class="nn">sloth.coordTrafo</span>
+
+<span class="c1">################################################################################</span>
+<span class="c1">################################ PFB ###########################################</span>
+<span class="c1">################################################################################</span>
+<span class="k">def</span> <span class="nf">write_packed</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">fmt</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">pack</span><span class="p">(</span><span class="n">fmt</span><span class="p">,</span> <span class="n">val</span><span class="p">))</span>
+
+<div class="viewcode-block" id="create_pfb">
+<a class="viewcode-back" href="../../IO.html#sloth.IO.create_pfb">[docs]</a>
+<span class="k">def</span> <span class="nf">create_pfb</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="n">delta</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">subgrids</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a ParFlow PFB file from a 3D array of variable data.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    filename : str</span>
+<span class="sd">        Name of the PFB file to be created.</span>
+<span class="sd">    var : ndarray</span>
+<span class="sd">        3D array of variable data to be stored in the PFB file.</span>
+<span class="sd">    delta : tuple of float, optional</span>
+<span class="sd">        Grid spacing values in the x, y, and z directions. Default is (1, 1, 1).</span>
+<span class="sd">    subgrids : tuple of int, optional</span>
+<span class="sd">        Number of subgrids in the x, y, and z directions. Default is (1, 1, 1).</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">    &gt;&gt;&gt; data = np.random.rand(10, 20, 30)</span>
+<span class="sd">    &gt;&gt;&gt; create_pfb(&#39;output.pfb&#39;, data, delta=(0.5, 0.5, 0.5))</span>
+<span class="sd">    ...</span>
+<span class="sd">    This creates a PFB file named &#39;output.pfb&#39; from a 3D array &#39;data&#39; with </span>
+<span class="sd">    custom delta settings.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">nz</span><span class="p">,</span> <span class="n">ny</span><span class="p">,</span> <span class="n">nx</span> <span class="o">=</span> <span class="n">var</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">dz</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span> <span class="n">dx</span> <span class="o">=</span> <span class="n">delta</span>
+    <span class="n">sz</span><span class="p">,</span> <span class="n">sy</span><span class="p">,</span> <span class="n">sx</span> <span class="o">=</span> <span class="n">subgrids</span>
+
+    <span class="n">filepfb</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Write start indices of global domain in x, y, z direction</span>
+    <span class="n">write_packed</span><span class="p">(</span><span class="n">filepfb</span><span class="p">,</span> <span class="s1">&#39;&gt;d&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">write_packed</span><span class="p">(</span><span class="n">filepfb</span><span class="p">,</span> <span class="s1">&#39;&gt;d&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">write_packed</span><span class="p">(</span><span class="n">filepfb</span><span class="p">,</span> <span class="s1">&#39;&gt;d&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+    <span class="c1"># Write number of global gridpoints in x, y, z direction</span>
+    <span class="n">write_packed</span><span class="p">(</span><span class="n">filepfb</span><span class="p">,</span> <span class="s1">&#39;&gt;i&#39;</span><span class="p">,</span> <span class="n">nx</span><span class="p">)</span>
+    <span class="n">write_packed</span><span class="p">(</span><span class="n">filepfb</span><span class="p">,</span> <span class="s1">&#39;&gt;i&#39;</span><span class="p">,</span> <span class="n">ny</span><span class="p">)</span>
+    <span class="n">write_packed</span><span class="p">(</span><span class="n">filepfb</span><span class="p">,</span> <span class="s1">&#39;&gt;i&#39;</span><span class="p">,</span> <span class="n">nz</span><span class="p">)</span>
+
+    <span class="c1"># Write delta x, delta y and delta z</span>
+    <span class="n">write_packed</span><span class="p">(</span><span class="n">filepfb</span><span class="p">,</span> <span class="s1">&#39;&gt;d&#39;</span><span class="p">,</span> <span class="n">dx</span><span class="p">)</span>
+    <span class="n">write_packed</span><span class="p">(</span><span class="n">filepfb</span><span class="p">,</span> <span class="s1">&#39;&gt;d&#39;</span><span class="p">,</span> <span class="n">dy</span><span class="p">)</span>
+    <span class="n">write_packed</span><span class="p">(</span><span class="n">filepfb</span><span class="p">,</span> <span class="s1">&#39;&gt;d&#39;</span><span class="p">,</span> <span class="n">dz</span><span class="p">)</span>
+
+    <span class="n">nSubGrid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">subgrids</span><span class="p">)</span>
+
+    <span class="n">nnx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">nx</span> <span class="o">/</span> <span class="n">sx</span><span class="p">)</span>
+    <span class="n">nny</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ny</span> <span class="o">/</span> <span class="n">sy</span><span class="p">)</span>
+    <span class="n">nnz</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">nz</span> <span class="o">/</span> <span class="n">sz</span><span class="p">)</span>
+
+    <span class="c1"># Write the subgrid grid ID</span>
+    <span class="n">write_packed</span><span class="p">(</span><span class="n">filepfb</span><span class="p">,</span> <span class="s1">&#39;&gt;i&#39;</span><span class="p">,</span> <span class="n">nSubGrid</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">iz</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">sz</span><span class="p">)</span><span class="o">*</span><span class="n">nnz</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">iy</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">sy</span><span class="p">)</span><span class="o">*</span><span class="n">nny</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">ix</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">sx</span><span class="p">)</span><span class="o">*</span><span class="n">nnx</span><span class="p">:</span>
+                <span class="c1">#print(ix,iy,iz, nnx,nny,nnz)</span>
+                <span class="c1"># Write start indices in x, y, z direction</span>
+                <span class="n">write_packed</span><span class="p">(</span><span class="n">filepfb</span><span class="p">,</span> <span class="s1">&#39;&gt;i&#39;</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">ix</span><span class="p">))</span>
+                <span class="n">write_packed</span><span class="p">(</span><span class="n">filepfb</span><span class="p">,</span> <span class="s1">&#39;&gt;i&#39;</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">iy</span><span class="p">))</span>
+                <span class="n">write_packed</span><span class="p">(</span><span class="n">filepfb</span><span class="p">,</span> <span class="s1">&#39;&gt;i&#39;</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">iz</span><span class="p">))</span>
+
+                <span class="c1"># Write number of grid points in x, y and z direction for this </span>
+                <span class="c1"># subgrid</span>
+                <span class="n">write_packed</span><span class="p">(</span><span class="n">filepfb</span><span class="p">,</span> <span class="s1">&#39;&gt;i&#39;</span><span class="p">,</span> <span class="n">nnx</span><span class="p">)</span>
+                <span class="n">write_packed</span><span class="p">(</span><span class="n">filepfb</span><span class="p">,</span> <span class="s1">&#39;&gt;i&#39;</span><span class="p">,</span> <span class="n">nny</span><span class="p">)</span>
+                <span class="n">write_packed</span><span class="p">(</span><span class="n">filepfb</span><span class="p">,</span> <span class="s1">&#39;&gt;i&#39;</span><span class="p">,</span> <span class="n">nnz</span><span class="p">)</span>
+
+                <span class="c1"># Write the relative(to global) grid refinement in this subgrid</span>
+                <span class="c1"># 0=same resolution as global</span>
+                <span class="n">write_packed</span><span class="p">(</span><span class="n">filepfb</span><span class="p">,</span> <span class="s1">&#39;&gt;i&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+                <span class="n">write_packed</span><span class="p">(</span><span class="n">filepfb</span><span class="p">,</span> <span class="s1">&#39;&gt;i&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+                <span class="n">write_packed</span><span class="p">(</span><span class="n">filepfb</span><span class="p">,</span> <span class="s1">&#39;&gt;i&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+                <span class="c1"># Assuming the data is stored in 3D array called varArray of </span>
+                <span class="c1"># global size nz*ny*nx</span>
+                <span class="n">fmt</span> <span class="o">=</span> <span class="s2">&quot;&gt;</span><span class="si">%d</span><span class="s2">d&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">nnz</span><span class="o">*</span><span class="n">nny</span><span class="o">*</span><span class="n">nnx</span><span class="p">)</span>
+                <span class="n">filepfb</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">pack</span><span class="p">(</span><span class="n">fmt</span><span class="p">,</span> <span class="o">*</span><span class="n">var</span><span class="p">[</span><span class="n">iz</span><span class="p">:</span><span class="n">iz</span><span class="o">+</span><span class="n">nnz</span><span class="p">,</span>
+                                               <span class="n">iy</span><span class="p">:</span><span class="n">iy</span><span class="o">+</span><span class="n">nny</span><span class="p">,</span>
+                                               <span class="n">ix</span><span class="p">:</span><span class="n">ix</span><span class="o">+</span><span class="n">nnx</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">()))</span>
+
+    <span class="n">filepfb</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="read_pfb">
+<a class="viewcode-back" href="../../IO.html#sloth.IO.read_pfb">[docs]</a>
+<span class="k">def</span> <span class="nf">read_pfb</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Read a ParFlow PFB file and return the data as a numpy ndarray.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    filename : str</span>
+<span class="sd">        Name of the PFB file to be read.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    data : ndarray</span>
+<span class="sd">        3D array containing the data read from the PFB file.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; data = read_pfb(&#39;input.pfb&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; print(data.shape)</span>
+<span class="sd">    (10, 20, 30)</span>
+<span class="sd">    ...</span>
+<span class="sd">    This reads a PFB file named &#39;input.pfb&#39; and returns the data as a 3D array.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="c1"># read meta informations of datafile</span>
+        <span class="n">meta_inf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;&gt;f8&#39;</span><span class="p">,</span> <span class="n">count</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">x1</span> <span class="o">=</span> <span class="n">meta_inf</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">y1</span> <span class="o">=</span> <span class="n">meta_inf</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">z1</span> <span class="o">=</span> <span class="n">meta_inf</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+
+        <span class="n">meta_inf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;&gt;i4&#39;</span><span class="p">,</span> <span class="n">count</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">nx</span> <span class="o">=</span> <span class="n">meta_inf</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">ny</span> <span class="o">=</span> <span class="n">meta_inf</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">nz</span> <span class="o">=</span> <span class="n">meta_inf</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">nn</span> <span class="o">=</span> <span class="n">nx</span> <span class="o">*</span> <span class="n">ny</span> <span class="o">*</span> <span class="n">nz</span>
+
+
+        <span class="n">meta_inf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;&gt;f8&#39;</span><span class="p">,</span> <span class="n">count</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">dx</span> <span class="o">=</span> <span class="n">meta_inf</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">dy</span> <span class="o">=</span> <span class="n">meta_inf</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">dz</span> <span class="o">=</span> <span class="n">meta_inf</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+
+        <span class="n">meta_inf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;&gt;i4&#39;</span><span class="p">,</span> <span class="n">count</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">nsubgrid</span> <span class="o">=</span> <span class="n">meta_inf</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">data</span> <span class="o">=</span>  <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">nz</span><span class="p">,</span><span class="n">ny</span><span class="p">,</span><span class="n">nx</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;&gt;f8&#39;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nsubgrid</span><span class="p">):</span>
+            <span class="n">meta_inf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;&gt;i4&#39;</span><span class="p">,</span> <span class="n">count</span> <span class="o">=</span> <span class="mi">9</span><span class="p">)</span>
+            <span class="n">ix</span> <span class="o">=</span> <span class="n">meta_inf</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">iy</span> <span class="o">=</span> <span class="n">meta_inf</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">iz</span> <span class="o">=</span> <span class="n">meta_inf</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+            <span class="c1"># print(&quot;---{0} Start Index (X,Y,Z):&quot;.format(s+1), ix, iy, iz)</span>
+
+            <span class="n">nx</span> <span class="o">=</span> <span class="n">meta_inf</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+            <span class="n">ny</span> <span class="o">=</span> <span class="n">meta_inf</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+            <span class="n">nz</span> <span class="o">=</span> <span class="n">meta_inf</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span>
+            <span class="n">nn</span> <span class="o">=</span> <span class="n">nx</span><span class="o">*</span><span class="n">ny</span><span class="o">*</span><span class="n">nz</span>
+            <span class="c1"># print(&quot;---{0} Dimensions (X,Y,Z):&quot;.format(s+1), nx, ny, nz)</span>
+
+            <span class="n">rx</span> <span class="o">=</span> <span class="n">meta_inf</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span>
+            <span class="n">ry</span> <span class="o">=</span> <span class="n">meta_inf</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span>
+            <span class="n">rz</span> <span class="o">=</span> <span class="n">meta_inf</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span>
+            <span class="c1"># print(&quot;---{0} Offsets (X,Y,Z):&quot;.format(s+1), rx, ry, rz)</span>
+
+            <span class="n">tmp_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;&gt;f8&#39;</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="n">nn</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">nz</span><span class="p">,</span><span class="n">ny</span><span class="p">,</span><span class="n">nx</span><span class="p">))</span>
+
+            <span class="n">data</span><span class="p">[</span><span class="n">iz</span><span class="p">:</span><span class="n">iz</span><span class="o">+</span><span class="n">nz</span><span class="p">,</span> <span class="n">iy</span><span class="p">:</span><span class="n">iy</span><span class="o">+</span><span class="n">ny</span><span class="p">,</span> <span class="n">ix</span><span class="p">:</span><span class="n">ix</span><span class="o">+</span><span class="n">nx</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmp_data</span>
+
+    <span class="k">return</span> <span class="n">data</span></div>
+
+
+<span class="k">def</span> <span class="nf">read_pfbMetaData</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="c1"># read meta informations of datafile</span>
+        <span class="n">meta_inf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;&gt;f8&#39;</span><span class="p">,</span> <span class="n">count</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">x1</span> <span class="o">=</span> <span class="n">meta_inf</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">y1</span> <span class="o">=</span> <span class="n">meta_inf</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">z1</span> <span class="o">=</span> <span class="n">meta_inf</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;x1: </span><span class="si">{</span><span class="n">x1</span><span class="si">}</span><span class="s1">; y1: </span><span class="si">{</span><span class="n">y1</span><span class="si">}</span><span class="s1">; z1: </span><span class="si">{</span><span class="n">z1</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+
+        <span class="n">meta_inf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;&gt;i4&#39;</span><span class="p">,</span> <span class="n">count</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">nx</span> <span class="o">=</span> <span class="n">meta_inf</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">ny</span> <span class="o">=</span> <span class="n">meta_inf</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">nz</span> <span class="o">=</span> <span class="n">meta_inf</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">nn</span> <span class="o">=</span> <span class="n">nx</span> <span class="o">*</span> <span class="n">ny</span> <span class="o">*</span> <span class="n">nz</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;nx: </span><span class="si">{</span><span class="n">nx</span><span class="si">}</span><span class="s1">; ny: </span><span class="si">{</span><span class="n">ny</span><span class="si">}</span><span class="s1">; nz: </span><span class="si">{</span><span class="n">nz</span><span class="si">}</span><span class="s1">; nn: </span><span class="si">{</span><span class="n">nn</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+
+        <span class="n">meta_inf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;&gt;f8&#39;</span><span class="p">,</span> <span class="n">count</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">dx</span> <span class="o">=</span> <span class="n">meta_inf</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">dy</span> <span class="o">=</span> <span class="n">meta_inf</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">dz</span> <span class="o">=</span> <span class="n">meta_inf</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;dx: </span><span class="si">{</span><span class="n">dx</span><span class="si">}</span><span class="s1">; dy: </span><span class="si">{</span><span class="n">dy</span><span class="si">}</span><span class="s1">; dz: </span><span class="si">{</span><span class="n">dz</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+
+        <span class="n">meta_inf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;&gt;i4&#39;</span><span class="p">,</span> <span class="n">count</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">nsubgrid</span> <span class="o">=</span> <span class="n">meta_inf</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;nsubgrid: </span><span class="si">{</span><span class="n">nsubgrid</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="kc">None</span>
+
+<span class="c1">################################################################################</span>
+<span class="c1">############################# netCDF ###########################################</span>
+<span class="c1">################################################################################</span>
+
+<div class="viewcode-block" id="createNetCDF">
+<a class="viewcode-back" href="../../IO.html#sloth.IO.createNetCDF">[docs]</a>
+<span class="k">def</span> <span class="nf">createNetCDF</span><span class="p">(</span><span class="n">fileName</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nz</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">calcLatLon</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">author</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">contact</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">institution</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">history</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">timeCalendar</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">timeUnit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">NBOUNDCUT</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a NetCDF file with typical metadata and dimensions.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    fileName : str</span>
+<span class="sd">        Name of the output NetCDF file.</span>
+<span class="sd">    domain : str or None, optional</span>
+<span class="sd">        Path to the domain definition file or a valid CORDEX/Griddes domain name.</span>
+<span class="sd">        If None, default domain definitions will be used.</span>
+<span class="sd">    nz : int or None, optional</span>
+<span class="sd">        Number of vertical levels. If None, no z-axis will be created.</span>
+<span class="sd">    calcLatLon : bool, optional</span>
+<span class="sd">        Flag indicating whether to calculate latitude and longitude values.</span>
+<span class="sd">        If True, lat and lon variables will be created.</span>
+<span class="sd">    author : str or None, optional</span>
+<span class="sd">        Name of the author.</span>
+<span class="sd">    description : str or None, optional</span>
+<span class="sd">        Description of the NetCDF file.</span>
+<span class="sd">    source : str or None, optional</span>
+<span class="sd">        Source of the data.</span>
+<span class="sd">    contact : str or None, optional</span>
+<span class="sd">        Contact information.</span>
+<span class="sd">    institution : str or None, optional</span>
+<span class="sd">        Institution associated with the data.</span>
+<span class="sd">    history : str or None, optional</span>
+<span class="sd">        History information.</span>
+<span class="sd">    timeCalendar : str or None, optional</span>
+<span class="sd">        Calendar type for the time-axis.</span>
+<span class="sd">    timeUnit : str or None, optional</span>
+<span class="sd">        Unit of measurement for the time-axis.</span>
+<span class="sd">    NBOUNDCUT : int, optional</span>
+<span class="sd">        Number of pixels to cut at the domain border.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    fileName : str</span>
+<span class="sd">        Name of the created NetCDF file.</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    &gt;&gt;&gt; # Create a NetCDF file with default domain definitions and no z-axis</span>
+<span class="sd">    &gt;&gt;&gt; createNetCDF(&quot;output.nc&quot;)</span>
+<span class="sd">    </span>
+<span class="sd">    &gt;&gt;&gt; # Create a NetCDF file with a specific domain and 10 vertical levels</span>
+<span class="sd">    &gt;&gt;&gt; createNetCDF(&quot;output.nc&quot;, domain=&quot;my_domain.txt&quot;, nz=10, calcLatLon=True)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1">#######################################################################</span>
+    <span class="c1">#### Get domain definitions</span>
+    <span class="c1">#######################################################################</span>
+    <span class="n">availableCORDEXDomains</span>  <span class="o">=</span> <span class="n">slothHelper</span><span class="o">.</span><span class="n">get_listOfCordexGrids</span><span class="p">()</span>
+    <span class="n">availableGriddesDomains</span> <span class="o">=</span> <span class="n">slothHelper</span><span class="o">.</span><span class="n">get_listOfGriddes</span><span class="p">()</span>
+    <span class="c1"># Check if &#39;domain&#39; is pointing to a domain path</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">domain</span><span class="p">):</span>
+        <span class="n">domainDef</span> <span class="o">=</span> <span class="n">slothHelper</span><span class="o">.</span><span class="n">get_griddesDomDef</span><span class="p">(</span><span class="n">domain</span><span class="p">)</span>
+    <span class="c1"># Check if &#39;domain&#39; is a official CORDEX name pattern</span>
+    <span class="k">elif</span> <span class="n">domain</span> <span class="ow">in</span> <span class="n">availableCORDEXDomains</span><span class="p">:</span>
+        <span class="n">domainDef</span> <span class="o">=</span> <span class="n">slothHelper</span><span class="o">.</span><span class="n">get_cordexDomDef</span><span class="p">(</span><span class="n">domain</span><span class="p">)</span>
+    <span class="c1"># Check if &#39;domain&#39; is provided by SLOTH</span>
+    <span class="k">elif</span> <span class="n">domain</span> <span class="ow">in</span> <span class="n">availableGriddesDomains</span><span class="p">:</span>
+        <span class="c1"># Read griddes file from configs dir</span>
+        <span class="c1"># Configs is located under `sloth/` (os.path.dirname(__file__))</span>
+        <span class="n">griddesFileName</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">domain</span><span class="si">}</span><span class="s1">_griddes.txt&#39;</span>
+        <span class="n">griddesFile</span>     <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="si">}</span><span class="s1">/configs/</span><span class="si">{</span><span class="n">griddesFileName</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">griddesFile</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;ERROR: There is no griddes file with name </span><span class="si">{</span><span class="n">griddesFile</span><span class="si">}</span><span class="s1"> --&gt; EXIT&#39;</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">domainDef</span> <span class="o">=</span> <span class="n">slothHelper</span><span class="o">.</span><span class="n">get_griddesDomDef</span><span class="p">(</span><span class="n">griddesFile</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;ERROR: passed domain is not supported. domain=</span><span class="si">{</span><span class="n">domain</span><span class="si">}</span><span class="s1"> --&gt; Exit&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="n">nx</span>     <span class="o">=</span> <span class="n">domainDef</span><span class="p">[</span><span class="s1">&#39;Nlon&#39;</span><span class="p">]</span>
+    <span class="n">ny</span>     <span class="o">=</span> <span class="n">domainDef</span><span class="p">[</span><span class="s1">&#39;Nlat&#39;</span><span class="p">]</span>
+    <span class="n">dx</span>     <span class="o">=</span> <span class="n">domainDef</span><span class="p">[</span><span class="s1">&#39;dlon&#39;</span><span class="p">]</span>
+    <span class="n">dy</span>     <span class="o">=</span> <span class="n">domainDef</span><span class="p">[</span><span class="s1">&#39;dlat&#39;</span><span class="p">]</span>
+    <span class="n">rpol_X</span> <span class="o">=</span> <span class="n">domainDef</span><span class="p">[</span><span class="s1">&#39;NPlon&#39;</span><span class="p">]</span>
+    <span class="n">rpol_Y</span> <span class="o">=</span> <span class="n">domainDef</span><span class="p">[</span><span class="s1">&#39;NPlat&#39;</span><span class="p">]</span>
+    <span class="n">SWC_X</span>  <span class="o">=</span> <span class="n">domainDef</span><span class="p">[</span><span class="s1">&#39;SWlon&#39;</span><span class="p">]</span>
+    <span class="n">SWC_Y</span>  <span class="o">=</span> <span class="n">domainDef</span><span class="p">[</span><span class="s1">&#39;SWlat&#39;</span><span class="p">]</span>
+
+    <span class="c1">#######################################################################</span>
+    <span class="c1">#### Checking if time- and / or z-axis is used</span>
+    <span class="c1">#######################################################################</span>
+    <span class="n">withTime</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="n">timeUnit</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">timeCalendar</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">withTime</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1">#print(&#39;NOT creating time-axis&#39;)</span>
+        <span class="c1">#print(f&#39;--  timeUnit = {timeUnit}; timeCalendar = {timeCalendar}&#39;)</span>
+        <span class="k">pass</span>
+
+    <span class="n">withZlvl</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="n">nz</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">withZlvl</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1">#print(&#39;NOT creating z-axis&#39;)</span>
+        <span class="k">pass</span>
+
+    <span class="c1">#######################################################################</span>
+    <span class="c1">#### Create netCDF file (overwrite if exist)</span>
+    <span class="c1">#######################################################################</span>
+    <span class="c1"># If no file-extension is passed, add &#39;.nc&#39; as default</span>
+    <span class="n">fileRoot</span><span class="p">,</span> <span class="n">fileExt</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">fileName</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">fileExt</span><span class="p">:</span>
+       <span class="n">fileExt</span> <span class="o">=</span> <span class="s1">&#39;.nc&#39;</span>
+    <span class="n">fileName</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">fileRoot</span><span class="si">}{</span><span class="n">fileExt</span><span class="si">}</span><span class="s1">&#39;</span>
+
+    <span class="c1"># Create netCDF file</span>
+    <span class="n">nc_file</span> <span class="o">=</span> <span class="n">nc</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">fileName</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;NETCDF4&#39;</span><span class="p">)</span>
+    <span class="c1"># Add basic information</span>
+    <span class="n">nc_file</span><span class="o">.</span><span class="n">author</span>      <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">author</span><span class="si">}</span><span class="s1">&#39;</span>
+    <span class="n">nc_file</span><span class="o">.</span><span class="n">contact</span>     <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">contact</span><span class="si">}</span><span class="s1">&#39;</span>
+    <span class="n">nc_file</span><span class="o">.</span><span class="n">institution</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">institution</span><span class="si">}</span><span class="s1">&#39;</span>
+    <span class="n">nc_file</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">description</span><span class="si">}</span><span class="s1">&#39;</span>
+    <span class="n">nc_file</span><span class="o">.</span><span class="n">history</span>     <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">history</span><span class="si">}</span><span class="s1">&#39;</span>
+    <span class="n">nc_file</span><span class="o">.</span><span class="n">source</span>      <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">source</span><span class="si">}</span><span class="s1">&#39;</span>
+
+    <span class="c1"># Create dimensions</span>
+    <span class="c1"># Take into account to &#39;cut&#39; pixel at domain border (NBOUNDCUT)</span>
+    <span class="n">drlon</span> <span class="o">=</span> <span class="n">nc_file</span><span class="o">.</span><span class="n">createDimension</span><span class="p">(</span><span class="s1">&#39;rlon&#39;</span><span class="p">,</span><span class="n">nx</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">NBOUNDCUT</span><span class="p">)</span>
+    <span class="n">drlat</span> <span class="o">=</span> <span class="n">nc_file</span><span class="o">.</span><span class="n">createDimension</span><span class="p">(</span><span class="s1">&#39;rlat&#39;</span><span class="p">,</span><span class="n">ny</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">NBOUNDCUT</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">withZlvl</span><span class="p">:</span>
+        <span class="n">dlvl</span> <span class="o">=</span> <span class="n">nc_file</span><span class="o">.</span><span class="n">createDimension</span><span class="p">(</span><span class="s1">&#39;lvl&#39;</span><span class="p">,</span><span class="n">nz</span><span class="p">)</span>
+    <span class="n">dtime</span> <span class="o">=</span> <span class="n">nc_file</span><span class="o">.</span><span class="n">createDimension</span><span class="p">(</span><span class="s1">&#39;time&#39;</span><span class="p">,</span><span class="kc">None</span><span class="p">)</span>
+
+    <span class="n">rlon</span> <span class="o">=</span> <span class="n">nc_file</span><span class="o">.</span><span class="n">createVariable</span><span class="p">(</span><span class="s1">&#39;rlon&#39;</span><span class="p">,</span> <span class="s1">&#39;f4&#39;</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;rlon&#39;</span><span class="p">,),</span>
+                                <span class="n">zlib</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">rlon</span><span class="o">.</span><span class="n">standard_name</span> <span class="o">=</span> <span class="s2">&quot;grid_longitude&quot;</span>
+    <span class="n">rlon</span><span class="o">.</span><span class="n">long_name</span> <span class="o">=</span> <span class="s2">&quot;rotated longitude&quot;</span>
+    <span class="n">rlon</span><span class="o">.</span><span class="n">units</span> <span class="o">=</span> <span class="s2">&quot;degrees&quot;</span>
+    <span class="n">rlon</span><span class="o">.</span><span class="n">axis</span> <span class="o">=</span> <span class="s2">&quot;X&quot;</span>
+    <span class="c1"># Take into account to &#39;cut&#39; pixel at domain border (NBOUNDCUT)</span>
+    <span class="n">rlon_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">SWC_X</span> <span class="o">+</span> <span class="p">(</span><span class="n">i</span><span class="o">*</span><span class="n">dx</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">NBOUNDCUT</span><span class="p">,</span> <span class="n">nx</span><span class="o">-</span><span class="n">NBOUNDCUT</span><span class="p">)])</span>
+    <span class="n">rlon</span><span class="p">[</span><span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">rlon_values</span><span class="p">[</span><span class="o">...</span><span class="p">]</span>
+
+    <span class="n">rlat</span> <span class="o">=</span> <span class="n">nc_file</span><span class="o">.</span><span class="n">createVariable</span><span class="p">(</span><span class="s1">&#39;rlat&#39;</span><span class="p">,</span> <span class="s1">&#39;f4&#39;</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;rlat&#39;</span><span class="p">,),</span>
+                                    <span class="n">zlib</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">rlat</span><span class="o">.</span><span class="n">standard_name</span> <span class="o">=</span> <span class="s2">&quot;grid_latitude&quot;</span>
+    <span class="n">rlat</span><span class="o">.</span><span class="n">long_name</span> <span class="o">=</span> <span class="s2">&quot;rotated latitude&quot;</span>
+    <span class="n">rlat</span><span class="o">.</span><span class="n">units</span> <span class="o">=</span> <span class="s2">&quot;degrees&quot;</span>
+    <span class="n">rlat</span><span class="o">.</span><span class="n">axis</span> <span class="o">=</span> <span class="s2">&quot;Y&quot;</span>
+    <span class="c1"># Take into account to &#39;cut&#39; pixel at domain border (NBOUNDCUT)</span>
+    <span class="n">rlat_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">SWC_Y</span> <span class="o">+</span> <span class="p">(</span><span class="n">i</span><span class="o">*</span><span class="n">dy</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">NBOUNDCUT</span><span class="p">,</span> <span class="n">ny</span><span class="o">-</span><span class="n">NBOUNDCUT</span><span class="p">)])</span>
+    <span class="n">rlat</span><span class="p">[</span><span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">rlat_values</span><span class="p">[</span><span class="o">...</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">calcLatLon</span><span class="p">:</span>
+        <span class="n">rlon2D</span><span class="p">,</span> <span class="n">rlat2D</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">rlon_values</span><span class="p">,</span> <span class="n">rlat_values</span><span class="p">)</span>
+        <span class="n">lat2D</span><span class="p">,</span> <span class="n">lon2D</span> <span class="o">=</span> <span class="n">sloth</span><span class="o">.</span><span class="n">coordTrafo</span><span class="o">.</span><span class="n">undo_grid_rotation</span><span class="p">(</span>
+                <span class="n">rlat</span> <span class="o">=</span> <span class="n">rlat2D</span><span class="p">,</span> <span class="n">rlon</span> <span class="o">=</span> <span class="n">rlon2D</span><span class="p">,</span> 
+                <span class="n">np_lat</span> <span class="o">=</span> <span class="n">rpol_Y</span><span class="p">,</span> <span class="n">np_lon</span> <span class="o">=</span> <span class="n">rpol_X</span><span class="p">)</span>
+
+        <span class="n">lat</span> <span class="o">=</span> <span class="n">nc_file</span><span class="o">.</span><span class="n">createVariable</span><span class="p">(</span><span class="s1">&#39;lat&#39;</span><span class="p">,</span> <span class="s1">&#39;f4&#39;</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;rlat&#39;</span><span class="p">,</span><span class="s1">&#39;rlon&#39;</span><span class="p">),</span>
+                                    <span class="n">zlib</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">lat</span><span class="o">.</span><span class="n">standard_name</span> <span class="o">=</span> <span class="s2">&quot;latitude&quot;</span>
+        <span class="n">lat</span><span class="o">.</span><span class="n">long_name</span> <span class="o">=</span> <span class="s2">&quot;latitude&quot;</span>
+        <span class="n">lat</span><span class="o">.</span><span class="n">units</span> <span class="o">=</span> <span class="s2">&quot;degrees_north&quot;</span>
+        <span class="n">lat</span><span class="o">.</span><span class="n">coordinates</span> <span class="o">=</span> <span class="s2">&quot;lon lat&quot;</span>
+        <span class="n">lat</span><span class="o">.</span><span class="n">grid_mapping</span> <span class="o">=</span> <span class="s2">&quot;rotated_pole&quot;</span>
+        <span class="n">lat</span><span class="p">[</span><span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">lat2D</span><span class="p">[</span><span class="o">...</span><span class="p">]</span>
+
+        <span class="n">lon</span> <span class="o">=</span> <span class="n">nc_file</span><span class="o">.</span><span class="n">createVariable</span><span class="p">(</span><span class="s1">&#39;lon&#39;</span><span class="p">,</span> <span class="s1">&#39;f4&#39;</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;rlat&#39;</span><span class="p">,</span><span class="s1">&#39;rlon&#39;</span><span class="p">),</span>
+                                    <span class="n">zlib</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">lon</span><span class="o">.</span><span class="n">standard_name</span> <span class="o">=</span> <span class="s2">&quot;longitude&quot;</span>
+        <span class="n">lon</span><span class="o">.</span><span class="n">long_name</span> <span class="o">=</span> <span class="s2">&quot;longitude&quot;</span>
+        <span class="n">lon</span><span class="o">.</span><span class="n">units</span> <span class="o">=</span> <span class="s2">&quot;degrees_east&quot;</span>
+        <span class="n">lon</span><span class="o">.</span><span class="n">coordinates</span> <span class="o">=</span> <span class="s2">&quot;lon lat&quot;</span>
+        <span class="n">lon</span><span class="o">.</span><span class="n">grid_mapping</span> <span class="o">=</span> <span class="s2">&quot;rotated_pole&quot;</span>
+        <span class="n">lon</span><span class="p">[</span><span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">lon2D</span><span class="p">[</span><span class="o">...</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1">#print(f&#39;-- no lat lon values used&#39;)</span>
+        <span class="k">pass</span>
+
+    <span class="k">if</span> <span class="n">withZlvl</span><span class="p">:</span>
+        <span class="n">lvl</span> <span class="o">=</span> <span class="n">nc_file</span><span class="o">.</span><span class="n">createVariable</span><span class="p">(</span><span class="s1">&#39;lvl&#39;</span><span class="p">,</span> <span class="s1">&#39;f4&#39;</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;lvl&#39;</span><span class="p">,),</span>
+                      <span class="n">zlib</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">lvl</span><span class="o">.</span><span class="n">standard_name</span> <span class="o">=</span> <span class="s2">&quot;level&quot;</span>
+        <span class="n">lvl</span><span class="o">.</span><span class="n">long_name</span> <span class="o">=</span> <span class="s2">&quot;ParFlow layers&quot;</span>
+        <span class="n">lvl</span><span class="o">.</span><span class="n">units</span> <span class="o">=</span> <span class="s2">&quot;-&quot;</span>
+        <span class="n">lvl</span><span class="o">.</span><span class="n">axis</span> <span class="o">=</span> <span class="s2">&quot;Z&quot;</span>
+        <span class="n">lvl_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">nz</span><span class="p">)</span>
+        <span class="n">lvl</span><span class="p">[</span><span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">lvl_values</span><span class="p">[</span><span class="o">...</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">withTime</span><span class="p">:</span>
+        <span class="n">ncTime</span> <span class="o">=</span> <span class="n">nc_file</span><span class="o">.</span><span class="n">createVariable</span><span class="p">(</span><span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="s1">&#39;f8&#39;</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;time&#39;</span><span class="p">,),</span> <span class="n">zlib</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">ncTime</span><span class="o">.</span><span class="n">units</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">timeUnit</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="n">ncTime</span><span class="o">.</span><span class="n">calendar</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">timeCalendar</span><span class="si">}</span><span class="s1">&#39;</span>
+
+    <span class="c1"># Create grid-mapping for rotated-pole grid</span>
+    <span class="n">rotated_pole</span> <span class="o">=</span> <span class="n">nc_file</span><span class="o">.</span><span class="n">createVariable</span><span class="p">(</span><span class="s1">&#39;rotated_pole&#39;</span><span class="p">,</span> <span class="s1">&#39;i2&#39;</span><span class="p">,</span> <span class="n">zlib</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">rotated_pole</span><span class="o">.</span><span class="n">long_name</span> <span class="o">=</span> <span class="s2">&quot;coordinates of the rotated North Pole&quot;</span>
+    <span class="n">rotated_pole</span><span class="o">.</span><span class="n">grid_mapping_name</span> <span class="o">=</span> <span class="s2">&quot;rotated_latitude_longitude&quot;</span>
+    <span class="n">rotated_pole</span><span class="o">.</span><span class="n">grid_north_pole_latitude</span> <span class="o">=</span> <span class="n">rpol_Y</span>
+    <span class="n">rotated_pole</span><span class="o">.</span><span class="n">grid_north_pole_longitude</span> <span class="o">=</span> <span class="n">rpol_X</span>
+
+    <span class="c1"># Close netCDF file for save and return</span>
+    <span class="n">nc_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">fileName</span></div>
+
+
+<div class="viewcode-block" id="readSa">
+<a class="viewcode-back" href="../../IO.html#sloth.IO.readSa">[docs]</a>
+<span class="k">def</span> <span class="nf">readSa</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Reads data from a file in ASCI format and returns a NumPy array.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    file : str</span>
+<span class="sd">        The file path to read the data from.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    numpy.ndarray</span>
+<span class="sd">        A NumPy array containing the data read from the file.</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    &gt;&gt;&gt; data = readSa(&#39;data.txt&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; print(data)</span>
+<span class="sd">    [[1.2 3.4]</span>
+<span class="sd">     [5.6 7.8]]</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+        <span class="n">nx</span><span class="p">,</span> <span class="n">ny</span><span class="p">,</span> <span class="n">nz</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">header</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">))</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">genfromtxt</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">nz</span><span class="p">,</span> <span class="n">ny</span><span class="p">,</span> <span class="n">nx</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">data</span></div>
+
+
+<div class="viewcode-block" id="writeSa">
+<a class="viewcode-back" href="../../IO.html#sloth.IO.writeSa">[docs]</a>
+<span class="k">def</span> <span class="nf">writeSa</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Writes data to a file in ASCI format.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    file : str</span>
+<span class="sd">        The file path to write the data to.</span>
+<span class="sd">    data : numpy.ndarray</span>
+<span class="sd">        The NumPy array containing the data to be written.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    &gt;&gt;&gt; data = np.array([[1.2, 3.4], [5.6, 7.8]])</span>
+<span class="sd">    &gt;&gt;&gt; writeSa(&#39;output.txt&#39;, data)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">nz</span><span class="p">,</span> <span class="n">ny</span><span class="p">,</span> <span class="n">nx</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">nx</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">ny</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">nz</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="c1"># Below should be more easy with a flatten array...</span>
+        <span class="c1"># But how to flatt? C or F order? </span>
+        <span class="c1"># If knowen and tested change below.</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nz</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ny</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nx</span><span class="p">):</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">data</span><span class="p">[</span><span class="n">k</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Niklas WAGNER.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

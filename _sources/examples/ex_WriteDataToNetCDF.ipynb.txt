@@ -1,0 +1,264 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "id": "ccb262f3-e639-491c-9818-53c66fca12fa",
+   "metadata": {},
+   "source": [
+    "# How to write data in netCDF format.\n",
+    "\n",
+    "netCDF is a standalone file format, meaning every meta-information needed to \n",
+    "work with the data inside the netCDF file (units, descriptions, source, author, \n",
+    "coordinates, etc), has to be provided with the netCDF files itself.\n",
+    "To achieve this one has to provide those meta-information already while \n",
+    "writing / creating the netCDF file."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "95fd5822-d2fc-455b-9a5f-42ef9082140a",
+   "metadata": {},
+   "source": [
+    "## Preparation\n",
+    "\n",
+    "Before we start, lets prepare some technical things.   \n",
+    "First, we have to make `SLOTH` available to import by Python. If you already have added `SLOTH` to your `PYHTONPATH`, below step is not needed."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "id": "beff1ea5-c2df-4d13-9574-9d488dd8561a",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import os\n",
+    "import sys\n",
+    "\n",
+    "cwd = os.getcwd()\n",
+    "sloth_path = f\"{cwd}/../\"\n",
+    "sys.path.append(sloth_path)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "30bcbf38-be70-4928-a93e-2879178c92d7",
+   "metadata": {},
+   "source": [
+    "Second, we need to import all libraries needed in the following example."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "id": "09ccc0c6-51f2-4779-ad55-a4bb5d37dfce",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import netCDF4 as nc\n",
+    "import numpy as np\n",
+    "import datetime as dt\n",
+    "import sloth.IO"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "a82b7e7a-2152-4a74-b9b2-b40ad6e5826d",
+   "metadata": {},
+   "source": [
+    "Define a target file, where to store the netCDF file"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "id": "f16dca73-e804-40f9-86ca-640892038ba0",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "saveFile = '../data/examples_Write2NetCDF_short.nc'"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "edacb7a1-b13a-43c1-a089-875c9a71b12c",
+   "metadata": {},
+   "source": [
+    "Use **SLOTH** to generate the target netCDF file.   "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "id": "6e56dd81-07ab-4253-bc53-963948fbe8ca",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "DEBUG: nc_file\n",
+      "<class 'netCDF4._netCDF4.Dataset'>\n",
+      "root group (NETCDF4 data model, file format HDF5):\n",
+      "    author: Niklas WAGNER\n",
+      "    contact: n.wagner@fz-juelich.de\n",
+      "    institution: FZJ - IBG-3\n",
+      "    description: Write a short description of your data to ship with the netCDF files!\n",
+      "    history: Created: 2023-09-04 11:48\n",
+      "    source: add source here\n",
+      "    dimensions(sizes): rlon(2000), rlat(2000), time(0)\n",
+      "    variables(dimensions): float32 rlon(rlon), float32 rlat(rlat), int16 rotated_pole()\n",
+      "    groups: \n"
+     ]
+    }
+   ],
+   "source": [
+    "netCDFFileName = sloth.IO.createNetCDF(saveFile, domain='DE06', \n",
+    "\tauthor='Niklas WAGNER', contact='n.wagner@fz-juelich.de',\n",
+    "\tinstitution='FZJ - IBG-3', history=f'Created: {dt.datetime.now().strftime(\"%Y-%m-%d %H:%M\")}',\n",
+    "\tdescription='Write a short description of your data to ship with the netCDF files!',\n",
+    "\tsource='add source here')\n",
+    "with nc.Dataset(netCDFFileName, 'a') as nc_file:\n",
+    "    print(f'DEBUG: nc_file\\n{nc_file}')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "4e4072cf-092a-4c8e-972e-f14ffb682f1d",
+   "metadata": {},
+   "source": [
+    "The used function (`sloth.IO.createNetCDF`) does collect some meta information as e.g. the author name and e-mail address, which are directly stored with the created netCDF file, to not get lost. Further the function does take the target domain as argument (`domain='DE06'`), to directly attach the correct axis and coordinates to the target netCDF file.    \n",
+    "The target domain could be a keyword (as `DE06` above) or the full path to a grid-description file as used by [CDO](https://code.mpimet.mpg.de/projects/cdo/embedded/cdo.pdf). The keywords are simple predefined, frequently used griddes files shipped with **SLOTH** under [sloth/configs/](https://github.com/HPSCTerrSys/SLOTH/tree/master/sloth/configs)."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "2b3558f7-d587-41b5-b8d8-27c15a40b219",
+   "metadata": {},
+   "source": [
+    "Generate some random example data, open the netCDF file and store the example data as a new variable called `TestData` with the netCDF file"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "id": "e2737c1a-2068-4e92-b28f-bc2adcacb034",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# create example data to store with the netCDF file:\n",
+    "# using 5 time steps, and nx, ny of DE05 grid\n",
+    "np.random.seed(42)\n",
+    "data = np.random.rand(5,2000,2000)\n",
+    "\n",
+    "# Create the actual variable we want to store the data at.\n",
+    "with nc.Dataset(netCDFFileName, 'a') as nc_file:\n",
+    "\t# Name of the variable: 'TestData'\n",
+    "\tncVar = nc_file.createVariable('TestData', 'f4', ('time', 'rlat', 'rlon',),\n",
+    "\t                                fill_value=-9999,\n",
+    "\t                                zlib=True)\n",
+    "\tncVar.standard_name = 'test_name'\n",
+    "\tncVar.long_name = 'variable to test writing netCDF'\n",
+    "\tncVar.units ='-'\n",
+    "\tncVar.grid_mapping = 'rotated_pole'\n",
+    "\n",
+    "\tncTime = nc_file.createVariable('time', 'i2', ('time',))\n",
+    "\tncTime.standard_name = 'time'\n",
+    "\tncTime.units = 'days since 1979-01-01 00:00:00'\n",
+    "\tncTime.calendar = '365_day'\n",
+    "\n",
+    "\tncVar[...] = data[...]\n",
+    "\tncTime[...] = np.arange(data.shape[0])"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "082b7f21-0206-45a9-9144-cf0042219d61",
+   "metadata": {},
+   "source": [
+    "Check the generated data with `ncdump -h`\n",
+    "\n",
+    "```\n",
+    ">> ncdump -h ../data/examples_Write2NetCDF_short.nc                                                                                           \n",
+    "netcdf examples_Write2NetCDF_short {\n",
+    "dimensions:\n",
+    "        rlon = 2000 ;\n",
+    "        rlat = 2000 ;\n",
+    "        time = UNLIMITED ; // (5 currently)\n",
+    "variables:\n",
+    "        float rlon(rlon) ;\n",
+    "                rlon:standard_name = \"grid_longitude\" ;\n",
+    "                rlon:long_name = \"rotated longitude\" ;\n",
+    "                rlon:units = \"degrees\" ;\n",
+    "                rlon:axis = \"X\" ;\n",
+    "        float rlat(rlat) ;\n",
+    "                rlat:standard_name = \"grid_latitude\" ;\n",
+    "                rlat:long_name = \"rotated latitude\" ;\n",
+    "                rlat:units = \"degrees\" ;\n",
+    "                rlat:axis = \"Y\" ;\n",
+    "        short rotated_pole ;\n",
+    "                rotated_pole:long_name = \"coordinates of the rotated North Pole\" ;\n",
+    "                rotated_pole:grid_mapping_name = \"rotated_latitude_longitude\" ;\n",
+    "                rotated_pole:grid_north_pole_latitude = 39.25 ;\n",
+    "                rotated_pole:grid_north_pole_longitude = -162. ;\n",
+    "        float TestData(time, rlat, rlon) ;\n",
+    "                TestData:_FillValue = -9999.f ;\n",
+    "                TestData:standard_name = \"test_name\" ;\n",
+    "                TestData:long_name = \"variable to test writing netCDF\" ;\n",
+    "                TestData:units = \"-\" ;\n",
+    "                TestData:grid_mapping = \"rotated_pole\" ;\n",
+    "        short time(time) ;\n",
+    "                time:standard_name = \"time\" ;\n",
+    "                time:units = \"days since 1979-01-01 00:00:00\" ;\n",
+    "                time:calendar = \"365_day\" ;\n",
+    "\n",
+    "// global attributes:\n",
+    "                :author = \"Niklas WAGNER\" ;\n",
+    "                :contact = \"n.wagner@fz-juelich.de\" ;\n",
+    "                :institution = \"FZJ - IBG-3\" ;\n",
+    "                :description = \"Write a short description of your data to ship with the netCDF files!\" ;                                                                                                  \n",
+    "                :history = \"Created: 2023-09-04 11:37\" ;\n",
+    "                :source = \"add source here\" ;\n",
+    "}\n",
+    "\n",
+    "```"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "e0527fb1-eb33-4e23-89be-210025728891",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "default_NWA",
+   "language": "python",
+   "name": "default_nwa"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.10.4"
+  },
+  "widgets": {
+   "application/vnd.jupyter.widget-state+json": {
+    "state": {},
+    "version_major": 2,
+    "version_minor": 0
+   }
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}

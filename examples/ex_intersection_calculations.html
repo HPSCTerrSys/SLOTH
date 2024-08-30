@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calculating the total subsurface storage anomalies using geopandas &mdash; SLOTH  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Maintenance" href="../content/maintenance.html" />
+    <link rel="prev" title="How to write data in netCDF format." href="ex_WriteDataToNetCDF.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            SLOTH
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">SLOTH:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../README.html">Welcome to SLOTH</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Functions:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../coordTrafo.html">coordTrafo.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../toolBox.html">toolBox.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../SanityCheck.html">SanityCheck.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../IO.html">IO.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../analysis.html">analysis.py</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Classes:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../mapper.html">mapper.py</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="README.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ex_RotatedCoordinates.html">Rotated Coordinates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ex_SanityCheck.html">SanityCheck</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ex_WriteDataToNetCDF.html">How to write data in netCDF format.</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Calculating the total subsurface storage anomalies using geopandas</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Maintenance:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../content/maintenance.html">Maintenance</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">SLOTH</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Calculating the total subsurface storage anomalies using geopandas</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/examples/ex_intersection_calculations.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section class="tex2jax_ignore mathjax_ignore" id="calculating-the-total-subsurface-storage-anomalies-using-geopandas">
+<h1>Calculating the total subsurface storage anomalies using geopandas<a class="headerlink" href="#calculating-the-total-subsurface-storage-anomalies-using-geopandas" title="Link to this heading"></a></h1>
+<p>In this example spatial mean monthly total subsurface storage for each federal state of Germany from 2011 until 2021
+will be calculated taking into account how much (ratio) of the gridpoints
+is actually being intersected
+inside each federal state.</p>
+<p>Before starting it is important to import the needed libraries. <br>
+Make sure to make geopandas and SLOTH available to import in python. If you already have added SLOTH to your PYHTONPATH, below step is not needed.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="n">cwd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+<span class="n">sloth_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">cwd</span><span class="si">}</span><span class="s2">/../&quot;</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sloth_path</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
+<span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="kn">import</span> <span class="n">Polygon</span>
+<span class="kn">import</span> <span class="nn">sloth.toolBox</span> 
+</pre></div>
+</div>
+</div>
+</div>
+<p>The paths needed for the anomalies calculations are prepared next.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">path</span> <span class="o">=</span> <span class="s1">&#39;//p/scratch/pfgpude05/belleflamme1/sim/ADAPTER_DE05_ECMWF-HRES_detforecast__FZJ-IBG3-ParFlowCLM380D_v01bJuwelsGpuProdClimatologyTl_PRhourly/postpro/data/&#39;</span>
+<span class="n">fname</span><span class="o">=</span> <span class="s1">&#39;tss_DE05_ECMWF-HRES_hindcast_r1i1p2_FZJ-IBG3-ParFlowCLM380_hgfadapter-h00-v3_1hr_*-*.nc&#39;</span>
+<span class="n">fname_tssAVE</span> <span class="o">=</span> <span class="s1">&#39;tssAve_DE05_ECMWF-HRES_hindcast_r1i1p2_FZJ-IBG3-ParFlowCLM380_hgfadapter-h00-v3_1hr_reference-year-2011-2021.nc&#39;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>In the following step all files will be compiled together and the monthly total subsurface <br>
+storage is calculated.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ds_tss</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">open_mfdataset</span><span class="p">(</span><span class="n">path</span><span class="o">+</span><span class="n">fname</span><span class="p">,</span> <span class="n">decode_times</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">ds_tss_mon</span> <span class="o">=</span> <span class="n">ds_tss</span><span class="o">.</span><span class="n">resample</span><span class="p">({</span><span class="s1">&#39;time&#39;</span><span class="p">:</span> <span class="s1">&#39;1MS&#39;</span><span class="p">})</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>  <span class="c1"># calculate the monthly mean</span>
+<span class="n">df_tss_mon</span> <span class="o">=</span> <span class="n">ds_tss_mon</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">()</span>
+<span class="n">df_tss_mon</span> <span class="o">=</span> <span class="n">df_tss_mon</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>  <span class="c1"># the values here represent the monthly tts for the whole 2000*2000 grid</span>
+<span class="n">df_tss_mon_sorted</span><span class="o">=</span><span class="n">df_tss_mon</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>For calculating the anomalies, the long term total subsurface storage is needed and calculated next.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ds_tssAVE</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">open_mfdataset</span><span class="p">(</span><span class="n">path</span> <span class="o">+</span> <span class="n">fname_tssAVE</span><span class="p">,</span> <span class="n">engine</span><span class="o">=</span><span class="s2">&quot;netcdf4&quot;</span><span class="p">,</span> <span class="n">decode_times</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">ds_tssAVE</span> <span class="o">=</span> <span class="n">ds_tssAVE</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">&#39;rotated_pole&#39;</span><span class="p">)</span>
+<span class="n">ds_tssAVE_mon</span> <span class="o">=</span> <span class="n">ds_tssAVE</span><span class="o">.</span><span class="n">resample</span><span class="p">({</span><span class="s1">&#39;time&#39;</span><span class="p">:</span> <span class="s1">&#39;1MS&#39;</span><span class="p">})</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>  
+<span class="n">df_tssAVE_mon</span> <span class="o">=</span> <span class="n">ds_tssAVE_mon</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">()</span>
+<span class="n">df_tssAVE_mon</span> <span class="o">=</span> <span class="n">df_tssAVE_mon</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>A dataframe is created with the lons and lats of the 2000*2000 grid (the domain that contains the total subsurface storage) in order to add the calculated anomalies later to this dataframe.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df_anomaly</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;lon&#39;</span><span class="p">,</span>
+                                   <span class="s1">&#39;lat&#39;</span><span class="p">,])</span>
+<span class="n">df_anomaly</span><span class="p">[</span><span class="s1">&#39;lon&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_tss_mon_sorted</span><span class="p">[</span><span class="s1">&#39;lon&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">4000000</span><span class="p">]</span>
+<span class="n">df_anomaly</span><span class="p">[</span><span class="s1">&#39;lat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_tss_mon_sorted</span><span class="p">[</span><span class="s1">&#39;lat&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">4000000</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>The final step is to calculate the anomalies, in this loop the anomalies for each month from 2011-2022 for each grid is calculated, it loops through the years and months and add the values in a column, which means for each month a column with its anomalies values will be added.
+t</p>
+<p>As shown below, the dataframe is prepared as follows:</p>
+<ul class="simple">
+<li><p>each row represents a grid point in the domain</p></li>
+<li><p>the columns contains information on lon and lat as well as anomalies for each month from 2011 until 2021</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df_anomaly</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>lon</th>
+      <th>lat</th>
+      <th>2011_1</th>
+      <th>2011_2</th>
+      <th>2011_3</th>
+      <th>2011_4</th>
+      <th>2011_5</th>
+      <th>2011_6</th>
+      <th>2011_7</th>
+      <th>2011_8</th>
+      <th>...</th>
+      <th>2022_3</th>
+      <th>2022_4</th>
+      <th>2022_5</th>
+      <th>2022_6</th>
+      <th>2022_7</th>
+      <th>2022_8</th>
+      <th>2022_9</th>
+      <th>2022_10</th>
+      <th>2022_11</th>
+      <th>2022_12</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>2.864156</td>
+      <td>44.254330</td>
+      <td>-0.455078</td>
+      <td>-0.175781</td>
+      <td>0.312500</td>
+      <td>-11.029297</td>
+      <td>-37.771484</td>
+      <td>-26.111328</td>
+      <td>16.777344</td>
+      <td>65.214844</td>
+      <td>...</td>
+      <td>-0.265625</td>
+      <td>4.953125</td>
+      <td>-23.765625</td>
+      <td>-55.781250</td>
+      <td>-37.515625</td>
+      <td>-91.335938</td>
+      <td>-103.468750</td>
+      <td>-117.330078</td>
+      <td>-125.214844</td>
+      <td>-57.529297</td>
+    </tr>
+    <tr>
+      <th>127800604</th>
+      <td>4.254391</td>
+      <td>48.737358</td>
+      <td>-0.806641</td>
+      <td>-0.367188</td>
+      <td>0.195312</td>
+      <td>-9.496094</td>
+      <td>-33.369141</td>
+      <td>-19.093750</td>
+      <td>20.230469</td>
+      <td>51.841797</td>
+      <td>...</td>
+      <td>-0.441406</td>
+      <td>4.152344</td>
+      <td>-19.548828</td>
+      <td>-45.017578</td>
+      <td>-23.996094</td>
+      <td>-75.730469</td>
+      <td>-86.578125</td>
+      <td>-95.554688</td>
+      <td>-96.341797</td>
+      <td>-27.708984</td>
+    </tr>
+    <tr>
+      <th>170586722</th>
+      <td>4.320573</td>
+      <td>51.805782</td>
+      <td>-0.154297</td>
+      <td>-0.035156</td>
+      <td>0.207031</td>
+      <td>-4.126953</td>
+      <td>-6.591797</td>
+      <td>3.384766</td>
+      <td>16.972656</td>
+      <td>15.625000</td>
+      <td>...</td>
+      <td>-0.224609</td>
+      <td>1.564453</td>
+      <td>-10.769531</td>
+      <td>-14.166016</td>
+      <td>-4.728516</td>
+      <td>-36.582031</td>
+      <td>-32.123047</td>
+      <td>-2.962891</td>
+      <td>-0.312500</td>
+      <td>-0.189453</td>
+    </tr>
+    <tr>
+      <th>646492778</th>
+      <td>15.528274</td>
+      <td>47.738449</td>
+      <td>-0.394531</td>
+      <td>-0.123047</td>
+      <td>0.328125</td>
+      <td>-10.277344</td>
+      <td>-37.744141</td>
+      <td>-24.435547</td>
+      <td>20.156250</td>
+      <td>64.380859</td>
+      <td>...</td>
+      <td>-0.312500</td>
+      <td>4.826172</td>
+      <td>-24.535156</td>
+      <td>-53.386719</td>
+      <td>-30.810547</td>
+      <td>-84.294922</td>
+      <td>-97.890625</td>
+      <td>-110.275391</td>
+      <td>-112.976562</td>
+      <td>-38.738281</td>
+    </tr>
+    <tr>
+      <th>22256262</th>
+      <td>2.113726</td>
+      <td>48.209255</td>
+      <td>-0.347656</td>
+      <td>-0.041016</td>
+      <td>0.251953</td>
+      <td>-10.488281</td>
+      <td>-37.468750</td>
+      <td>-23.828125</td>
+      <td>21.552734</td>
+      <td>63.205078</td>
+      <td>...</td>
+      <td>-0.408203</td>
+      <td>4.753906</td>
+      <td>-23.535156</td>
+      <td>-51.101562</td>
+      <td>-29.115234</td>
+      <td>-81.833984</td>
+      <td>-94.062500</td>
+      <td>-104.388672</td>
+      <td>-103.269531</td>
+      <td>-26.167969</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>9990224</th>
+      <td>0.359184</td>
+      <td>52.314259</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>566925424</th>
+      <td>13.920066</td>
+      <td>46.913773</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>47866008</th>
+      <td>2.631417</td>
+      <td>48.333389</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>567278116</th>
+      <td>14.007371</td>
+      <td>45.914566</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>567809288</th>
+      <td>13.674760</td>
+      <td>49.967464</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+<p>4000000 rows × 146 columns</p>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>   <span class="n">anomaly_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">list_year</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2011</span><span class="p">,</span> <span class="mi">2012</span><span class="p">,</span> <span class="mi">2013</span><span class="p">,</span> <span class="mi">2014</span><span class="p">,</span>
+                 <span class="mi">2015</span><span class="p">,</span> <span class="mi">2016</span><span class="p">,</span> <span class="mi">2017</span><span class="p">,</span> <span class="mi">2018</span><span class="p">,</span>
+                 <span class="mi">2019</span><span class="p">,</span> <span class="mi">2020</span><span class="p">,</span> <span class="mi">2021</span><span class="p">,</span> <span class="mi">2022</span>
+    <span class="p">]</span>
+    <span class="n">list_month</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span>
+                  <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span>
+                  <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span>
+                  <span class="mi">10</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span>
+    <span class="p">]</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;calculating the anomalies&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">list_year</span><span class="p">)):</span>
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">list_month</span><span class="p">)):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">list_month</span><span class="p">[</span><span class="n">n</span><span class="p">])</span>
+            <span class="n">start_mon</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">list_year</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s1">-</span><span class="si">{</span><span class="n">list_month</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="si">}</span><span class="s1">-01&#39;</span>
+            <span class="n">end_mon</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">list_year</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s1">-</span><span class="si">{</span><span class="n">list_month</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="si">}</span><span class="s1">-01&#39;</span>
+            <span class="n">start_mon</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">start_mon</span><span class="p">)</span>
+            <span class="n">end_mon</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">end_mon</span><span class="p">)</span>
+            <span class="n">start_mon_tssAVE</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;2017-</span><span class="si">{</span><span class="n">list_month</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="si">}</span><span class="s1">-01&#39;</span>
+            <span class="n">end_mon_tssAVE</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;2017-</span><span class="si">{</span><span class="n">list_month</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="si">}</span><span class="s1">-01&#39;</span>
+            <span class="n">start_mon_tssAVE</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">start_mon_tssAVE</span><span class="p">)</span>
+            <span class="n">end_mon_tssAVE</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">end_mon_tssAVE</span><span class="p">)</span>
+            <span class="n">df_tss_yr</span> <span class="o">=</span> <span class="n">df_tss_mon</span><span class="p">[</span><span class="n">df_tss_mon</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="n">start_mon</span><span class="p">,</span> <span class="n">end_mon</span><span class="p">)]</span>
+            <span class="n">df_tss_yr</span> <span class="o">=</span> <span class="n">df_tss_yr</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+            <span class="n">df_tssAVE_mon_yr</span> <span class="o">=</span> <span class="n">df_tssAVE_mon</span><span class="p">[</span><span class="n">df_tssAVE_mon</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="n">start_mon_tssAVE</span><span class="p">,</span> <span class="n">end_mon_tssAVE</span><span class="p">)]</span>
+            <span class="n">df_tssAVE_mon_yr</span> <span class="o">=</span> <span class="n">df_tssAVE_mon_yr</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+            <span class="n">df_anom</span> <span class="o">=</span> <span class="n">df_tss_yr</span><span class="p">[</span><span class="s1">&#39;tss&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">df_tssAVE_mon_yr</span><span class="p">[</span><span class="s1">&#39;tssAve&#39;</span><span class="p">]</span>
+
+            <span class="n">df_anomaly</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">list_year</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">list_month</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_anom</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">df_anomaly</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s1">&#39;/p/scratch/pfgpude05/hammoudeh1/sim/ADAPTER_DE05_ECMWF-HRES_detforecast__FZJ-IBG3-ParFlowCLM380D_v01bJuwelsGpuProdClimatologyTl_PRhourly/postpro/data/time_series/tss_anomalies_DE05_2021-20230823.csv&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>After the anomalies are calculated, the paths for the data are prepared.<br>
+Data needed:</p>
+<ul class="simple">
+<li><p>Data containing information on the total subsurafce storage to calculate the monthly anomaly.</p></li>
+<li><p>Dataframe (can also be a nectdf or any other data type) containing infromation on the four longitudes and latitudes that surrounds each gridpoint in the source dataframe. this information is needed to be able to create polygons for each gridpoint.</p></li>
+<li><p>Shapefile fo Germany containing all the federal stations.</p></li>
+</ul>
+<p>Another information is needed such as:</p>
+<ul class="simple">
+<li><p>Projected coordinate reference system (utm).</p></li>
+<li><p>Number of years.</p></li>
+<li><p>Number of days/months etc.</p></li>
+<li><p>A path to save the output.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df_data</span><span class="o">=</span> <span class="n">df_anomaly</span>
+<span class="c1">#df_data = &#39;/p/scratch/pfgpude05/hammoudeh1/sim/ADAPTER_DE05_ECMWF-HRES_detforecast__FZJ-IBG3-ParFlowCLM380D_v01bJuwelsGpuProdClimatologyTl_PRhourly/postpro/data/time_series/tss_anomalies_DE05_2021-20230823.csv&#39;</span>
+<span class="n">corners</span> <span class="o">=</span> <span class="s1">&#39;/p/project/pfgpude05/hammoudeh1/geo_data/corner_grids_DE06/corner_grids_DE06.nc&#39;</span>
+<span class="n">area_of_interest</span> <span class="o">=</span><span class="s1">&#39;/p/project/pfgpude05/hammoudeh1/geo_data/nuts2500/2500_NUTS1.shp&#39;</span>
+<span class="n">crs_utm</span> <span class="o">=</span> <span class="s1">&#39;EPSG:25832&#39;</span>
+<span class="n">nr_yr</span> <span class="o">=</span><span class="mi">12</span>
+<span class="n">nr_entries</span> <span class="o">=</span> <span class="mi">12</span>
+<span class="n">save_dir</span> <span class="o">=</span> <span class="s1">&#39;/p/scratch/pfgpude05/hammoudeh1/sim/ADAPTER_DE05_ECMWF-HRES_detforecast__FZJ-IBG3-ParFlowCLM380D_v01bJuwelsGpuProdClimatologyTl_PRhourly/geo_data/anomalies_geopandas/NUTS3_tss_monthly_anomalies_DE06_ECMWF-HRES_hindcast_r1i1p2_FZJ-IBG3-ParFlowCLM380_hgfadapter-h00-v3_1hr/NUTS1_tss_monthly_anomalies_DE06_Parflow_SH_v1.shp&#39;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">shapefile</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>NUTS_LEVEL</th>
+      <th>NUTS_CODE</th>
+      <th>NUTS_NAME</th>
+      <th>geometry</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>DE1</td>
+      <td>Baden-Württemberg</td>
+      <td>MULTIPOLYGON (((591826.754 5434806.578, 591502...</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1</td>
+      <td>DE2</td>
+      <td>Bayern</td>
+      <td>POLYGON ((759919.057 5493994.847, 759656.392 5...</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1</td>
+      <td>DE3</td>
+      <td>Berlin</td>
+      <td>POLYGON ((812675.236 5831469.065, 813573.397 5...</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1</td>
+      <td>DE4</td>
+      <td>Brandenburg</td>
+      <td>POLYGON ((785946.492 5753692.786, 785689.525 5...</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1</td>
+      <td>DE5</td>
+      <td>Bremen</td>
+      <td>MULTIPOLYGON (((471292.489 5932922.759, 470685...</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>1</td>
+      <td>DE6</td>
+      <td>Hamburg</td>
+      <td>MULTIPOLYGON (((463107.577 5977587.614, 462620...</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>1</td>
+      <td>DE7</td>
+      <td>Hessen</td>
+      <td>POLYGON ((492636.671 5483361.184, 491734.166 5...</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>1</td>
+      <td>DE8</td>
+      <td>Mecklenburg-Vorpommern</td>
+      <td>MULTIPOLYGON (((713722.584 6019028.989, 714041...</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>1</td>
+      <td>DE9</td>
+      <td>Niedersachsen</td>
+      <td>MULTIPOLYGON (((508518.071 5806884.353, 508505...</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>1</td>
+      <td>DEA</td>
+      <td>Nordrhein-Westfalen</td>
+      <td>POLYGON ((373588.503 5612322.662, 372409.785 5...</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>1</td>
+      <td>DEB</td>
+      <td>Rheinland-Pfalz</td>
+      <td>POLYGON ((420154.696 5433007.302, 418891.303 5...</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>1</td>
+      <td>DEC</td>
+      <td>Saarland</td>
+      <td>POLYGON ((361553.412 5446433.660, 360354.267 5...</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>1</td>
+      <td>DED</td>
+      <td>Sachsen</td>
+      <td>POLYGON ((753976.948 5653939.390, 753924.450 5...</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>1</td>
+      <td>DEE</td>
+      <td>Sachsen-Anhalt</td>
+      <td>POLYGON ((669178.456 5690646.781, 668139.009 5...</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>1</td>
+      <td>DEF</td>
+      <td>Schleswig-Holstein</td>
+      <td>MULTIPOLYGON (((427783.160 6003522.451, 427486...</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>1</td>
+      <td>DEG</td>
+      <td>Thüringen</td>
+      <td>POLYGON ((726352.625 5648413.044, 726600.494 5...</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>The ‘NUTS_NAME’ from the table below, will be used for dissovling the field in the end. <br>
+That’s why this information is needed as an input in the tool</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Name_area</span> <span class="o">=</span> <span class="s2">&quot;NUTS_NAME&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>The intersection_calculations tool is imported from sloth.toolbox</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sloth</span><span class="o">.</span><span class="n">toolbox</span><span class="o">.</span><span class="n">intersection_calculations</span><span class="p">(</span><span class="n">df_data</span><span class="p">,</span> <span class="n">corners</span><span class="p">,</span> <span class="n">area_of_interest</span><span class="p">,</span> <span class="n">Name_area</span><span class="p">,</span> <span class="n">crs_utm</span><span class="p">,</span> <span class="n">nr_yr</span><span class="p">,</span> <span class="n">nr_entries</span><span class="p">,</span> <span class="n">save_dir</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>The result is shown in the table below:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dissolve_gdf</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">&#39;index_left&#39;</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;columns&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>geometry</th>
+      <th>lon</th>
+      <th>lat</th>
+      <th>2011_1</th>
+      <th>2011_2</th>
+      <th>2011_3</th>
+      <th>2011_4</th>
+      <th>2011_5</th>
+      <th>2011_6</th>
+      <th>2011_7</th>
+      <th>...</th>
+      <th>2022_7</th>
+      <th>2022_8</th>
+      <th>2022_9</th>
+      <th>2022_10</th>
+      <th>2022_11</th>
+      <th>2022_12</th>
+      <th>area</th>
+      <th>NUTS_LEVEL</th>
+      <th>area_intersected</th>
+      <th>weight</th>
+    </tr>
+    <tr>
+      <th>NUTS_NAME</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Baden-Württemberg</th>
+      <td>MULTIPOLYGON (((400493.888 5268816.619, 401103...</td>
+      <td>9.045352</td>
+      <td>48.537956</td>
+      <td>0.999507</td>
+      <td>-2.988537</td>
+      <td>-13.584477</td>
+      <td>-21.015722</td>
+      <td>-57.277115</td>
+      <td>-63.289494</td>
+      <td>-43.851151</td>
+      <td>...</td>
+      <td>-64.984001</td>
+      <td>-93.216202</td>
+      <td>-89.057289</td>
+      <td>-77.876862</td>
+      <td>-81.391617</td>
+      <td>-76.319214</td>
+      <td>374678.085372</td>
+      <td>1.0</td>
+      <td>369487.918176</td>
+      <td>0.986148</td>
+    </tr>
+    <tr>
+      <th>Bayern</th>
+      <td>POLYGON ((507442.465 5491666.064, 507374.615 5...</td>
+      <td>11.420963</td>
+      <td>48.933758</td>
+      <td>1.731518</td>
+      <td>-3.034703</td>
+      <td>-13.670825</td>
+      <td>-21.404711</td>
+      <td>-57.849911</td>
+      <td>-64.082687</td>
+      <td>-44.784664</td>
+      <td>...</td>
+      <td>-63.859665</td>
+      <td>-91.726974</td>
+      <td>-87.553711</td>
+      <td>-76.597458</td>
+      <td>-80.274864</td>
+      <td>-75.176254</td>
+      <td>375050.561093</td>
+      <td>1.0</td>
+      <td>370964.112033</td>
+      <td>0.989103</td>
+    </tr>
+    <tr>
+      <th>Berlin</th>
+      <td>POLYGON ((780348.536 5813302.828, 779911.820 5...</td>
+      <td>13.403963</td>
+      <td>52.500927</td>
+      <td>25.705936</td>
+      <td>25.638256</td>
+      <td>14.032354</td>
+      <td>9.348076</td>
+      <td>-15.815358</td>
+      <td>-17.693853</td>
+      <td>1.582355</td>
+      <td>...</td>
+      <td>-85.105247</td>
+      <td>-108.459457</td>
+      <td>-101.509254</td>
+      <td>-95.753525</td>
+      <td>-108.704613</td>
+      <td>-102.388306</td>
+      <td>375838.643631</td>
+      <td>1.0</td>
+      <td>347783.234208</td>
+      <td>0.925356</td>
+    </tr>
+    <tr>
+      <th>Brandenburg</th>
+      <td>POLYGON ((676049.159 5877864.309, 676109.609 5...</td>
+      <td>13.397862</td>
+      <td>52.468426</td>
+      <td>5.543557</td>
+      <td>0.937342</td>
+      <td>-10.016368</td>
+      <td>-17.526293</td>
+      <td>-52.535980</td>
+      <td>-59.144440</td>
+      <td>-40.211243</td>
+      <td>...</td>
+      <td>-63.198277</td>
+      <td>-90.098953</td>
+      <td>-85.329941</td>
+      <td>-75.727402</td>
+      <td>-80.210075</td>
+      <td>-75.104263</td>
+      <td>375848.489952</td>
+      <td>1.0</td>
+      <td>369595.519417</td>
+      <td>0.983361</td>
+    </tr>
+    <tr>
+      <th>Bremen</th>
+      <td>MULTIPOLYGON (((468226.157 5893810.567, 467760...</td>
+      <td>8.736111</td>
+      <td>53.206532</td>
+      <td>-9.506310</td>
+      <td>-12.064992</td>
+      <td>-21.316515</td>
+      <td>-31.167387</td>
+      <td>-75.887642</td>
+      <td>-81.646461</td>
+      <td>-60.356339</td>
+      <td>...</td>
+      <td>-78.357590</td>
+      <td>-107.278130</td>
+      <td>-101.842323</td>
+      <td>-84.059784</td>
+      <td>-87.900513</td>
+      <td>-85.182060</td>
+      <td>374818.598036</td>
+      <td>1.0</td>
+      <td>326689.773857</td>
+      <td>0.871589</td>
+    </tr>
+    <tr>
+      <th>Hamburg</th>
+      <td>MULTIPOLYGON (((551170.414 5928592.519, 550963...</td>
+      <td>10.002545</td>
+      <td>53.550182</td>
+      <td>25.570534</td>
+      <td>26.046181</td>
+      <td>13.929835</td>
+      <td>10.464141</td>
+      <td>-12.814467</td>
+      <td>-16.788189</td>
+      <td>1.120710</td>
+      <td>...</td>
+      <td>-84.439415</td>
+      <td>-104.581825</td>
+      <td>-96.698769</td>
+      <td>-92.634155</td>
+      <td>-105.355164</td>
+      <td>-98.748741</td>
+      <td>374803.502594</td>
+      <td>1.0</td>
+      <td>343649.951681</td>
+      <td>0.916876</td>
+    </tr>
+    <tr>
+      <th>Hessen</th>
+      <td>POLYGON ((420136.833 5536098.325, 419637.142 5...</td>
+      <td>9.029756</td>
+      <td>50.597702</td>
+      <td>-1.622735</td>
+      <td>-6.414443</td>
+      <td>-17.024820</td>
+      <td>-24.803610</td>
+      <td>-62.581284</td>
+      <td>-69.298172</td>
+      <td>-49.687885</td>
+      <td>...</td>
+      <td>-65.227036</td>
+      <td>-94.198318</td>
+      <td>-89.954620</td>
+      <td>-78.154289</td>
+      <td>-81.152153</td>
+      <td>-76.200714</td>
+      <td>375041.337313</td>
+      <td>1.0</td>
+      <td>367454.244201</td>
+      <td>0.979770</td>
+    </tr>
+    <tr>
+      <th>Mecklenburg-Vorpommern</th>
+      <td>MULTIPOLYGON (((617186.776 5910703.204, 616915...</td>
+      <td>12.542992</td>
+      <td>53.756886</td>
+      <td>3.585589</td>
+      <td>-0.735577</td>
+      <td>-11.536910</td>
+      <td>-19.055853</td>
+      <td>-54.574936</td>
+      <td>-60.570900</td>
+      <td>-41.148571</td>
+      <td>...</td>
+      <td>-66.532906</td>
+      <td>-94.190651</td>
+      <td>-89.620071</td>
+      <td>-79.108841</td>
+      <td>-83.113586</td>
+      <td>-77.816010</td>
+      <td>375282.656001</td>
+      <td>1.0</td>
+      <td>364617.468794</td>
+      <td>0.971585</td>
+    </tr>
+    <tr>
+      <th>Niedersachsen</th>
+      <td>MULTIPOLYGON (((354207.146 5814329.405, 354033...</td>
+      <td>9.159881</td>
+      <td>52.761726</td>
+      <td>7.291996</td>
+      <td>3.948156</td>
+      <td>-6.924499</td>
+      <td>-13.796718</td>
+      <td>-47.395435</td>
+      <td>-53.088966</td>
+      <td>-33.938244</td>
+      <td>...</td>
+      <td>-66.691063</td>
+      <td>-93.021286</td>
+      <td>-88.040375</td>
+      <td>-78.674881</td>
+      <td>-84.412430</td>
+      <td>-79.208153</td>
+      <td>374952.406115</td>
+      <td>1.0</td>
+      <td>368999.595577</td>
+      <td>0.984124</td>
+    </tr>
+    <tr>
+      <th>Nordrhein-Westfalen</th>
+      <td>POLYGON ((290655.096 5623782.625, 290656.794 5...</td>
+      <td>7.558647</td>
+      <td>51.475185</td>
+      <td>4.601259</td>
+      <td>0.266528</td>
+      <td>-10.279454</td>
+      <td>-17.371027</td>
+      <td>-52.570518</td>
+      <td>-58.947182</td>
+      <td>-39.851475</td>
+      <td>...</td>
+      <td>-64.477089</td>
+      <td>-91.286812</td>
+      <td>-86.429611</td>
+      <td>-76.440918</td>
+      <td>-80.905113</td>
+      <td>-75.741623</td>
+      <td>375154.023219</td>
+      <td>1.0</td>
+      <td>369483.374360</td>
+      <td>0.984885</td>
+    </tr>
+    <tr>
+      <th>Rheinland-Pfalz</th>
+      <td>POLYGON ((301290.602 5531392.741, 301084.142 5...</td>
+      <td>7.450834</td>
+      <td>49.910480</td>
+      <td>6.048045</td>
+      <td>2.004749</td>
+      <td>-9.018032</td>
+      <td>-16.458361</td>
+      <td>-50.644306</td>
+      <td>-56.789558</td>
+      <td>-37.998516</td>
+      <td>...</td>
+      <td>-64.440720</td>
+      <td>-91.378166</td>
+      <td>-86.539139</td>
+      <td>-76.646225</td>
+      <td>-81.347626</td>
+      <td>-76.340233</td>
+      <td>375094.153727</td>
+      <td>1.0</td>
+      <td>368624.320980</td>
+      <td>0.982752</td>
+    </tr>
+    <tr>
+      <th>Saarland</th>
+      <td>POLYGON ((315507.595 5481970.296, 314910.921 5...</td>
+      <td>6.951203</td>
+      <td>49.383770</td>
+      <td>2.946488</td>
+      <td>-1.885279</td>
+      <td>-12.328921</td>
+      <td>-20.652977</td>
+      <td>-58.255016</td>
+      <td>-63.524227</td>
+      <td>-44.533035</td>
+      <td>...</td>
+      <td>-61.877522</td>
+      <td>-90.718102</td>
+      <td>-88.003914</td>
+      <td>-76.803322</td>
+      <td>-79.527748</td>
+      <td>-73.550659</td>
+      <td>375104.627509</td>
+      <td>1.0</td>
+      <td>359668.655686</td>
+      <td>0.958849</td>
+    </tr>
+    <tr>
+      <th>Sachsen</th>
+      <td>POLYGON ((712923.245 5582183.306, 712733.682 5...</td>
+      <td>13.345225</td>
+      <td>51.048813</td>
+      <td>4.797780</td>
+      <td>-0.519058</td>
+      <td>-11.254671</td>
+      <td>-18.747925</td>
+      <td>-54.531155</td>
+      <td>-61.287735</td>
+      <td>-42.006641</td>
+      <td>...</td>
+      <td>-61.797779</td>
+      <td>-88.396599</td>
+      <td>-83.679886</td>
+      <td>-74.015678</td>
+      <td>-78.097069</td>
+      <td>-72.758545</td>
+      <td>375951.445976</td>
+      <td>1.0</td>
+      <td>368478.593865</td>
+      <td>0.980122</td>
+    </tr>
+    <tr>
+      <th>Sachsen-Anhalt</th>
+      <td>POLYGON ((615254.052 5726743.256, 615250.857 5...</td>
+      <td>11.702046</td>
+      <td>52.007923</td>
+      <td>-10.956268</td>
+      <td>-16.022284</td>
+      <td>-26.324970</td>
+      <td>-35.175495</td>
+      <td>-76.511673</td>
+      <td>-83.026962</td>
+      <td>-63.564831</td>
+      <td>...</td>
+      <td>-60.799084</td>
+      <td>-92.132446</td>
+      <td>-89.499664</td>
+      <td>-74.617950</td>
+      <td>-75.833855</td>
+      <td>-71.662788</td>
+      <td>375364.559161</td>
+      <td>1.0</td>
+      <td>369012.082595</td>
+      <td>0.983077</td>
+    </tr>
+    <tr>
+      <th>Schleswig-Holstein</th>
+      <td>MULTIPOLYGON (((426389.821 6005095.954, 426461...</td>
+      <td>9.806491</td>
+      <td>54.186234</td>
+      <td>8.032061</td>
+      <td>4.532070</td>
+      <td>-6.483582</td>
+      <td>-13.468135</td>
+      <td>-46.871441</td>
+      <td>-52.392162</td>
+      <td>-33.390022</td>
+      <td>...</td>
+      <td>-66.364571</td>
+      <td>-92.719681</td>
+      <td>-87.642197</td>
+      <td>-78.375977</td>
+      <td>-83.884872</td>
+      <td>-78.847504</td>
+      <td>374599.191754</td>
+      <td>1.0</td>
+      <td>363606.684402</td>
+      <td>0.970651</td>
+    </tr>
+    <tr>
+      <th>Thüringen</th>
+      <td>POLYGON ((562083.355 5611197.224, 562099.302 5...</td>
+      <td>11.030182</td>
+      <td>50.901054</td>
+      <td>11.136419</td>
+      <td>8.009848</td>
+      <td>-2.874439</td>
+      <td>-9.569095</td>
+      <td>-42.398903</td>
+      <td>-48.243431</td>
+      <td>-29.178293</td>
+      <td>...</td>
+      <td>-69.037308</td>
+      <td>-94.825653</td>
+      <td>-89.288139</td>
+      <td>-80.275635</td>
+      <td>-86.308487</td>
+      <td>-80.896896</td>
+      <td>375262.305978</td>
+      <td>1.0</td>
+      <td>366870.117407</td>
+      <td>0.977638</td>
+    </tr>
+  </tbody>
+</table>
+<p>16 rows × 151 columns</p>
+</div></div></div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="ex_WriteDataToNetCDF.html" class="btn btn-neutral float-left" title="How to write data in netCDF format." accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../content/maintenance.html" class="btn btn-neutral float-right" title="Maintenance" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Niklas WAGNER.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

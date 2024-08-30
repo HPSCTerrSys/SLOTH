@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>analysis.py &mdash; SLOTH  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="mapper.py" href="mapper.html" />
+    <link rel="prev" title="IO.py" href="IO.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            SLOTH
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">SLOTH:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="README.html">Welcome to SLOTH</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Functions:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="coordTrafo.html">coordTrafo.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="toolBox.html">toolBox.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="SanityCheck.html">SanityCheck.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="IO.html">IO.py</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">analysis.py</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#sloth.analysis.calc_wtd"><code class="docutils literal notranslate"><span class="pre">calc_wtd()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sloth.analysis.calc_wtd_HT"><code class="docutils literal notranslate"><span class="pre">calc_wtd_HT()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sloth.analysis.get_3Dgroundwaterbody_mask"><code class="docutils literal notranslate"><span class="pre">get_3Dgroundwaterbody_mask()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sloth.analysis.get_3Dgroundwaterbody_mask_HT"><code class="docutils literal notranslate"><span class="pre">get_3Dgroundwaterbody_mask_HT()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sloth.analysis.vanGenuchten"><code class="docutils literal notranslate"><span class="pre">vanGenuchten()</span></code></a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Classes:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="mapper.html">mapper.py</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="examples/README.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/ex_RotatedCoordinates.html">Rotated Coordinates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/ex_SanityCheck.html">SanityCheck</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/ex_WriteDataToNetCDF.html">How to write data in netCDF format.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/ex_intersection_calculations.html">Calculating the total subsurface storage anomalies using geopandas</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Maintenance:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="content/maintenance.html">Maintenance</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">SLOTH</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">analysis.py</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/analysis.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-sloth.analysis">
+<span id="analysis-py"></span><h1>analysis.py<a class="headerlink" href="#module-sloth.analysis" title="Link to this heading"></a></h1>
+<p>analysis - submodule of SLOTH</p>
+<p>Description:
+analysis.py is aimed to hold standalone functions used for analysis purpose.
+Basically this are functions calculating some variabels.</p>
+<p>[TBE]</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="sloth.analysis.calc_wtd">
+<span class="sig-prename descclassname"><span class="pre">sloth.analysis.</span></span><span class="sig-name descname"><span class="pre">calc_wtd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">press</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cellDepths</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sloth/analysis.html#calc_wtd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sloth.analysis.calc_wtd" title="Link to this definition"></a></dt>
+<dd><p>Calculate the water table depth.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>press</strong> (<em>ndarray</em>) – Array of pressure values. The dimensions depend on the scenario:
+- For 3D: (z, y, x)
+- For 4D: (t, z, y, x)</p></li>
+<li><p><strong>cellDepths</strong> (<em>ndarray</em>) – Array of cell depths.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>wtd</strong> – Array of water table depths.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The function calculates the water table depth based on the given pressure values
+and cell depths. The water table depth is determined by subtracting the lower most
+pressure values and cell depths from the total column depth.</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>For 3D input, the water table depth is calculated as:</dt><dd><p>wtd = totalColumnDepth - (press[0] + cellDepths[0] * 0.5)</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>For 4D input, assuming a time series of pressure values, the water table depth is calculated as:</dt><dd><p>wtd = totalColumnDepth - (press[:, 0, …] + cellDepths[0] * 0.5)</p>
+</dd>
+</dl>
+</li>
+</ul>
+<p>Negative water table depths are set to 0 using <cite>np.where()</cite>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sloth.analysis.calc_wtd_HT">
+<span class="sig-prename descclassname"><span class="pre">sloth.analysis.</span></span><span class="sig-name descname"><span class="pre">calc_wtd_HT</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">press</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cellDepths</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sloth/analysis.html#calc_wtd_HT"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sloth.analysis.calc_wtd_HT" title="Link to this definition"></a></dt>
+<dd><p>Calculate the water table depth.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>press</strong> (<em>htdarray</em>) – Array of pressure values. The dimensions depend on the scenario:
+- For 3D: (z, y, x)
+- For 4D: (t, z, y, x)</p></li>
+<li><p><strong>cellDepths</strong> (<em>ndarray</em>) – Array of cell depths.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>wtd</strong> – Array of water table depths.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The function calculates the water table depth based on the given pressure values
+and cell depths. The water table depth is determined by subtracting the lower most
+pressure values and cell depths from the total column depth.</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>For 3D input, the water table depth is calculated as:</dt><dd><p>wtd = totalColumnDepth - (press[0] + cellDepths[0] * 0.5)</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>For 4D input, assuming a time series of pressure values, the water table depth is calculated as:</dt><dd><p>wtd = totalColumnDepth - (press[:, 0, …] + cellDepths[0] * 0.5)</p>
+</dd>
+</dl>
+</li>
+</ul>
+<p>Negative water table depths are set to 0 using <cite>np.where()</cite>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sloth.analysis.get_3Dgroundwaterbody_mask">
+<span class="sig-prename descclassname"><span class="pre">sloth.analysis.</span></span><span class="sig-name descname"><span class="pre">get_3Dgroundwaterbody_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">satur</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sloth/analysis.html#get_3Dgroundwaterbody_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sloth.analysis.get_3Dgroundwaterbody_mask" title="Link to this definition"></a></dt>
+<dd><p>Calculate a 3D mask of the groundwater body.</p>
+<p>The groundwater body refers to the volume of a soil column that is continuously
+fully saturated, starting from the very bottom of the model domain (bedrock).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>satur</strong> (<em>ndarray</em>) – Input array representing the saturation level of the soil column.
+Shape: (nz, ny, nx)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>gwb_mask</strong> (<em>ndarray</em>) – Numpy array of the same shape as the ‘satur’ input, where each pixel
+belonging to the groundwater body is assigned a value of 1, and 0 otherwise.
+Shape: (nz, ny, nx)</p></li>
+<li><p><strong>wtd_z_index</strong> (<em>ndarray</em>) – Numpy array of the same 2D shape as the ‘satur’ input (without the z dimension).
+It holds the index of the first unsaturated layer, counted from the bottom/bedrock
+to the top/surface, for each soil column. If the index has a value of N+1, where N
+is the number of layers in the model, the entire column is saturated.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sloth.analysis.get_3Dgroundwaterbody_mask_HT">
+<span class="sig-prename descclassname"><span class="pre">sloth.analysis.</span></span><span class="sig-name descname"><span class="pre">get_3Dgroundwaterbody_mask_HT</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">satur</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sloth/analysis.html#get_3Dgroundwaterbody_mask_HT"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sloth.analysis.get_3Dgroundwaterbody_mask_HT" title="Link to this definition"></a></dt>
+<dd><p>Calculate a 3D mask of the groundwater body.</p>
+<p>The groundwater body refers to the volume of a soil column that is continuously
+fully saturated, starting from the very bottom of the model domain (bedrock).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>satur</strong> (<em>htdarray</em>) – Input array representing the saturation level of the soil column.
+Shape: (nz, ny, nx)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>gwb_mask</strong> (<em>ndarray</em>) – Numpy array of the same shape as the ‘satur’ input, where each pixel
+belonging to the groundwater body is assigned a value of 1, and 0 otherwise.
+Shape: (nz, ny, nx)</p></li>
+<li><p><strong>wtd_z_index</strong> (<em>ndarray</em>) – Numpy array of the same 2D shape as the ‘satur’ input (without the z dimension).
+It holds the index of the first unsaturated layer, counted from the bottom/bedrock
+to the top/surface, for each soil column. If the index has a value of N+1, where N
+is the number of layers in the model, the entire column is saturated.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sloth.analysis.vanGenuchten">
+<span class="sig-prename descclassname"><span class="pre">sloth.analysis.</span></span><span class="sig-name descname"><span class="pre">vanGenuchten</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">refP</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sSat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sRes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nVanG</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aVanG</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sloth/analysis.html#vanGenuchten"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sloth.analysis.vanGenuchten" title="Link to this definition"></a></dt>
+<dd><p>Calculate the degree of saturation as a function of the pressure head.</p>
+<p>The degree of saturation is calculated as a function of the pressure head
+according to the M. Th. van Genuchten equation.</p>
+<p>Reference:
+M. Th. van Genuchten. “A Closed‐form Equation for Predicting the Hydraulic Conductivity
+of Unsaturated Soils.” Soil Science Society of America Journal, 1980.
+DOI: <a class="reference external" href="https://doi.org/10.2136/sssaj1980.03615995004400050002x">https://doi.org/10.2136/sssaj1980.03615995004400050002x</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>refP</strong> (<em>ndarray</em>) – Pressure head. [L]</p></li>
+<li><p><strong>sSat</strong> (<em>float</em>) – Relative saturated water content. [-]</p></li>
+<li><p><strong>sRes</strong> (<em>float</em>) – Relative residual saturation. [-]</p></li>
+<li><p><strong>nVanG</strong> (<em>float</em>) – Non-linearity coefficient of the soil. [-]</p></li>
+<li><p><strong>aVanG</strong> (<em>float</em>) – Air entry value of the soil. [L^-1]</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>vanG</strong> – Degree of saturation.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This function calculates the degree of saturation as a function of the pressure head
+using the van Genuchten equation. The van Genuchten equation relates the degree of
+saturation to the pressure head and soil-specific parameters.</p>
+<p>The equation is given by:</p>
+<blockquote>
+<div><p>vanG = ((sSat - sRes) / (1 + (aVanG * np.absolute(refP)) ** nVanG) ** mVanG) + sRes</p>
+</div></blockquote>
+<p>Where:
+- sSat is the relative saturated water content,
+- sRes is the relative residual saturation,
+- nVanG is the non-linearity coefficient of the soil,
+- aVanG is the air entry value of the soil.</p>
+<p>The coefficient mVanG is calculated as mVanG = 1 - (1 / nVanG).</p>
+<p>To avoid unsaturated values where water is ponding, the output vanG is adjusted to 1
+wherever refP is greater than or equal to 0.</p>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="IO.html" class="btn btn-neutral float-left" title="IO.py" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="mapper.html" class="btn btn-neutral float-right" title="mapper.py" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Niklas WAGNER.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

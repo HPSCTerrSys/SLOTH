@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>sloth.toolBox &mdash; SLOTH  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            SLOTH
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">SLOTH:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../README.html">Welcome to SLOTH</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Functions:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../coordTrafo.html">coordTrafo.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../toolBox.html">toolBox.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../SanityCheck.html">SanityCheck.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../IO.html">IO.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../analysis.html">analysis.py</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Classes:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../mapper.html">mapper.py</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/README.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/ex_RotatedCoordinates.html">Rotated Coordinates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/ex_SanityCheck.html">SanityCheck</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/ex_WriteDataToNetCDF.html">How to write data in netCDF format.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/ex_intersection_calculations.html">Calculating the total subsurface storage anomalies using geopandas</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Maintenance:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../content/maintenance.html">Maintenance</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">SLOTH</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">sloth.toolBox</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for sloth.toolBox</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot; toolBox - submodule of SLOTH</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">calendar</span> <span class="kn">import</span> <span class="n">monthrange</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">IO</span> <span class="k">as</span> <span class="n">io</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">ndimage</span> <span class="k">as</span> <span class="n">nd</span>
+<span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
+<span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="kn">import</span> <span class="n">Polygon</span>
+
+<span class="kn">import</span> <span class="nn">sloth.slothHelper</span> <span class="k">as</span> <span class="nn">slothHelper</span>
+
+
+<div class="viewcode-block" id="calc_catchment">
+<a class="viewcode-back" href="../../toolBox.html#sloth.toolBox.calc_catchment">[docs]</a>
+<span class="k">def</span> <span class="nf">calc_catchment</span><span class="p">(</span><span class="n">slopex</span><span class="p">,</span> <span class="n">slopey</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Calculate the catchment area associated with a given outlet pixel </span>
+<span class="sd">    using x- and y-slope data.</span>
+
+<span class="sd">    This function implements a simple yet efficient algorithm to determine the </span>
+<span class="sd">    catchment area by starting with a list of pixels that initially contains </span>
+<span class="sd">    only the outlet pixel(s). It iteratively processes the pixels in the list, </span>
+<span class="sd">    marking them as part of the catchment and identifying the surrounding pixels </span>
+<span class="sd">    that drain into the current pixel and are not already included in the </span>
+<span class="sd">    catchment. Foun pixels are added to the list and the algorithm continues </span>
+<span class="sd">    until all pixels belonging to the catchment area are discovered.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    slopex : ndarray</span>
+<span class="sd">        2D slopes in x-direction</span>
+<span class="sd">    slopey : ndarray</span>
+<span class="sd">        2D slopes in y-direction</span>
+<span class="sd">    x : int</span>
+<span class="sd">        index in x-direction to calulate catchment from </span>
+<span class="sd">    y : int</span>
+<span class="sd">        index in y-direction to calulate catchment from</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    catchment : ndarray</span>
+<span class="sd">        2D ndarray of the same size as slopex/y. 0 = not part of catchment; 1 = part of catchment</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dims</span> <span class="o">=</span> <span class="n">slopey</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">nx</span> <span class="o">=</span> <span class="n">dims</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="c1"># convert slopes to: &#39;in which 1D index I do drain&#39;</span>
+    <span class="n">drainx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">slopex</span><span class="p">)</span>
+    <span class="n">drainx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">slopex</span><span class="o">&lt;</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">drainx</span><span class="p">)</span>
+    <span class="n">drainx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">slopex</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">drainx</span><span class="p">)</span>
+    <span class="n">drainx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">slopex</span><span class="o">==</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">999</span><span class="p">,</span> <span class="n">drainx</span><span class="p">)</span>
+    <span class="n">drainy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">slopey</span><span class="p">)</span>
+    <span class="n">drainy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">slopey</span><span class="o">&lt;</span><span class="mi">0</span><span class="p">,</span> <span class="n">nx</span><span class="p">,</span> <span class="n">drainy</span><span class="p">)</span>
+    <span class="n">drainy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">slopey</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="n">nx</span><span class="p">,</span> <span class="n">drainy</span><span class="p">)</span>
+    <span class="n">drainy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">slopey</span><span class="o">==</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">999</span><span class="p">,</span> <span class="n">drainy</span><span class="p">)</span>
+    <span class="c1"># plt.imshow(drainx)</span>
+    <span class="c1"># plt.show()</span>
+    <span class="c1"># FlatDrainX</span>
+    <span class="n">fdx</span> <span class="o">=</span> <span class="n">drainx</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">)</span>
+    <span class="c1"># FlatDrainY</span>
+    <span class="n">fdy</span> <span class="o">=</span> <span class="n">drainy</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">)</span>
+    <span class="c1"># FlatCatchment</span>
+    <span class="n">fc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">fdx</span><span class="p">)</span>
+    <span class="c1"># flat_idx order=&#39;C&#39;: idx = (y * nx) + x</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="p">(</span><span class="n">y</span> <span class="o">*</span> <span class="n">nx</span> <span class="p">)</span> <span class="o">+</span> <span class="n">x</span>
+
+    <span class="n">openEnds</span> <span class="o">=</span> <span class="p">[</span><span class="n">start</span><span class="p">]</span>
+    <span class="k">while</span> <span class="n">openEnds</span><span class="p">:</span>
+        <span class="c1"># Get one open end</span>
+        <span class="n">step</span> <span class="o">=</span> <span class="n">openEnds</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="c1"># Mark open end as catchment</span>
+        <span class="n">fc</span><span class="p">[</span><span class="n">step</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="c1"># GET surrounding Pixel</span>
+        <span class="c1"># Nort = step - nx; East = step +1</span>
+        <span class="c1"># West = step - 1 ;South = step + nx</span>
+        <span class="c1"># NEWS = [step-nx, step+1, step-1, step+nx]</span>
+        <span class="n">NS</span> <span class="o">=</span> <span class="p">[</span><span class="n">step</span><span class="o">-</span><span class="n">nx</span><span class="p">,</span> <span class="n">step</span><span class="o">+</span><span class="n">nx</span><span class="p">]</span>
+        <span class="n">EW</span> <span class="o">=</span> <span class="p">[</span><span class="n">step</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">step</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="c1"># CHECK if surrounding drain to step (D2S) and are NOT catchment already.</span>
+        <span class="c1"># Step is the current handled open end.</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">NSD2S</span> <span class="o">=</span> <span class="p">[</span> <span class="n">idx</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span>  <span class="n">NS</span> <span class="k">if</span> <span class="p">(</span><span class="n">idx</span> <span class="o">+</span> <span class="n">fdy</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">==</span> <span class="n">step</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">fc</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="p">)</span> <span class="p">]</span> 
+            <span class="n">EWD2S</span> <span class="o">=</span> <span class="p">[</span> <span class="n">idx</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span>  <span class="n">EW</span> <span class="k">if</span> <span class="p">(</span><span class="n">idx</span> <span class="o">+</span> <span class="n">fdx</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">==</span> <span class="n">step</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">fc</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="p">)</span> <span class="p">]</span> 
+        <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;FEHLER&#39;</span><span class="p">)</span>
+            <span class="k">continue</span>
+        <span class="n">D2S</span> <span class="o">=</span> <span class="n">NSD2S</span> <span class="o">+</span> <span class="n">EWD2S</span>
+        <span class="c1"># add all found pixes to openEnds</span>
+        <span class="n">openEnds</span> <span class="o">+=</span> <span class="n">D2S</span>
+
+    <span class="k">return</span> <span class="n">fc</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">dims</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_intervalSlice">
+<a class="viewcode-back" href="../../toolBox.html#sloth.toolBox.get_intervalSlice">[docs]</a>
+<span class="k">def</span> <span class="nf">get_intervalSlice</span><span class="p">(</span><span class="n">dates</span><span class="p">,</span> <span class="n">sliceInterval</span><span class="o">=</span><span class="s1">&#39;month&#39;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39; This functions calculates interval slices of a given time-series</span>
+
+<span class="sd">    This function calculates interval slices of a given time-series, </span>
+<span class="sd">    aiming to mimic pythons default slice notation `array[start:stop:step]`</span>
+<span class="sd">    to also enable multi dimensional slicing.    </span>
+<span class="sd">    The calculation takes the models dumpintervall into account, wherefore </span>
+<span class="sd">    this function is working for (nearly) every time-resolution.   </span>
+<span class="sd">    The calculation is based on datetime-objects and therefore really </span>
+<span class="sd">    calculates the slice of individual interval, even if the time-series </span>
+<span class="sd">    does not start or end at the first or last of a given interval.  </span>
+
+<span class="sd">    Use case:   </span>
+<span class="sd">    You got a time-series of hourly data points and want to calculate the</span>
+<span class="sd">    monthly mean. This functions returns the slices needed to divide your</span>
+<span class="sd">    data into monthly peaces.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    dates : NDarray </span>
+<span class="sd">        the time-series as datetime-object. </span>
+<span class="sd">    sliceInterval : str</span>
+<span class="sd">        defining the interval. Supported are: &#39;day&#39;, &#39;month&#39;</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Slices : list</span>
+<span class="sd">        A list with length of found intervals with related slices</span>
+
+<span class="sd">    Notes </span>
+<span class="sd">    -----</span>
+<span class="sd">    This function assumes:   </span>
+<span class="sd">    i) The passed time-series covers at least on intervall!</span>
+<span class="sd">    ii) At least hourly steps / dumpIntervals! </span>
+<span class="sd">    iii) No seconds in dates - model output is at least on full minutes!</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="c1"># Check is passed sliceInterval is supported and exit if not.</span>
+    <span class="n">supportedSliceInterval</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;day&#39;</span><span class="p">,</span> <span class="s1">&#39;month&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">sliceInterval</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">supportedSliceInterval</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;ERROR: sliceInterval &quot;</span><span class="si">{</span><span class="n">sliceInterval</span><span class="si">}</span><span class="s1">&quot; is not supported.&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;---    supported values are: </span><span class="si">{</span><span class="n">supportedSliceInterval</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;---    EXIT program&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;########################################################################&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;#### calculate dumpInterval and check if equal for all data-points&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;########################################################################&#39;</span><span class="p">)</span>
+    <span class="c1"># Calculating dumpInterval</span>
+    <span class="n">tmp_dumpInterval</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">dates</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="c1"># Check if dumpInterval equal for all data-points</span>
+    <span class="c1"># and if so define set dumpInterval </span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">tmp_dumpInterval</span> <span class="o">==</span> <span class="n">tmp_dumpInterval</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;ERROR: calculated dumpInterval is not equal for all data-points&#39;</span><span class="p">)</span>
+        <span class="c1"># In case of error: break function</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">dumpInterval</span> <span class="o">=</span> <span class="n">tmp_dumpInterval</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;DONE --&gt; DumpInterval: </span><span class="si">{</span><span class="n">dumpInterval</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>        
+    
+    <span class="c1"># Finding the first time-step of a interval, by looping over the time-series and </span>
+    <span class="c1"># check for each time-step if this is the first of the interval (break loop if found).</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;########################################################################&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;#### Finding first of month&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;########################################################################&#39;</span><span class="p">)</span>
+    <span class="n">Offset</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="c1"># verify first date is first of interval.</span>
+        <span class="c1"># idea explained with sliceInterval=&#39;month&#39;: </span>
+        <span class="c1"># first step - dumpInterval (or 0.5*dumpInterval) is first of month 00UTC</span>
+        <span class="c1"># By checking 1*dumpInterval and 0.5*dumpInterval we do take into account, that</span>
+        <span class="c1"># the time-axis of averaged model output might got shifted in between the </span>
+        <span class="c1"># time-bounds.</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Offset: </span><span class="si">{</span><span class="n">Offset</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">tmp_first</span> <span class="o">=</span> <span class="n">dates</span><span class="p">[</span><span class="n">Offset</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">sliceInterval</span> <span class="o">==</span> <span class="s1">&#39;day&#39;</span><span class="p">:</span>
+            <span class="c1"># using midnight as reference</span>
+            <span class="n">tmp_first_ref</span> <span class="o">=</span> <span class="n">tmp_first</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">hour</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">minute</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">second</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">sliceInterval</span> <span class="o">==</span> <span class="s1">&#39;month&#39;</span><span class="p">:</span>
+            <span class="c1"># using the first of current month at midnight as reference</span>
+            <span class="n">tmp_first_ref</span> <span class="o">=</span> <span class="n">tmp_first</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">day</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">hour</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">minute</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">second</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="c1"># First time-step of dates is already first of a interval</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">tmp_first</span> <span class="o">==</span> <span class="n">tmp_first_ref</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;check step </span><span class="si">{</span><span class="n">Offset</span><span class="si">}</span><span class="s1"> is first of a month at midnight&#39;</span><span class="p">)</span>
+            <span class="k">break</span>
+        <span class="c1">#if (tmp_first - dumpInterval) == tmp_first_ref:</span>
+        <span class="c1">#    print(f&#39;check step {Offset} is first of a month at midnight&#39;)</span>
+        <span class="c1">#    break</span>
+        <span class="c1"># First time-step is not the exact first of a interval but set in</span>
+        <span class="c1"># middle of time-bounds and therefore halfe a dumpInteral away from</span>
+        <span class="c1"># first date of a interval</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="n">tmp_first</span> <span class="o">-</span> <span class="p">(</span><span class="mf">0.5</span><span class="o">*</span><span class="n">dumpInterval</span><span class="p">))</span> <span class="o">==</span> <span class="n">tmp_first_ref</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;check step </span><span class="si">{</span><span class="n">Offset</span><span class="si">}</span><span class="s1"> is first of a month at midnight&#39;</span><span class="p">)</span>
+            <span class="k">break</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;ERROR: step </span><span class="si">{</span><span class="n">Offset</span><span class="si">}</span><span class="s1"> is not first step of month at midnight!&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;step: </span><span class="si">{</span><span class="n">tmp_first</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">Offset</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="c1"># hard break of loop if no &#39;beginning&#39; is found after 50 time-steps</span>
+            <span class="k">if</span> <span class="n">Offset</span> <span class="o">&gt;</span> <span class="mi">50</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="k">continue</span>
+
+    <span class="c1"># Calculating the slices by looping over all time-steps and check if the </span>
+    <span class="c1"># next time-step belong to the next interval.</span>
+    <span class="c1"># NWR 20210422:</span>
+    <span class="c1"># there should be some clever and short solution for below loop ...!</span>
+    <span class="c1"># now that we know the dumpInterval and first step is first of interval...</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;########################################################################&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;#### getting month series / slices&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;########################################################################&#39;</span><span class="p">)</span>
+    <span class="n">t_lower</span> <span class="o">=</span> <span class="n">Offset</span>
+    <span class="n">Slices</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">Offset</span><span class="p">,</span> <span class="n">dates</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="c1"># I decided to go for the solution checking current month and next month</span>
+        <span class="c1"># to catch the case if the dateset contains one month only!</span>
+        <span class="k">if</span> <span class="n">sliceInterval</span> <span class="o">==</span> <span class="s1">&#39;day&#39;</span><span class="p">:</span>
+            <span class="n">currInterval</span> <span class="o">=</span> <span class="n">dates</span><span class="p">[</span><span class="n">t</span><span class="p">]</span><span class="o">.</span><span class="n">day</span>
+            <span class="n">nextInterval</span> <span class="o">=</span> <span class="p">(</span><span class="n">dates</span><span class="p">[</span><span class="n">t</span><span class="p">]</span> <span class="o">+</span> <span class="n">dumpInterval</span><span class="p">)</span><span class="o">.</span><span class="n">day</span>
+        <span class="k">elif</span> <span class="n">sliceInterval</span> <span class="o">==</span> <span class="s1">&#39;month&#39;</span><span class="p">:</span>
+            <span class="n">currInterval</span> <span class="o">=</span> <span class="n">dates</span><span class="p">[</span><span class="n">t</span><span class="p">]</span><span class="o">.</span><span class="n">month</span>
+            <span class="n">nextInterval</span> <span class="o">=</span> <span class="p">(</span><span class="n">dates</span><span class="p">[</span><span class="n">t</span><span class="p">]</span> <span class="o">+</span> <span class="n">dumpInterval</span><span class="p">)</span><span class="o">.</span><span class="n">month</span>
+        <span class="k">if</span> <span class="n">nextInterval</span> <span class="o">!=</span> <span class="n">currInterval</span><span class="p">:</span>
+            <span class="n">Slices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="n">t_lower</span><span class="p">,</span><span class="n">t</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="kc">None</span><span class="p">))</span>
+            <span class="n">t_lower</span> <span class="o">=</span> <span class="n">t</span><span class="o">+</span><span class="mi">1</span>
+
+    <span class="k">return</span> <span class="n">Slices</span> </div>
+
+
+<div class="viewcode-block" id="spher_dist_v1">
+<a class="viewcode-back" href="../../toolBox.html#sloth.toolBox.spher_dist_v1">[docs]</a>
+<span class="k">def</span> <span class="nf">spher_dist_v1</span><span class="p">(</span><span class="n">lon1</span><span class="p">,</span> <span class="n">lat1</span><span class="p">,</span> <span class="n">lon2</span><span class="p">,</span> <span class="n">lat2</span><span class="p">,</span> <span class="n">Rearth</span><span class="o">=</span><span class="mi">6373</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; calculate the spherical / haversine distance</span>
+
+<span class="sd">    This function calculates the real distance (in [km]) between two points on</span>
+<span class="sd">    earth given in lat/lon coordinates. </span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    lon1 : ndarray</span>
+<span class="sd">        Longitude value in [rad] of first point in [rad]. Could be any dim</span>
+<span class="sd">    lat1 : ndarray</span>
+<span class="sd">        Latitude value in [rad] of first point in [rad]. Could be any dim</span>
+<span class="sd">    lon2 : ndarray</span>
+<span class="sd">        Longitude value in [rad] of second point in [rad]. Could be any dim</span>
+<span class="sd">    lat2 : ndarray</span>
+<span class="sd">        Latitude value in [rad] of second point in [rad]. Could be any dim</span>
+<span class="sd">    Rearth : int or float </span>
+<span class="sd">        The earth radius in [km].</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ndarray</span>
+<span class="sd">        The distance is returned in [km]</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Source: https://www.kompf.de/gps/distcalc.html</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">term1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">lat1</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">lat2</span><span class="p">)</span>
+    <span class="n">term2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">lat1</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">lat2</span><span class="p">)</span>
+    <span class="n">term3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">lon2</span> <span class="o">-</span> <span class="n">lon1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Rearth</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span><span class="n">term1</span><span class="o">+</span><span class="n">term2</span><span class="o">*</span><span class="n">term3</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="find_nearest_Index_2D">
+<a class="viewcode-back" href="../../toolBox.html#sloth.toolBox.find_nearest_Index_2D">[docs]</a>
+<span class="k">def</span> <span class="nf">find_nearest_Index_2D</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">coord2D</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Find the nearest index in a 2D array.</span>
+
+<span class="sd">    Given a 2D array `coord2D` and a specific `point` value, this function returns</span>
+<span class="sd">    the index of the 2D array that holds the closest values to the `point`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    point : scalar</span>
+<span class="sd">        The value for which to find the nearest index in the 2D array.</span>
+<span class="sd">    coord2D : ndarray</span>
+<span class="sd">        The 2D array in which to search for the nearest index.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    (int, int)</span>
+<span class="sd">        The index in the first and second dimensions of `coord2D` that holds the</span>
+<span class="sd">        closest values to the `point`.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    This function calculates the absolute differences between `coord2D` and `point`</span>
+<span class="sd">    using `np.abs()`. It then determines the index of the minimum value in the</span>
+<span class="sd">    differences array using `np.argmin()`. The resulting flattened index is converted</span>
+<span class="sd">    into a tuple of indices representing the original shape of `coord2D` using</span>
+<span class="sd">    `np.unravel_index()`.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">    &gt;&gt;&gt; arr = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])</span>
+<span class="sd">    &gt;&gt;&gt; find_nearest_Index_2D(5, arr)</span>
+<span class="sd">    (1, 1)</span>
+
+<span class="sd">    &gt;&gt;&gt; arr = np.array([[0.1, 0.2, 0.3], [0.4, 0.5, 0.6], [0.7, 0.8, 0.9]])</span>
+<span class="sd">    &gt;&gt;&gt; find_nearest_Index_2D(0.25, arr)</span>
+<span class="sd">    (0, 1)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">coord2D</span> <span class="o">-</span> <span class="n">point</span><span class="p">)</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unravel_index</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">),</span><span class="n">dist</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">idx</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">idx</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="plusOneMonth">
+<a class="viewcode-back" href="../../toolBox.html#sloth.toolBox.plusOneMonth">[docs]</a>
+<span class="k">def</span> <span class="nf">plusOneMonth</span><span class="p">(</span><span class="n">currDate</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return the passed date incremented by one month.</span>
+
+<span class="sd">    This function provides a simple way to calculate a date that is one month ahead</span>
+<span class="sd">    of the given `currDate`. Unlike the bash command-line tool `date`, which can</span>
+<span class="sd">    handle this calculation easily, Python&#39;s `datetime` objects are based on hours</span>
+<span class="sd">    or seconds, requiring special treatment for adding one month due to varying</span>
+<span class="sd">    month lengths. This function serves as a wrapper to handle this task in a clean</span>
+<span class="sd">    manner, facilitating usage in other code snippets.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    currDate : datetime</span>
+<span class="sd">        An arbitrary date.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    datetime</span>
+<span class="sd">        The passed date incremented by one month.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    This function determines the number of days in the month of `currDate` using</span>
+<span class="sd">    `monthrange()` from the `calendar` module. It then returns `currDate` incremented</span>
+<span class="sd">    by a timedelta calculated as `24 * num_days` hours. This ensures that the returned</span>
+<span class="sd">    date correctly reflects one month ahead while accounting for varying month lengths.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; import datetime</span>
+<span class="sd">    &gt;&gt;&gt; currDate = datetime.datetime(2023, 5, 15)</span>
+<span class="sd">    &gt;&gt;&gt; plusOneMonth(currDate)</span>
+<span class="sd">    datetime.datetime(2023, 6, 15, 0, 0)</span>
+
+<span class="sd">    &gt;&gt;&gt; currDate = datetime.datetime(2023, 12, 31)</span>
+<span class="sd">    &gt;&gt;&gt; plusOneMonth(currDate)</span>
+<span class="sd">    datetime.datetime(2024, 1, 31, 0, 0)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">num_days</span> <span class="o">=</span> <span class="n">monthrange</span><span class="p">(</span><span class="n">currDate</span><span class="o">.</span><span class="n">year</span><span class="p">,</span> <span class="n">currDate</span><span class="o">.</span><span class="n">month</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">currDate</span> <span class="o">+</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">hours</span><span class="o">=</span><span class="mi">24</span><span class="o">*</span><span class="n">num_days</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="trunc">
+<a class="viewcode-back" href="../../toolBox.html#sloth.toolBox.trunc">[docs]</a>
+<span class="k">def</span> <span class="nf">trunc</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">decs</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Truncate a passed float value or floating ndarray.</span>
+
+<span class="sd">    This function truncates a given float value or floating ndarray by a </span>
+<span class="sd">    specified truncation precision (decimal digits).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    values : ndarray</span>
+<span class="sd">        A ndarray of any dimension (including scalar) containing float values to be truncated.    </span>
+<span class="sd">    decs : int, optional</span>
+<span class="sd">        An integer value defining the truncation precision. It specifies the number of decimal places to keep (default is 0).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ndarray</span>
+<span class="sd">        A ndarray of the same type as the input, with the specified number of decimal places truncated from the original values.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">    &gt;&gt;&gt; values = np.array([2.12345, 3.45678, 4.56789])</span>
+<span class="sd">    &gt;&gt;&gt; trunc(values, decs=3)</span>
+<span class="sd">    array([2.123, 3.456, 4.567])</span>
+
+<span class="sd">    &gt;&gt;&gt; value = 2.98765</span>
+<span class="sd">    &gt;&gt;&gt; trunc(value, decs=2)</span>
+<span class="sd">    2.98</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">trunc</span><span class="p">(</span><span class="n">values</span><span class="o">*</span><span class="mi">10</span><span class="o">**</span><span class="n">decs</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">10</span><span class="o">**</span><span class="n">decs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="fill">
+<a class="viewcode-back" href="../../toolBox.html#sloth.toolBox.fill">[docs]</a>
+<span class="k">def</span> <span class="nf">fill</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">transkargs</span><span class="o">=</span><span class="p">{}):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Fill invalid data points with nearest neighbor interpolation.</span>
+
+<span class="sd">    This function replaces invalid data points in the input array (`data`) with the</span>
+<span class="sd">    value of the nearest valid data point. Invalid data points are indicated by the</span>
+<span class="sd">    `invalid` array or, if not provided, by NaN (Not a Number) values in `data`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : ndarray</span>
+<span class="sd">        An array containing the data to be filled.</span>
+<span class="sd">    invalid : ndarray, optional</span>
+<span class="sd">        A binary array of the same shape as `data`. Data values are replaced where</span>
+<span class="sd">        `invalid` is True. If not provided, invalid data points are identified using</span>
+<span class="sd">        `np.isnan(data)` (default).</span>
+<span class="sd">    transkargs : dict, optional</span>
+<span class="sd">        Additional arguments to pass to the `distance_transform_edt()` function.</span>
+<span class="sd">        Default is an empty dictionary.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ndarray</span>
+<span class="sd">        A filled ndarray, where invalid data points have been replaced by the value</span>
+<span class="sd">        of the nearest valid data point.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    This function uses nearest neighbor interpolation to fill invalid data points in</span>
+<span class="sd">    the input array. It calculates the Euclidean distance transform of the `invalid`</span>
+<span class="sd">    array to find the indices of the nearest valid data points. The original `data`</span>
+<span class="sd">    array is then updated with the values from the nearest valid data points.</span>
+
+<span class="sd">    If the shapes of `data` and `invalid` are not equal, an error is raised, as filling</span>
+<span class="sd">    is not possible. </span>
+<span class="sd">    </span>
+<span class="sd">    See also: https://stackoverflow.com/questions/5551286/filling-gaps-in-a-numpy-array</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">    &gt;&gt;&gt; data = np.array([1.0, 2.0, np.nan, 4.0, np.nan])</span>
+<span class="sd">    &gt;&gt;&gt; fill(data)</span>
+<span class="sd">    array([1., 2., 4., 4., 4.])</span>
+
+<span class="sd">    &gt;&gt;&gt; invalid = np.isnan(data)</span>
+<span class="sd">    &gt;&gt;&gt; fill(data, invalid)</span>
+<span class="sd">    array([1., 2., 4., 4., 4.])</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># check if data and invalid shape is equal, as otherwise filling is not</span>
+    <span class="c1"># possible</span>
+    <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">invalid</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;ERROR: data.shape </span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s1"> != invalid.shape (invalid.shape)&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">invalid</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="n">invalid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="n">ind</span> <span class="o">=</span> <span class="n">nd</span><span class="o">.</span><span class="n">distance_transform_edt</span><span class="p">(</span><span class="n">invalid</span><span class="p">,</span>
+                                    <span class="n">return_distances</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                    <span class="n">return_indices</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                    <span class="o">**</span><span class="n">transkargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">data</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">ind</span><span class="p">)]</span></div>
+
+
+<div class="viewcode-block" id="get_prudenceMask">
+<a class="viewcode-back" href="../../toolBox.html#sloth.toolBox.get_prudenceMask">[docs]</a>
+<span class="k">def</span> <span class="nf">get_prudenceMask</span><span class="p">(</span><span class="n">lat2D</span><span class="p">,</span> <span class="n">lon2D</span><span class="p">,</span> <span class="n">prudName</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return a Prudence mask based on latitude and longitude values.</span>
+
+<span class="sd">    This function generates a boolean mask array where True represents masked areas</span>
+<span class="sd">    and False represents non-masked areas. The mask is determined based on a set of</span>
+<span class="sd">    latitude and longitude values and the name of the Prudence region.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    lat2D : ndarray</span>
+<span class="sd">        2D array containing latitude information for each pixel.</span>
+<span class="sd">    lon2D : ndarray</span>
+<span class="sd">        2D array containing longitude information for each pixel.</span>
+<span class="sd">    prudName : str</span>
+<span class="sd">        Short name of the Prudence region.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    prudMask : ndarray</span>
+<span class="sd">        Boolean ndarray of the same shape as `lat2D`, indicating masked and</span>
+<span class="sd">        non-masked areas.</span>
+<span class="sd">        True = masked; False = not masked.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The Prudence mask is created based on specific latitude and longitude ranges</span>
+<span class="sd">    for each Prudence region. The function checks the `prudName` parameter and</span>
+<span class="sd">    generates the corresponding mask using NumPy&#39;s `np.where()` function.</span>
+
+<span class="sd">    The available Prudence region names and their corresponding latitude and</span>
+<span class="sd">    longitude ranges are as follows (True is masked, Fals is not masked):</span>
+
+<span class="sd">    - &#39;BI&#39;: Latitude: &lt;50.0 or &gt;59.0, Longitude: &lt;-10.0 or &gt;2.0</span>
+<span class="sd">    - &#39;IP&#39;: Latitude: &lt;36.0 or &gt;44.0, Longitude: &lt;-10.0 or &gt;3.0</span>
+<span class="sd">    - &#39;FR&#39;: Latitude: &lt;44.0 or &gt;50.0, Longitude: &lt;-5.0 or &gt;5.0</span>
+<span class="sd">    - &#39;ME&#39;: Latitude: &lt;48.0 or &gt;55.0, Longitude: &lt;2.0 or &gt;16.0</span>
+<span class="sd">    - &#39;SC&#39;: Latitude: &lt;55.0 or &gt;70.0, Longitude: &lt;5.0 or &gt;30.0</span>
+<span class="sd">    - &#39;AL&#39;: Latitude: &lt;44.0 or &gt;48.0, Longitude: &lt;5.0 or &gt;15.0</span>
+<span class="sd">    - &#39;MD&#39;: Latitude: &lt;36.0 or &gt;44.0, Longitude: &lt;3.0 or &gt;25.0</span>
+<span class="sd">    - &#39;EA&#39;: Latitude: &lt;44.0 or &gt;55.0, Longitude: &lt;16.0 or &gt;30.0</span>
+
+<span class="sd">    If an unsupported Prudence region name is provided, an error message is printed,</span>
+<span class="sd">    and the program exits.</span>
+
+<span class="sd">    For reference see also: http://prudence.dmi.dk/public/publications/PSICC/Christensen&amp;Christensen.pdf p.38</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">prudName</span><span class="o">==</span><span class="s1">&#39;BI&#39;</span><span class="p">):</span>
+        <span class="n">prudMask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">((</span><span class="n">lat2D</span> <span class="o">&lt;</span> <span class="mf">50.0</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">lat2D</span> <span class="o">&gt;</span> <span class="mf">59.0</span><span class="p">)</span>  <span class="o">|</span> <span class="p">(</span><span class="n">lon2D</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mf">10.0</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">lon2D</span> <span class="o">&gt;</span>  <span class="mf">2.0</span><span class="p">),</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="p">(</span><span class="n">prudName</span><span class="o">==</span><span class="s1">&#39;IP&#39;</span><span class="p">):</span>
+        <span class="n">prudMask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">((</span><span class="n">lat2D</span> <span class="o">&lt;</span> <span class="mf">36.0</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">lat2D</span> <span class="o">&gt;</span> <span class="mf">44.0</span><span class="p">)</span>  <span class="o">|</span> <span class="p">(</span><span class="n">lon2D</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mf">10.0</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">lon2D</span> <span class="o">&gt;</span>  <span class="mf">3.0</span><span class="p">),</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="p">(</span><span class="n">prudName</span><span class="o">==</span><span class="s1">&#39;FR&#39;</span><span class="p">):</span>
+        <span class="n">prudMask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">((</span><span class="n">lat2D</span> <span class="o">&lt;</span> <span class="mf">44.0</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">lat2D</span> <span class="o">&gt;</span> <span class="mf">50.0</span><span class="p">)</span>  <span class="o">|</span> <span class="p">(</span><span class="n">lon2D</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mf">5.0</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">lon2D</span> <span class="o">&gt;</span>  <span class="mf">5.0</span><span class="p">),</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="p">(</span><span class="n">prudName</span><span class="o">==</span><span class="s1">&#39;ME&#39;</span><span class="p">):</span>
+        <span class="n">prudMask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">((</span><span class="n">lat2D</span> <span class="o">&lt;</span> <span class="mf">48.0</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">lat2D</span> <span class="o">&gt;</span> <span class="mf">55.0</span><span class="p">)</span>  <span class="o">|</span> <span class="p">(</span><span class="n">lon2D</span> <span class="o">&lt;</span> <span class="mf">2.0</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">lon2D</span> <span class="o">&gt;</span>  <span class="mf">16.0</span><span class="p">),</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="p">(</span><span class="n">prudName</span><span class="o">==</span><span class="s1">&#39;SC&#39;</span><span class="p">):</span>
+        <span class="n">prudMask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">((</span><span class="n">lat2D</span> <span class="o">&lt;</span> <span class="mf">55.0</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">lat2D</span> <span class="o">&gt;</span> <span class="mf">70.0</span><span class="p">)</span>  <span class="o">|</span> <span class="p">(</span><span class="n">lon2D</span> <span class="o">&lt;</span> <span class="mf">5.0</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">lon2D</span> <span class="o">&gt;</span>  <span class="mf">30.0</span><span class="p">),</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="p">(</span><span class="n">prudName</span><span class="o">==</span><span class="s1">&#39;AL&#39;</span><span class="p">):</span>
+        <span class="n">prudMask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">((</span><span class="n">lat2D</span> <span class="o">&lt;</span> <span class="mf">44.0</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">lat2D</span> <span class="o">&gt;</span> <span class="mf">48.0</span><span class="p">)</span>  <span class="o">|</span> <span class="p">(</span><span class="n">lon2D</span> <span class="o">&lt;</span> <span class="mf">5.0</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">lon2D</span> <span class="o">&gt;</span>  <span class="mf">15.0</span><span class="p">),</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="p">(</span><span class="n">prudName</span><span class="o">==</span><span class="s1">&#39;MD&#39;</span><span class="p">):</span>
+        <span class="n">prudMask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">((</span><span class="n">lat2D</span> <span class="o">&lt;</span> <span class="mf">36.0</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">lat2D</span> <span class="o">&gt;</span> <span class="mf">44.0</span><span class="p">)</span>  <span class="o">|</span> <span class="p">(</span><span class="n">lon2D</span> <span class="o">&lt;</span> <span class="mf">3.0</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">lon2D</span> <span class="o">&gt;</span>  <span class="mf">25.0</span><span class="p">),</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="p">(</span><span class="n">prudName</span><span class="o">==</span><span class="s1">&#39;EA&#39;</span><span class="p">):</span>
+        <span class="n">prudMask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">((</span><span class="n">lat2D</span> <span class="o">&lt;</span> <span class="mf">44.0</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">lat2D</span> <span class="o">&gt;</span> <span class="mf">55.0</span><span class="p">)</span>  <span class="o">|</span> <span class="p">(</span><span class="n">lon2D</span> <span class="o">&lt;</span> <span class="mf">16.0</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">lon2D</span> <span class="o">&gt;</span>  <span class="mf">30.0</span><span class="p">),</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;prudance region </span><span class="si">{</span><span class="n">prudName</span><span class="si">}</span><span class="s1"> not found --&gt; EXIT&#39;</span><span class="p">)</span>
+        <span class="n">eys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">prudMask</span></div>
+
+
+<div class="viewcode-block" id="stampLLSM">
+<a class="viewcode-back" href="../../toolBox.html#sloth.toolBox.stampLLSM">[docs]</a>
+<span class="k">def</span> <span class="nf">stampLLSM</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">invalid</span><span class="p">,</span> <span class="n">LLSM</span><span class="p">,</span> <span class="n">LLSMThreshold</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; stamps a LLSM to passed data</span>
+
+<span class="sd">    Some times its needed to force different datasets to use the same </span>
+<span class="sd">    Land-Lake-Sea-Mask (LLSM). One example is combining different data sets to </span>
+<span class="sd">    force a model with. If the datasets are taken fomr different sources, most </span>
+<span class="sd">    propably the used LLSM is different too. This, for exmple, could lead to the </span>
+<span class="sd">    situation along the coastline that one dataset is indicating water (ocean) </span>
+<span class="sd">    while the other is indicating land. This inconsistency has to be fixe, </span>
+<span class="sd">    especially within the realm of coupled models.</span>
+
+
+<span class="sd">    To achive this, this function is\n</span>
+<span class="sd">    i)   masking invalid pixels within the passed data set  </span>
+<span class="sd">    ii)  interpolate remaining data over the maske regions  </span>
+<span class="sd">    iii) set pixel to water value according to a passed LLSM  </span>
+
+<span class="sd">    This guaranthees each land pixel is holding land informtion and each</span>
+<span class="sd">    water pixel is marked as water.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : ndarray</span>
+<span class="sd">        A 2D nd array holding the datset to stamp the LLSM</span>
+<span class="sd">    invalid : scalar</span>
+<span class="sd">        A scalar witht the value indicating invalid pixel</span>
+<span class="sd">    LLSM : ndarray</span>
+<span class="sd">        A ndarray of the same shape as data holding the LLSM</span>
+<span class="sd">        (Land=2 Lake=1 Sea=0)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ndarray</span>
+<span class="sd">        A (MASKED!) ndarray of the same shape as data, with stamped LLSM</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># some checks to verify we can progress</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;data is of type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="si">}</span><span class="s1"> but &lt;class &quot;numpy.ndarray&quot;&gt; is required!&#39;</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">data</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;data is of dimension </span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">ndim</span><span class="si">}</span><span class="s1"> but dimension 2 is required!&#39;</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># i)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">masked_where</span><span class="p">(</span><span class="n">data</span><span class="o">==</span><span class="n">invalid</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+    <span class="c1"># ii)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">fill</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">out</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="n">out</span><span class="o">.</span><span class="n">mask</span><span class="p">)</span>
+    <span class="c1"># iii)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">masked_where</span><span class="p">((</span><span class="n">LLSM</span> <span class="o">&lt;</span> <span class="n">LLSMThreshold</span><span class="p">),</span> <span class="n">out</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">out</span></div>
+
+
+
+<div class="viewcode-block" id="mapDataRange_lin">
+<a class="viewcode-back" href="../../toolBox.html#sloth.toolBox.mapDataRange_lin">[docs]</a>
+<span class="k">def</span> <span class="nf">mapDataRange_lin</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y_min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">y_max</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">x_min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">x_max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">cutMinMax</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Map a source data range linearly to a target data range.</span>
+
+<span class="sd">    Perform a linear mapping of a source data range (X) to a target data range (Y). The</span>
+<span class="sd">    function calculates the mapping using the formula: y = (y_max - y_min) / (x_max - x_min) * (x - x_min) + y_min.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    X : ndarray</span>
+<span class="sd">        Source data range to remap.</span>
+<span class="sd">    y_min : scalar, optional</span>
+<span class="sd">        Minimum value of the target data range (default is 0).</span>
+<span class="sd">    y_max : scalar, optional</span>
+<span class="sd">        Maximum value of the target data range (default is 1).</span>
+<span class="sd">    x_min : scalar, optional</span>
+<span class="sd">        Minimum value of the source data range. If not provided, it is calculated based on X.</span>
+<span class="sd">    x_max : scalar, optional</span>
+<span class="sd">        Maximum value of the source data range. If not provided, it is calculated based on X.</span>
+<span class="sd">    cutMinMax : bool, optional</span>
+<span class="sd">        If True, cut the mapped values outside the target data range to the minimum and maximum values.</span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ndarray</span>
+<span class="sd">        The target data range after linear mapping.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    This function is useful for mapping a source data range to a different target data range. It can be</span>
+<span class="sd">    used for various purposes, such as normalizing data ranges to facilitate comparison with other ranges.</span>
+<span class="sd">    An intermediat step is used by first transform both (X and Y) into data </span>
+<span class="sd">    ranges starting from zero (X&#39; and Y&#39;), as those data range can be easily </span>
+<span class="sd">    mapped with</span>
+
+<span class="sd">    i)   y&#39; = y&#39;_max / x&#39;_max * x&#39;</span>
+<span class="sd">    ii)  y&#39; = y - y_min   AND   x&#39; = x - x_min</span>
+<span class="sd">    iii) y = (y_max-y_min) / (x_max-x_min) * (x-x_min) + y_min</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; X = np.array([0, 1, 2, 3, 4, 5])</span>
+<span class="sd">    &gt;&gt;&gt; mapped = mapDataRange_lin(X, y_min=10, y_max=20)</span>
+<span class="sd">    &gt;&gt;&gt; print(mapped)</span>
+<span class="sd">    [10. 12. 14. 16. 18. 20.]</span>
+
+<span class="sd">    &gt;&gt;&gt; X = np.array([100, 200, 300, 400, 500])</span>
+<span class="sd">    &gt;&gt;&gt; mapped = mapDataRange_lin(X, y_min=-1, y_max=1, x_min=100, x_max=500)</span>
+<span class="sd">    &gt;&gt;&gt; print(mapped)</span>
+<span class="sd">    [-1.  -0.5  0.   0.5  1. ]</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Calculate x_min and x_max if not passed</span>
+    <span class="k">if</span> <span class="n">x_min</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">x_min</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">x_max</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">x_max</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+    <span class="c1"># Map X to new data range</span>
+    <span class="n">Y</span> <span class="o">=</span> <span class="p">(</span><span class="n">y_max</span><span class="o">-</span><span class="n">y_min</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">x_max</span><span class="o">-</span><span class="n">x_min</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">X</span><span class="o">-</span><span class="n">x_min</span><span class="p">)</span> <span class="o">+</span> <span class="n">y_min</span>
+
+    <span class="c1"># Cut Y for min and max values if wanted</span>
+    <span class="k">if</span> <span class="n">cutMinMax</span><span class="p">:</span>
+        <span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">Y</span><span class="o">&lt;=</span><span class="n">y_min</span><span class="p">,</span> <span class="n">y_min</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span>
+        <span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">Y</span><span class="o">&gt;=</span><span class="n">y_max</span><span class="p">,</span> <span class="n">y_max</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">Y</span></div>
+
+
+<div class="viewcode-block" id="intersection_calculations">
+<a class="viewcode-back" href="../../toolBox.html#sloth.toolBox.intersection_calculations">[docs]</a>
+<span class="k">def</span> <span class="nf">intersection_calculations</span><span class="p">(</span><span class="n">df_data</span><span class="p">,</span> <span class="n">corners</span><span class="p">,</span> <span class="n">area_of_interest</span><span class="p">,</span> <span class="n">Name_area</span><span class="p">,</span> <span class="n">crs_utm</span><span class="p">,</span> <span class="n">nr_yr</span><span class="p">,</span> <span class="n">nr_entries</span><span class="p">,</span> <span class="n">save_dir</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Calculate spatial mean values for a shapefile in interest.</span>
+
+<span class="sd">    This function calculates spatial mean values (example for a specific </span>
+<span class="sd">    region or province) taking into account how much (ratio) of the </span>
+<span class="sd">    gridpoint is actually being intersected inside our region of interest.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    -------------</span>
+<span class="sd">    df_data: dataframe</span>
+<span class="sd">         dataframe containing infromation about each gridpoint</span>
+<span class="sd">    </span>
+<span class="sd">    corners: dataframe (can also be a nectdf or any other data type)</span>
+<span class="sd">         containing infromation on the four longitudes and latitudes </span>
+<span class="sd">         that surrounds each gridpoint in the source dataframe</span>
+<span class="sd">    </span>
+<span class="sd">    area_of_interest: a shapefile or geodataframe</span>
+<span class="sd">    	shapefile of the area of interest</span>
+
+<span class="sd">    Name_area: the field name in the shapefile, that the dissolve will be based on</span>
+<span class="sd">     </span>
+<span class="sd">    crs_utm: projected coordinate reference system (utm)</span>
+<span class="sd">    </span>
+<span class="sd">    nr_yr: variable</span>
+<span class="sd">    	number of years of interest</span>
+<span class="sd">    </span>
+<span class="sd">    nr_entries:variable</span>
+<span class="sd">    	number of hours/days/or months etc..</span>
+<span class="sd">    </span>
+<span class="sd">    save_dir: path</span>
+<span class="sd">    	path for saving the output </span>
+<span class="sd">     &quot;&quot;&quot;</span>
+    
+
+    <span class="c1"># create a geodataframe from the dataframe that we want to work with</span>
+    <span class="n">df_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">df_data</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;creating a geodataframe of the given dataframe&quot;</span><span class="p">)</span>
+    <span class="n">gdf_data</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">df_data</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">gpd</span><span class="o">.</span><span class="n">points_from_xy</span><span class="p">(</span><span class="n">df_data</span><span class="o">.</span><span class="n">lon</span><span class="p">,</span>
+                                                                     <span class="n">df_data</span><span class="o">.</span><span class="n">lat</span><span class="p">))</span>
+    <span class="n">ds_corners</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">open_dataset</span><span class="p">(</span><span class="n">corners</span><span class="p">)</span>
+
+    <span class="c1"># convert the netcdf to dataframe in order to be able </span>
+    <span class="c1"># to convert it to geopandas and create polygons</span>
+    <span class="n">df_corners</span> <span class="o">=</span> <span class="n">ds_corners</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">()</span>
+    <span class="n">df_corners</span> <span class="o">=</span> <span class="n">df_corners</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+    <span class="n">df_corners</span> <span class="o">=</span> <span class="n">df_corners</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">4</span><span class="p">:]</span>
+
+    <span class="c1"># create a list of the four pairs (lon,lat) that creates the polygons</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;creating a list of four pairs (lon,lat) to create polygons&quot;</span><span class="p">)</span>
+    <span class="n">list_poly</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">polygon_geom</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">df_corners</span><span class="o">.</span><span class="n">grid_corner_lon</span><span class="p">,</span> <span class="n">df_corners</span><span class="o">.</span><span class="n">grid_corner_lat</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">polygon_geom</span><span class="p">),</span> <span class="mi">4</span><span class="p">):</span>
+        <span class="n">list_poly</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Polygon</span><span class="p">(</span><span class="n">polygon_geom</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="mi">4</span><span class="p">]))</span>
+
+    <span class="c1"># create a geodataframe from the polygon list that was created</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;creating a geodataframe with the polygons&quot;</span><span class="p">)</span>
+    <span class="n">gdf_polygons</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">geometry</span><span class="o">=</span><span class="n">list_poly</span><span class="p">)</span>
+    <span class="c1"># for some reason the polygons were doubled so a drop_duplicates() was used</span>
+    <span class="n">gdf_polygons</span> <span class="o">=</span> <span class="n">gdf_polygons</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">()</span> 
+
+    <span class="c1"># if the two goedataframes are do not have a coordinate systems</span>
+    <span class="c1"># we have to set it first before going further setting the crs</span>
+
+    <span class="n">gdf_data_wgs</span> <span class="o">=</span> <span class="n">gdf_data</span><span class="o">.</span><span class="n">set_crs</span><span class="p">(</span><span class="s1">&#39;EPSG:4326&#39;</span><span class="p">)</span> <span class="c1"># setting the crs to WGS84</span>
+    <span class="c1"># in order to calculate the area later, it is needed to convert </span>
+    <span class="c1"># the geodataframe to UTM</span>
+    <span class="n">gdf_data_utm32N</span> <span class="o">=</span> <span class="n">gdf_data_wgs</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">crs_utm</span><span class="p">)</span> 
+
+    <span class="n">gdf_polygons_wgs</span> <span class="o">=</span> <span class="n">gdf_polygons</span><span class="o">.</span><span class="n">set_crs</span><span class="p">(</span><span class="s1">&#39;EPSG:4326&#39;</span><span class="p">)</span>  <span class="c1"># setting the crs to WGS84</span>
+    <span class="n">gdf_polygons_utm32N</span> <span class="o">=</span> <span class="n">gdf_polygons_wgs</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">crs_utm</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Geodataframes are created&quot;</span><span class="p">)</span>
+
+    <span class="c1"># calculate the area of the polygons.</span>
+    <span class="c1"># it is important for calculating the ratio (weight) of the area of </span>
+    <span class="c1"># each polygon interscted</span>
+    <span class="n">gdf_polygons_utm32N</span><span class="p">[</span><span class="s1">&#39;area&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gdf_polygons_utm32N</span><span class="o">.</span><span class="n">area</span>
+
+    <span class="c1"># after calculating the area, in come cases (when calculating for whole country)</span>
+    <span class="c1"># the area of polygons will differ for example in when comparing cities along </span>
+    <span class="c1"># the meridian lines, there will be slight difference in the area</span>
+
+    <span class="c1"># joining thw two geodataframe using sjoin, in order to join the dataframe </span>
+    <span class="c1"># that has the values with its corresponding polygons</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Joining the two geodataframes&quot;</span><span class="p">)</span>
+    <span class="n">join_within_right_gdf_utm32N</span> <span class="o">=</span> <span class="n">gdf_data_utm32N</span><span class="o">.</span><span class="n">sjoin</span><span class="p">(</span><span class="n">gdf_polygons_utm32N</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">,</span> <span class="n">predicate</span><span class="o">=</span><span class="s2">&quot;within&quot;</span><span class="p">)</span>
+    
+    <span class="n">shapefile_gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">area_of_interest</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">shapefile_gdf</span><span class="o">.</span><span class="n">crs</span><span class="p">)</span>   <span class="c1"># to check wether it has the same crs as the geodataframe that we created</span>
+    <span class="c1"># if not convert it to utm (to be able to calculate the area)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;intersecting&quot;</span><span class="p">)</span>
+    <span class="n">overlay_gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">overlay</span><span class="p">(</span><span class="n">join_within_right_gdf_utm32N</span><span class="p">,</span> <span class="n">shapefile_gdf</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;intersection&#39;</span><span class="p">)</span>
+    <span class="n">overlay_gdf</span><span class="p">[</span><span class="s1">&#39;area_intersected&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">overlay_gdf</span><span class="o">.</span><span class="n">area</span>
+    <span class="c1"># the weight calculated below represents how much area from each polygon</span>
+    <span class="c1"># is inside the shapefile after intesection</span>
+    <span class="n">overlay_gdf</span><span class="p">[</span><span class="s1">&#39;weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">overlay_gdf</span><span class="p">[</span><span class="s1">&#39;area_intersected&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">overlay_gdf</span><span class="p">[</span><span class="s1">&#39;area&#39;</span><span class="p">]</span> 
+
+
+    <span class="c1"># after this step we should have a geodataframe for the intersected polygons </span>
+    <span class="c1"># that are inside the shapefile of interest the geodataframe will have</span>
+    <span class="c1"># the lon,lat, with the corresponding values for each date (each date in a column), </span>
+    <span class="c1"># area of the polygon before intersection, area after intersection,</span>
+    <span class="c1"># and the ratio (area_intersected/area) and it can also include the names of the </span>
+    <span class="c1"># regions (in order to be able to dissolve it into mean values for each region)</span>
+
+    <span class="c1"># in the next step, a dataframe was created to add the values of each </span>
+    <span class="c1"># polygon (gridpoint) after calculating its weight inside </span>
+    <span class="c1"># the intersection for each date</span>
+    <span class="n">nr_yr</span> <span class="o">=</span> <span class="n">nr_yr</span>
+    <span class="n">nr_entries</span> <span class="o">=</span> <span class="n">nr_entries</span> <span class="c1"># ex: number of dates :hourly, daily, monthly..etc</span>
+    <span class="n">nr_column</span> <span class="o">=</span> <span class="n">nr_yr</span><span class="o">*</span><span class="n">nr_entries</span>
+    <span class="n">df_data_inter</span> <span class="o">=</span> <span class="n">overlay_gdf</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span><span class="mi">3</span><span class="p">:</span><span class="n">nr_column</span><span class="o">+</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">overlay_gdf</span><span class="p">[</span><span class="s1">&#39;weight&#39;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="s2">&quot;index&quot;</span><span class="p">)</span>
+
+    <span class="c1"># copy the geometry column (important for creating a geodataframe) and other </span>
+    <span class="c1"># relevant data to the new dataframe</span>
+    <span class="c1"># like the name of the regions (important for calculating the mean values for each region)</span>
+    <span class="n">Name_area</span> <span class="o">=</span> <span class="n">Name_area</span>
+    <span class="n">df_data_inter</span><span class="p">[</span><span class="n">Name_area</span><span class="p">]</span> <span class="o">=</span> <span class="n">overlay_gdf</span><span class="p">[</span><span class="n">Name_area</span><span class="p">]</span> <span class="c1"># this sould be adapted depending on the shapefile available</span>
+    <span class="n">df_data_inter</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">overlay_gdf</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">]</span>
+    <span class="n">geometry</span> <span class="o">=</span> <span class="n">df_data_inter</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">]</span>
+    <span class="n">gdf_data_inter</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">df_data_inter</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="s2">&quot;epsg:25832&quot;</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">geometry</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;calculating the mean value for each region of interest&quot;</span><span class="p">)</span>
+    <span class="n">dissolve_gdf</span> <span class="o">=</span> <span class="n">gdf_data_inter</span><span class="o">.</span><span class="n">dissolve</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="n">Name_area</span><span class="p">,</span> <span class="n">aggfunc</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="n">as_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">observed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dropna</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">dissolve_gdf_wgs</span> <span class="o">=</span> <span class="n">dissolve_gdf</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="s1">&#39;EPSG:4326&#39;</span><span class="p">)</span> <span class="c1"># convert back to wgs 1984</span>
+    
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;saving as a shapefile&quot;</span><span class="p">)</span>
+    <span class="n">dissolve_gdf_wgs</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="n">save_dir</span><span class="p">)</span></div>
+
+
+    
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Im there!&#39;</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Niklas WAGNER.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

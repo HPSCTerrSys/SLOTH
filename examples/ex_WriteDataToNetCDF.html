@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>How to write data in netCDF format. &mdash; SLOTH  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Calculating the total subsurface storage anomalies using geopandas" href="ex_intersection_calculations.html" />
+    <link rel="prev" title="SanityCheck" href="ex_SanityCheck.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            SLOTH
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">SLOTH:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../README.html">Welcome to SLOTH</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Functions:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../coordTrafo.html">coordTrafo.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../toolBox.html">toolBox.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../SanityCheck.html">SanityCheck.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../IO.html">IO.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../analysis.html">analysis.py</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Classes:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../mapper.html">mapper.py</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="README.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ex_RotatedCoordinates.html">Rotated Coordinates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ex_SanityCheck.html">SanityCheck</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">How to write data in netCDF format.</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#preparation">Preparation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ex_intersection_calculations.html">Calculating the total subsurface storage anomalies using geopandas</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Maintenance:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../content/maintenance.html">Maintenance</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">SLOTH</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">How to write data in netCDF format.</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/examples/ex_WriteDataToNetCDF.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section class="tex2jax_ignore mathjax_ignore" id="how-to-write-data-in-netcdf-format">
+<h1>How to write data in netCDF format.<a class="headerlink" href="#how-to-write-data-in-netcdf-format" title="Link to this heading"></a></h1>
+<p>netCDF is a standalone file format, meaning every meta-information needed to
+work with the data inside the netCDF file (units, descriptions, source, author,
+coordinates, etc), has to be provided with the netCDF files itself.
+To achieve this one has to provide those meta-information already while
+writing / creating the netCDF file.</p>
+<section id="preparation">
+<h2>Preparation<a class="headerlink" href="#preparation" title="Link to this heading"></a></h2>
+<p>Before we start, lets prepare some technical things.<br />
+First, we have to make <code class="docutils literal notranslate"><span class="pre">SLOTH</span></code> available to import by Python. If you already have added <code class="docutils literal notranslate"><span class="pre">SLOTH</span></code> to your <code class="docutils literal notranslate"><span class="pre">PYHTONPATH</span></code>, below step is not needed.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="n">cwd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+<span class="n">sloth_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">cwd</span><span class="si">}</span><span class="s2">/../&quot;</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sloth_path</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Second, we need to import all libraries needed in the following example.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">netCDF4</span> <span class="k">as</span> <span class="nn">nc</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">datetime</span> <span class="k">as</span> <span class="nn">dt</span>
+<span class="kn">import</span> <span class="nn">sloth.IO</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Define a target file, where to store the netCDF file</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">saveFile</span> <span class="o">=</span> <span class="s1">&#39;../data/examples_Write2NetCDF_short.nc&#39;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Use <strong>SLOTH</strong> to generate the target netCDF file.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">netCDFFileName</span> <span class="o">=</span> <span class="n">sloth</span><span class="o">.</span><span class="n">IO</span><span class="o">.</span><span class="n">createNetCDF</span><span class="p">(</span><span class="n">saveFile</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="s1">&#39;DE06&#39;</span><span class="p">,</span> 
+	<span class="n">author</span><span class="o">=</span><span class="s1">&#39;Niklas WAGNER&#39;</span><span class="p">,</span> <span class="n">contact</span><span class="o">=</span><span class="s1">&#39;n.wagner@fz-juelich.de&#39;</span><span class="p">,</span>
+	<span class="n">institution</span><span class="o">=</span><span class="s1">&#39;FZJ - IBG-3&#39;</span><span class="p">,</span> <span class="n">history</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;Created: </span><span class="si">{</span><span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M&quot;</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
+	<span class="n">description</span><span class="o">=</span><span class="s1">&#39;Write a short description of your data to ship with the netCDF files!&#39;</span><span class="p">,</span>
+	<span class="n">source</span><span class="o">=</span><span class="s1">&#39;add source here&#39;</span><span class="p">)</span>
+<span class="k">with</span> <span class="n">nc</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span><span class="n">netCDFFileName</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">nc_file</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;DEBUG: nc_file</span><span class="se">\n</span><span class="si">{</span><span class="n">nc_file</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>DEBUG: nc_file
+&lt;class &#39;netCDF4._netCDF4.Dataset&#39;&gt;
+root group (NETCDF4 data model, file format HDF5):
+    author: Niklas WAGNER
+    contact: n.wagner@fz-juelich.de
+    institution: FZJ - IBG-3
+    description: Write a short description of your data to ship with the netCDF files!
+    history: Created: 2023-09-04 11:48
+    source: add source here
+    dimensions(sizes): rlon(2000), rlat(2000), time(0)
+    variables(dimensions): float32 rlon(rlon), float32 rlat(rlat), int16 rotated_pole()
+    groups: 
+</pre></div>
+</div>
+</div>
+</div>
+<p>The used function (<code class="docutils literal notranslate"><span class="pre">sloth.IO.createNetCDF</span></code>) does collect some meta information as e.g. the author name and e-mail address, which are directly stored with the created netCDF file, to not get lost. Further the function does take the target domain as argument (<code class="docutils literal notranslate"><span class="pre">domain='DE06'</span></code>), to directly attach the correct axis and coordinates to the target netCDF file.<br />
+The target domain could be a keyword (as <code class="docutils literal notranslate"><span class="pre">DE06</span></code> above) or the full path to a grid-description file as used by <a class="reference external" href="https://code.mpimet.mpg.de/projects/cdo/embedded/cdo.pdf">CDO</a>. The keywords are simple predefined, frequently used griddes files shipped with <strong>SLOTH</strong> under <a class="reference external" href="https://github.com/HPSCTerrSys/SLOTH/tree/master/sloth/configs">sloth/configs/</a>.</p>
+<p>Generate some random example data, open the netCDF file and store the example data as a new variable called <code class="docutils literal notranslate"><span class="pre">TestData</span></code> with the netCDF file</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># create example data to store with the netCDF file:</span>
+<span class="c1"># using 5 time steps, and nx, ny of DE05 grid</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">2000</span><span class="p">,</span><span class="mi">2000</span><span class="p">)</span>
+
+<span class="c1"># Create the actual variable we want to store the data at.</span>
+<span class="k">with</span> <span class="n">nc</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span><span class="n">netCDFFileName</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">nc_file</span><span class="p">:</span>
+	<span class="c1"># Name of the variable: &#39;TestData&#39;</span>
+	<span class="n">ncVar</span> <span class="o">=</span> <span class="n">nc_file</span><span class="o">.</span><span class="n">createVariable</span><span class="p">(</span><span class="s1">&#39;TestData&#39;</span><span class="p">,</span> <span class="s1">&#39;f4&#39;</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="s1">&#39;rlat&#39;</span><span class="p">,</span> <span class="s1">&#39;rlon&#39;</span><span class="p">,),</span>
+	                                <span class="n">fill_value</span><span class="o">=-</span><span class="mi">9999</span><span class="p">,</span>
+	                                <span class="n">zlib</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+	<span class="n">ncVar</span><span class="o">.</span><span class="n">standard_name</span> <span class="o">=</span> <span class="s1">&#39;test_name&#39;</span>
+	<span class="n">ncVar</span><span class="o">.</span><span class="n">long_name</span> <span class="o">=</span> <span class="s1">&#39;variable to test writing netCDF&#39;</span>
+	<span class="n">ncVar</span><span class="o">.</span><span class="n">units</span> <span class="o">=</span><span class="s1">&#39;-&#39;</span>
+	<span class="n">ncVar</span><span class="o">.</span><span class="n">grid_mapping</span> <span class="o">=</span> <span class="s1">&#39;rotated_pole&#39;</span>
+
+	<span class="n">ncTime</span> <span class="o">=</span> <span class="n">nc_file</span><span class="o">.</span><span class="n">createVariable</span><span class="p">(</span><span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="s1">&#39;i2&#39;</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;time&#39;</span><span class="p">,))</span>
+	<span class="n">ncTime</span><span class="o">.</span><span class="n">standard_name</span> <span class="o">=</span> <span class="s1">&#39;time&#39;</span>
+	<span class="n">ncTime</span><span class="o">.</span><span class="n">units</span> <span class="o">=</span> <span class="s1">&#39;days since 1979-01-01 00:00:00&#39;</span>
+	<span class="n">ncTime</span><span class="o">.</span><span class="n">calendar</span> <span class="o">=</span> <span class="s1">&#39;365_day&#39;</span>
+
+	<span class="n">ncVar</span><span class="p">[</span><span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="o">...</span><span class="p">]</span>
+	<span class="n">ncTime</span><span class="p">[</span><span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Check the generated data with <code class="docutils literal notranslate"><span class="pre">ncdump</span> <span class="pre">-h</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">ncdump</span> <span class="o">-</span><span class="n">h</span> <span class="o">../</span><span class="n">data</span><span class="o">/</span><span class="n">examples_Write2NetCDF_short</span><span class="o">.</span><span class="n">nc</span>                                                                                           
+<span class="n">netcdf</span> <span class="n">examples_Write2NetCDF_short</span> <span class="p">{</span>
+<span class="n">dimensions</span><span class="p">:</span>
+        <span class="n">rlon</span> <span class="o">=</span> <span class="mi">2000</span> <span class="p">;</span>
+        <span class="n">rlat</span> <span class="o">=</span> <span class="mi">2000</span> <span class="p">;</span>
+        <span class="n">time</span> <span class="o">=</span> <span class="n">UNLIMITED</span> <span class="p">;</span> <span class="o">//</span> <span class="p">(</span><span class="mi">5</span> <span class="n">currently</span><span class="p">)</span>
+<span class="n">variables</span><span class="p">:</span>
+        <span class="nb">float</span> <span class="n">rlon</span><span class="p">(</span><span class="n">rlon</span><span class="p">)</span> <span class="p">;</span>
+                <span class="n">rlon</span><span class="p">:</span><span class="n">standard_name</span> <span class="o">=</span> <span class="s2">&quot;grid_longitude&quot;</span> <span class="p">;</span>
+                <span class="n">rlon</span><span class="p">:</span><span class="n">long_name</span> <span class="o">=</span> <span class="s2">&quot;rotated longitude&quot;</span> <span class="p">;</span>
+                <span class="n">rlon</span><span class="p">:</span><span class="n">units</span> <span class="o">=</span> <span class="s2">&quot;degrees&quot;</span> <span class="p">;</span>
+                <span class="n">rlon</span><span class="p">:</span><span class="n">axis</span> <span class="o">=</span> <span class="s2">&quot;X&quot;</span> <span class="p">;</span>
+        <span class="nb">float</span> <span class="n">rlat</span><span class="p">(</span><span class="n">rlat</span><span class="p">)</span> <span class="p">;</span>
+                <span class="n">rlat</span><span class="p">:</span><span class="n">standard_name</span> <span class="o">=</span> <span class="s2">&quot;grid_latitude&quot;</span> <span class="p">;</span>
+                <span class="n">rlat</span><span class="p">:</span><span class="n">long_name</span> <span class="o">=</span> <span class="s2">&quot;rotated latitude&quot;</span> <span class="p">;</span>
+                <span class="n">rlat</span><span class="p">:</span><span class="n">units</span> <span class="o">=</span> <span class="s2">&quot;degrees&quot;</span> <span class="p">;</span>
+                <span class="n">rlat</span><span class="p">:</span><span class="n">axis</span> <span class="o">=</span> <span class="s2">&quot;Y&quot;</span> <span class="p">;</span>
+        <span class="n">short</span> <span class="n">rotated_pole</span> <span class="p">;</span>
+                <span class="n">rotated_pole</span><span class="p">:</span><span class="n">long_name</span> <span class="o">=</span> <span class="s2">&quot;coordinates of the rotated North Pole&quot;</span> <span class="p">;</span>
+                <span class="n">rotated_pole</span><span class="p">:</span><span class="n">grid_mapping_name</span> <span class="o">=</span> <span class="s2">&quot;rotated_latitude_longitude&quot;</span> <span class="p">;</span>
+                <span class="n">rotated_pole</span><span class="p">:</span><span class="n">grid_north_pole_latitude</span> <span class="o">=</span> <span class="mf">39.25</span> <span class="p">;</span>
+                <span class="n">rotated_pole</span><span class="p">:</span><span class="n">grid_north_pole_longitude</span> <span class="o">=</span> <span class="o">-</span><span class="mf">162.</span> <span class="p">;</span>
+        <span class="nb">float</span> <span class="n">TestData</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">rlat</span><span class="p">,</span> <span class="n">rlon</span><span class="p">)</span> <span class="p">;</span>
+                <span class="n">TestData</span><span class="p">:</span><span class="n">_FillValue</span> <span class="o">=</span> <span class="o">-</span><span class="mf">9999.</span><span class="n">f</span> <span class="p">;</span>
+                <span class="n">TestData</span><span class="p">:</span><span class="n">standard_name</span> <span class="o">=</span> <span class="s2">&quot;test_name&quot;</span> <span class="p">;</span>
+                <span class="n">TestData</span><span class="p">:</span><span class="n">long_name</span> <span class="o">=</span> <span class="s2">&quot;variable to test writing netCDF&quot;</span> <span class="p">;</span>
+                <span class="n">TestData</span><span class="p">:</span><span class="n">units</span> <span class="o">=</span> <span class="s2">&quot;-&quot;</span> <span class="p">;</span>
+                <span class="n">TestData</span><span class="p">:</span><span class="n">grid_mapping</span> <span class="o">=</span> <span class="s2">&quot;rotated_pole&quot;</span> <span class="p">;</span>
+        <span class="n">short</span> <span class="n">time</span><span class="p">(</span><span class="n">time</span><span class="p">)</span> <span class="p">;</span>
+                <span class="n">time</span><span class="p">:</span><span class="n">standard_name</span> <span class="o">=</span> <span class="s2">&quot;time&quot;</span> <span class="p">;</span>
+                <span class="n">time</span><span class="p">:</span><span class="n">units</span> <span class="o">=</span> <span class="s2">&quot;days since 1979-01-01 00:00:00&quot;</span> <span class="p">;</span>
+                <span class="n">time</span><span class="p">:</span><span class="n">calendar</span> <span class="o">=</span> <span class="s2">&quot;365_day&quot;</span> <span class="p">;</span>
+
+<span class="o">//</span> <span class="k">global</span> <span class="n">attributes</span><span class="p">:</span>
+                <span class="p">:</span><span class="n">author</span> <span class="o">=</span> <span class="s2">&quot;Niklas WAGNER&quot;</span> <span class="p">;</span>
+                <span class="p">:</span><span class="n">contact</span> <span class="o">=</span> <span class="s2">&quot;n.wagner@fz-juelich.de&quot;</span> <span class="p">;</span>
+                <span class="p">:</span><span class="n">institution</span> <span class="o">=</span> <span class="s2">&quot;FZJ - IBG-3&quot;</span> <span class="p">;</span>
+                <span class="p">:</span><span class="n">description</span> <span class="o">=</span> <span class="s2">&quot;Write a short description of your data to ship with the netCDF files!&quot;</span> <span class="p">;</span>                                                                                                  
+                <span class="p">:</span><span class="n">history</span> <span class="o">=</span> <span class="s2">&quot;Created: 2023-09-04 11:37&quot;</span> <span class="p">;</span>
+                <span class="p">:</span><span class="n">source</span> <span class="o">=</span> <span class="s2">&quot;add source here&quot;</span> <span class="p">;</span>
+<span class="p">}</span>
+
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="ex_SanityCheck.html" class="btn btn-neutral float-left" title="SanityCheck" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="ex_intersection_calculations.html" class="btn btn-neutral float-right" title="Calculating the total subsurface storage anomalies using geopandas" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Niklas WAGNER.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

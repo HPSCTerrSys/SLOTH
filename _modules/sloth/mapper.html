@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>sloth.mapper &mdash; SLOTH  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            SLOTH
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">SLOTH:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../README.html">Welcome to SLOTH</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Functions:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../coordTrafo.html">coordTrafo.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../toolBox.html">toolBox.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../SanityCheck.html">SanityCheck.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../IO.html">IO.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../analysis.html">analysis.py</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Classes:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../mapper.html">mapper.py</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/README.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/ex_RotatedCoordinates.html">Rotated Coordinates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/ex_SanityCheck.html">SanityCheck</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/ex_WriteDataToNetCDF.html">How to write data in netCDF format.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/ex_intersection_calculations.html">Calculating the total subsurface storage anomalies using geopandas</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Maintenance:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../content/maintenance.html">Maintenance</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">SLOTH</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">sloth.mapper</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for sloth.mapper</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">csv</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">toolBox</span>
+
+<div class="viewcode-block" id="mapper">
+<a class="viewcode-back" href="../../mapper.html#sloth.mapper.mapper">[docs]</a>
+<span class="k">class</span> <span class="nc">mapper</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39; </span>
+
+<span class="sd">    **TBE**</span>
+
+<span class="sd">    Due to several reasons (e.g. coarse resolutions) the river corridors</span>
+<span class="sd">    within TSMP (as all other models) does not have to match the real corridor</span>
+<span class="sd">    for all pixels along the river. </span>
+<span class="sd">    [...]</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="c1">###########################################################################</span>
+    <span class="c1">############################# Definition ##################################</span>
+    <span class="c1">###########################################################################</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">SimLons</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">SimLats</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+                       <span class="n">ObsLons</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ObsLats</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+                       <span class="n">ObsIDs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+                       <span class="n">SimMeanQ</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ObsMeanQ</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                       <span class="n">SimMeanArea</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ObsMeanArea</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39; Default constructor of mapper-class</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        SimLons : 2D ndarray</span>
+<span class="sd">            Two dimensional ndarray containing the lon value for each point of </span>
+<span class="sd">            SimGrid</span>
+<span class="sd">        SimLats : 2D ndarray</span>
+<span class="sd">            Two dimensional ndarray containing the lat value for each point of </span>
+<span class="sd">            SimGrid</span>
+<span class="sd">        ObsLons : 1D ndarray</span>
+<span class="sd">            One dimensional ndarray containing the lon values for each individual </span>
+<span class="sd">            GRDC station stored with the object</span>
+<span class="sd">        ObsLats : 1D ndarray</span>
+<span class="sd">            One dimensional ndarray containing the lat values for each individual </span>
+<span class="sd">            GRDC station stored with the object</span>
+<span class="sd">        ObsID : 1D ndarray</span>
+<span class="sd">            One dimensional ndarray containing the station ID for each individual </span>
+<span class="sd">            GRDC station stored with the object</span>
+<span class="sd">        SimMeanQ : 2D ndarray</span>
+<span class="sd">            Two dimensional ndarray containing the mean discharge for each point</span>
+<span class="sd">            of SimGrid (mean Q for entire period or ref period) </span>
+<span class="sd">        ObsMeanQ : 1D ndarray</span>
+<span class="sd">            One dimensional ndarray containing the mean discharge for each individual </span>
+<span class="sd">            GRDC station stored with the object</span>
+<span class="sd">        SimMeanArea : 1D ndarray</span>
+<span class="sd">            One dimensional ndarray containing the best fitting catchment area</span>
+<span class="sd">            for each individual GRDC station stored with the object (calculation </span>
+<span class="sd">            based on Sim data)</span>
+<span class="sd">        ObsMeanArea : 1D ndarray</span>
+<span class="sd">            One dimensional ndarray containing the mean catchment area of each individual </span>
+<span class="sd">            GRDC station stored with the object</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c1"># input</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">SimLons</span>        <span class="o">=</span> <span class="n">SimLons</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">SimLats</span>        <span class="o">=</span> <span class="n">SimLats</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ObsLons</span>        <span class="o">=</span> <span class="n">ObsLons</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ObsLats</span>        <span class="o">=</span> <span class="n">ObsLats</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ObsIDs</span>         <span class="o">=</span> <span class="n">ObsIDs</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">SimMeanQ</span>       <span class="o">=</span> <span class="n">SimMeanQ</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ObsMeanQ</span>       <span class="o">=</span> <span class="n">ObsMeanQ</span>
+
+        <span class="c1"># output</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">MapXIdx_raw</span>    <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">MapYIdx_raw</span>    <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">MapXIdx_fit</span>    <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">MapYIdx_fit</span>    <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ObsMeanArea</span>    <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">SimMeanArea</span>    <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">SimLons</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__SimLons</span>
+    <span class="nd">@SimLons</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">SimLons</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">SimLons</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; SimLons is expected to be an 2D ndarray &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">SimLons</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Initialize SimLons as NoneType&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__SimLons</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">SimLons</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;SimLons is of type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">SimLons</span><span class="p">)</span><span class="si">}</span><span class="s1"> but &lt;class &quot;numpy.ndarray&quot;&gt; is required!&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__SimLons</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">SimLons</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;SimLons is of dimension </span><span class="si">{</span><span class="n">SimLons</span><span class="o">.</span><span class="n">ndim</span><span class="si">}</span><span class="s1"> but dimension 2 is required!&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__SimLons</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__SimLons</span>      <span class="o">=</span> <span class="n">SimLons</span>
+        <span class="c1"># set mapped idx to None again, since the SimLons was changed!</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">MapXIdx_raw</span>    <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">MapYIdx_raw</span>    <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">MapXIdx_fit</span>    <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">MapYIdx_fit</span>    <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">SimLats</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__SimLats</span>
+    <span class="nd">@SimLats</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">SimLats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">SimLats</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; SimLats is expected to be an 2D ndarray &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">SimLats</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Initialize SimLats as NoneType&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__SimLats</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">SimLats</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;SimLats is of type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">SimLats</span><span class="p">)</span><span class="si">}</span><span class="s1"> but &lt;class &quot;numpy.ndarray&quot;&gt; is required!&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__SimLats</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">SimLats</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;SimLats is of dimension </span><span class="si">{</span><span class="n">SimLats</span><span class="o">.</span><span class="n">ndim</span><span class="si">}</span><span class="s1"> but dimension 2 is required!&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__SimLats</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__SimLats</span>      <span class="o">=</span> <span class="n">SimLats</span>
+        <span class="c1"># set mapped idx to None again, since the SimLats was changed!</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">MapXIdx_raw</span>    <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">MapYIdx_raw</span>    <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">MapXIdx_fit</span>    <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">MapYIdx_fit</span>    <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ObsLons</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ObsLons</span>
+    <span class="nd">@ObsLons</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">ObsLons</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ObsLons</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; ObsLons is expected to be an 2D ndarray &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">ObsLons</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Initialize ObsLons as NoneType&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__ObsLons</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ObsLons</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;ObsLons is of type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">ObsLons</span><span class="p">)</span><span class="si">}</span><span class="s1"> but &lt;class &quot;numpy.ndarray&quot;&gt; is required!&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__ObsLons</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">ObsLons</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;ObsLons is of dimension </span><span class="si">{</span><span class="n">ObsLons</span><span class="o">.</span><span class="n">ndim</span><span class="si">}</span><span class="s1"> but dimension 1 is required!&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__ObsLons</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__ObsLons</span>      <span class="o">=</span> <span class="n">ObsLons</span>
+        <span class="c1"># set mapped idx to None again, since the ObsLons was changed!</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">MapXIdx_raw</span>    <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">MapYIdx_raw</span>    <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">MapXIdx_fit</span>    <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">MapYIdx_fit</span>    <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ObsLats</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ObsLats</span>
+    <span class="nd">@ObsLats</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">ObsLats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ObsLats</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; ObsLats is expected to be an 2D ndarray &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">ObsLats</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Initialize ObsLats as NoneType&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__ObsLats</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ObsLats</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;ObsLats is of type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">ObsLats</span><span class="p">)</span><span class="si">}</span><span class="s1"> but &lt;class &quot;numpy.ndarray&quot;&gt; is required!&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__ObsLats</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">ObsLats</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;ObsLats is of dimension </span><span class="si">{</span><span class="n">ObsLats</span><span class="o">.</span><span class="n">ndim</span><span class="si">}</span><span class="s1"> but dimension 1 is required!&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__ObsLats</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__ObsLats</span>      <span class="o">=</span> <span class="n">ObsLats</span>
+        <span class="c1"># set mapped idx to None again, since the ObsLats was changed!</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">MapXIdx_raw</span>    <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">MapYIdx_raw</span>    <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">MapXIdx_fit</span>    <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">MapYIdx_fit</span>    <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ObsIDs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ObsIDs</span>
+    <span class="nd">@ObsIDs</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">ObsIDs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ObsIDs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; ObsIDs is expected to be an 2D ndarray &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">ObsIDs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Initialize ObsIDs as NoneType&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__ObsIDs</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ObsIDs</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;ObsIDs is of type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">ObsIDs</span><span class="p">)</span><span class="si">}</span><span class="s1"> but &lt;class &quot;numpy.ndarray&quot;&gt; is required!&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__ObsIDs</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">ObsIDs</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;ObsIDs is of dimension </span><span class="si">{</span><span class="n">ObsIDs</span><span class="o">.</span><span class="n">ndim</span><span class="si">}</span><span class="s1"> but dimension 1 is required!&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__ObsIDs</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__ObsIDs</span>       <span class="o">=</span> <span class="n">ObsIDs</span>
+        <span class="c1"># set mapped idx to None again, since the ObsIDs was changed!</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">MapXIdx_raw</span>    <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">MapYIdx_raw</span>    <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">MapXIdx_fit</span>    <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">MapYIdx_fit</span>    <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">SimMeanQ</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__SimMeanQ</span>
+    <span class="nd">@SimMeanQ</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">SimMeanQ</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">SimMeanQ</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; SimMeanQ is expected to be an 2D ndarray &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">SimMeanQ</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Initialize SimMeanQ as NoneType&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__SimMeanQ</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">SimMeanQ</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;SimMeanQ is of type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">SimMeanQ</span><span class="p">)</span><span class="si">}</span><span class="s1"> but &lt;class &quot;numpy.ndarray&quot;&gt; is required!&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__SimMeanQ</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">SimMeanQ</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;SimMeanQ is of dimension </span><span class="si">{</span><span class="n">SimMeanQ</span><span class="o">.</span><span class="n">ndim</span><span class="si">}</span><span class="s1"> but dimension 2 is required!&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__SimMeanQ</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__SimMeanQ</span>     <span class="o">=</span> <span class="n">SimMeanQ</span>
+        <span class="c1"># set mapped idx to None again, since the SimMeanQ was changed!</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">MapXIdx_raw</span>    <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">MapYIdx_raw</span>    <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">MapXIdx_fit</span>    <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">MapYIdx_fit</span>    <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ObsMeanQ</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ObsMeanQ</span>
+    <span class="nd">@ObsMeanQ</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">ObsMeanQ</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ObsMeanQ</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; ObsMeanQ is expected to be an 2D ndarray &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">ObsMeanQ</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Initialize ObsMeanQ as NoneType&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__ObsMeanQ</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ObsMeanQ</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;ObsMeanQ is of type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">ObsMeanQ</span><span class="p">)</span><span class="si">}</span><span class="s1"> but &lt;class &quot;numpy.ndarray&quot;&gt; is required!&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__ObsMeanQ</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">ObsMeanQ</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;ObsMeanQ is of dimension </span><span class="si">{</span><span class="n">ObsMeanQ</span><span class="o">.</span><span class="n">ndim</span><span class="si">}</span><span class="s1"> but dimension 1 is required!&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__ObsMeanQ</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__ObsMeanQ</span>     <span class="o">=</span> <span class="n">ObsMeanQ</span>
+        <span class="c1"># set mapped idx to None again, since the ObsMeanQ was changed!</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">MapXIdx_raw</span>    <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">MapYIdx_raw</span>    <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">MapXIdx_fit</span>    <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">MapYIdx_fit</span>    <span class="o">=</span> <span class="kc">None</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    One can think about additional functions like:</span>
+<span class="sd">    setGridFromDef</span>
+<span class="sd">    readNetCDF</span>
+<span class="sd">    [...]</span>
+<span class="sd">    or similar</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1">###########################################################################</span>
+    <span class="c1">########################## Auxiliary tools ################################</span>
+    <span class="c1">###########################################################################</span>
+<div class="viewcode-block" id="mapper.spher_dist">
+<a class="viewcode-back" href="../../mapper.html#sloth.mapper.mapper.spher_dist">[docs]</a>
+    <span class="k">def</span> <span class="nf">spher_dist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lon1</span><span class="p">,</span> <span class="n">lat1</span><span class="p">,</span> <span class="n">lon2</span><span class="p">,</span> <span class="n">lat2</span><span class="p">,</span> <span class="n">Rearth</span><span class="o">=</span><span class="mi">6373</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; calculate the spherical / haversine distance</span>
+
+<span class="sd">        Source: https://www.kompf.de/gps/distcalc.html</span>
+<span class="sd">        This function is supposed to proper handle different shaped coords</span>
+<span class="sd">        latX and lonX is supposed to be passed in rad</span>
+
+<span class="sd">        return 2D ndarray</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">term1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">lat1</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">lat2</span><span class="p">)</span>
+        <span class="n">term2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">lat1</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">lat2</span><span class="p">)</span>
+        <span class="n">term3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">lon2</span> <span class="o">-</span> <span class="n">lon1</span><span class="p">)</span>
+        <span class="c1"># tmp_bool = ( (-1 &lt;= (term1+term2*term3)) &amp; ((term1+term2*term3) &gt;= 1) &amp; ((term1+term2*term3) == 0) &amp; (np.isnan(term1+term2*term3)) ).all()</span>
+        <span class="c1"># print(f&#39;arccos: {tmp_bool}&#39;)</span>
+        <span class="k">return</span> <span class="n">Rearth</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span><span class="n">term1</span><span class="o">+</span><span class="n">term2</span><span class="o">*</span><span class="n">term3</span><span class="p">)</span></div>
+
+
+
+    <span class="c1">###########################################################################</span>
+    <span class="c1">########################### Core functions ################################</span>
+    <span class="c1">########################################################################### </span>
+
+    <span class="k">def</span> <span class="nf">__checkt4MapRaw</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39; This is a separate function to keep MapRaw() functions readable.</span>
+
+<span class="sd">        This function checks if the passed data fulfills some basic </span>
+<span class="sd">        requirements as e.g. if all needed data are defined and if </span>
+<span class="sd">        SimMeanQ and SimLons are of same shape.</span>
+<span class="sd">        This is basically to avoid trivial errors while using this class.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        boolean </span>
+<span class="sd">            True if check is passed, False if some errors are detected.</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c1"># are all variables defined?</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">SimLons</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;self.SimLons is not defined yet, but required by function self.MapRaw()!&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">SimLats</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;self.SimLats is not defined yet, but required by function self.MapRaw()!&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ObsLons</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;self.ObsLons is not defined yet, but required by function self.MapRaw()!&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ObsLats</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;self.ObsLats is not defined yet, but required by function self.MapRaw()!&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ObsIDs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;self.ObsIDs is not defined yet, but required by function self.MapRaw()!&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="c1"># are the variables / shapes reasonable?</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">SimLons</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SimLats</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;The shape of self.SimLons </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">SimLons</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s1"> is not equal the shape of self.SimLats </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">SimLats</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s1">!&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ObsLons</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ObsLats</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;The shape of self.ObsLons </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ObsLons</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s1"> is not equal the shape of self.ObsLats </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ObsLats</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s1">!&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ObsLons</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ObsIDs</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;The shape of self.ObsLons / self.ObsLats </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ObsLons</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s1"> is not equal the shape of self.ObsIDs </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ObsIDs</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s1">!&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">return</span> <span class="kc">True</span>
+
+<div class="viewcode-block" id="mapper.MapRaw">
+<a class="viewcode-back" href="../../mapper.html#sloth.mapper.mapper.MapRaw">[docs]</a>
+    <span class="k">def</span> <span class="nf">MapRaw</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39; This functions straight forward maps OBS on SimGrid.</span>
+
+<span class="sd">        This function maps OBS data according to its Lat/Lon values </span>
+<span class="sd">        to SimGrid, by calculating the &#39;real&#39; distance between OBS location</span>
+<span class="sd">        and all points in SimGrid. The point with the smallest distance is </span>
+<span class="sd">        choose as the correct location of OBS on SimGrid. </span>
+<span class="sd">        The &#39;real&#39; distance is hereby the distance in [m] between OBS and SimGrind </span>
+<span class="sd">        calculated on a sphere.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This function sets / updates the object variables self.MapYIdx_fit, </span>
+<span class="sd">        and self.MapXIdx_fit directly</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="c1">#check if all needed data are already defined</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__checkt4MapRaw</span><span class="p">():</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;checkt4MapRaw() failed --&gt; self.MapRaw() canceled!&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="c1"># Create empty lists for results</span>
+        <span class="n">tmp_MapXIdx_raw</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">tmp_MapYIdx_raw</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># Loop over all ObsIDs stored with the object</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;MapRaw start&#39;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">numObsIDs</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ObsIDs</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">ObsID</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ObsIDs</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\r</span><span class="s1">MapRaw ObsID: </span><span class="si">{</span><span class="n">ObsID</span><span class="si">}</span><span class="s1"> (</span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s1"> / </span><span class="si">{</span><span class="n">numObsIDs</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">ObsLon</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ObsLons</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+            <span class="n">ObsLat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ObsLats</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+            <span class="c1"># Calculate distance between Obs and SimGrid on Earth surface</span>
+            <span class="n">dist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spher_dist</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SimLons</span><span class="p">),</span>
+                                      <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SimLats</span><span class="p">),</span>
+                                      <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">ObsLon</span><span class="p">),</span>
+                                      <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">ObsLat</span><span class="p">))</span>
+            <span class="c1"># Find index of smallest distance</span>
+            <span class="n">mapped_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unravel_index</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">),</span><span class="n">dist</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+            <span class="c1"># Temporally store found idx in list</span>
+            <span class="n">tmp_MapYIdx_raw</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mapped_idx</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">tmp_MapXIdx_raw</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mapped_idx</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;MapRaw done&#39;</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># update object-variables with found information</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">MapYIdx_raw</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">tmp_MapYIdx_raw</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">MapXIdx_raw</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">tmp_MapXIdx_raw</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span> <span class="nf">__check4MapQ</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39; This is a separate function to keep MapXXX functions readable.</span>
+
+<span class="sd">        This function checks if the passed data fulfills some basic </span>
+<span class="sd">        requirements as e.g. SimMeanQ and SimLons are of same shape.</span>
+<span class="sd">        This is basically to avoid trivial errors while using this class.</span>
+<span class="sd">        Because self.MapRaw() is called as part of all self.MapBestXXX() </span>
+<span class="sd">        functions, this function only checks additional requirements</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        boolean </span>
+<span class="sd">            True if check is passed, False if some errors are detected.</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c1"># are all variables defined?</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">SimMeanQ</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;self.SimMeanQ is not defined yet, but required by function self.check4MapQ()!&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ObsMeanQ</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;self.ObsMeanQ is not defined yet, but required by function self.check4MapQ()!&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">SimMeanQ</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SimLons</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;The shape of self.SimMeanQ </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">SimMeanQ</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s1"> is not equal the shape of self.SimLons / self.SimLats </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">SimLons</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s1">!&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ObsMeanQ</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ObsLons</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;The shape of self.ObsMeanQ </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ObsMeanQ</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s1"> is not equal the shape of self.ObsLons / self.ObsLats </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ObsLons</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s1">!&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">return</span> <span class="kc">True</span>
+
+<div class="viewcode-block" id="mapper.MapBestQ">
+<a class="viewcode-back" href="../../mapper.html#sloth.mapper.mapper.MapBestQ">[docs]</a>
+    <span class="k">def</span> <span class="nf">MapBestQ</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">search_rad</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39; This functions maps OBS on SimGrid by choosing that pixel with best </span>
+<span class="sd">        fitting discharge (Q) within given radius.</span>
+
+<span class="sd">        The best fitting Q is found by calculating the discharge of</span>
+<span class="sd">        each pixel within a given radius around the origin pixel.</span>
+<span class="sd">        The origin pixel is hereby defined by MapRaw().</span>
+<span class="sd">        That pixel with Q closes to GRDC data is than set.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        search_rad : int </span>
+<span class="sd">            defining the radius around the origin pixel to search for best fitting Q. </span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This function sets / updates the object variables self.MapYIdx_fit, </span>
+<span class="sd">        and self.MapXIdx_fit directly</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="c1"># First MapRaw(), than adjust according to best fitting Q</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">MapRaw</span><span class="p">()</span>
+        <span class="c1">#check if all needed data are already defined</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__check4MapQ</span><span class="p">():</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;check4MapQ() failed --&gt; self.MapBestQ() canceled!&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="c1"># Create empty lists for results</span>
+        <span class="n">tmp_MapXIdx_fit</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">tmp_MapYIdx_fit</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># Loop over all ObsIDs stored with the object</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">ObsID</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ObsIDs</span><span class="p">):</span>
+            <span class="c1"># Set the original pixel around which to search</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">MapYIdx_raw</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">MapXIdx_raw</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+            <span class="c1"># extract subset of self.SimMeanQ around origin pixel</span>
+            <span class="c1"># and search radius search_rad (+1 cause last is exclusive)</span>
+            <span class="n">sub_SimMeanQ</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SimMeanQ</span><span class="p">[</span><span class="n">y</span><span class="o">-</span><span class="n">search_rad</span><span class="p">:</span><span class="n">y</span><span class="o">+</span><span class="n">search_rad</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">x</span><span class="o">-</span><span class="n">search_rad</span><span class="p">:</span><span class="n">x</span><span class="o">+</span><span class="n">search_rad</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">sub_ObsMeanQ</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ObsMeanQ</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+            <span class="c1"># Calculate difference between SimMeanQ and ObsMeanQ (GRDC) within subset</span>
+            <span class="n">dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">sub_SimMeanQ</span> <span class="o">-</span> <span class="n">sub_ObsMeanQ</span><span class="p">)</span>
+            <span class="c1"># Get index of best fitting Q (min(dist)) within subset</span>
+            <span class="n">mapped_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unravel_index</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">),</span><span class="n">dist</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+            <span class="c1"># Convert subset-index to global index and</span>
+            <span class="c1"># store (x|y) of best fitting Q in results list</span>
+            <span class="n">tmp_realYidx</span> <span class="o">=</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">search_rad</span><span class="p">)</span> <span class="o">+</span> <span class="n">mapped_idx</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">tmp_realXidx</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">search_rad</span><span class="p">)</span> <span class="o">+</span> <span class="n">mapped_idx</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">tmp_MapYIdx_fit</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tmp_realYidx</span><span class="p">)</span>
+            <span class="n">tmp_MapXIdx_fit</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tmp_realXidx</span><span class="p">)</span>
+
+        <span class="c1"># update object-variables with found information</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">MapYIdx_fit</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">tmp_MapYIdx_fit</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">MapXIdx_fit</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">tmp_MapXIdx_fit</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="mapper.MapHighQ">
+<a class="viewcode-back" href="../../mapper.html#sloth.mapper.mapper.MapHighQ">[docs]</a>
+    <span class="k">def</span> <span class="nf">MapHighQ</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">search_rad</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39; This functions maps OBS on SimGrid by choosing that pixel with highest </span>
+<span class="sd">        discharge (Q) within given radius.</span>
+
+<span class="sd">        The highest discharge (Q) is simply found by applying np.argmax() to </span>
+<span class="sd">        the subset (search_rad around origin pixel) of SimMeanQ.</span>
+<span class="sd">        The origin pixel is hereby defined by MapRaw()</span>
+<span class="sd">        SimMeanQ is part of the objects-variables</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        search_rad : int </span>
+<span class="sd">            defining the radius around the origin pixel to search for highest Q. </span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This function sets / updates the object variables self.MapYIdx_fit, </span>
+<span class="sd">        and self.MapXIdx_fit directly</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c1"># First MapRaw(), than adjust according to highest Q</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">MapRaw</span><span class="p">()</span>
+        <span class="c1">#check if all needed data are already defined</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__check4MapQ</span><span class="p">():</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;check4MapQ() failed --&gt; self.MapBestQ() canceled!&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="c1"># Create empty lists for results</span>
+        <span class="n">tmp_MapXIdx_fit</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">tmp_MapYIdx_fit</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># Loop over all ObsIDs stored with the object</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">ObsID</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ObsIDs</span><span class="p">):</span>
+            <span class="c1"># Set the original pixel around which to search</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">MapYIdx_raw</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">MapXIdx_raw</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+            <span class="c1"># extract sub area of self.SimMeanQ according to current ObsID</span>
+            <span class="c1"># and search radius search_rad (+1 because last is exclusive)</span>
+            <span class="n">sub_SimMeanQ</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SimMeanQ</span><span class="p">[</span><span class="n">y</span><span class="o">-</span><span class="n">search_rad</span><span class="p">:</span><span class="n">y</span><span class="o">+</span><span class="n">search_rad</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">x</span><span class="o">-</span><span class="n">search_rad</span><span class="p">:</span><span class="n">x</span><span class="o">+</span><span class="n">search_rad</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+            <span class="c1"># sub_ObsMeanQ = self.ObsMeanQ[idx] # REMOVE</span>
+            <span class="c1"># Get index of Q within subset</span>
+            <span class="n">mapped_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unravel_index</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">sub_SimMeanQ</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">),</span><span class="n">sub_SimMeanQ</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+            <span class="c1"># Convert subset-index to global index and</span>
+            <span class="c1"># store (x|y) of highest Q in results list</span>
+            <span class="n">tmp_realYidx</span> <span class="o">=</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">search_rad</span><span class="p">)</span> <span class="o">+</span> <span class="n">mapped_idx</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">tmp_realXidx</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">search_rad</span><span class="p">)</span> <span class="o">+</span> <span class="n">mapped_idx</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">tmp_MapYIdx_fit</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tmp_realYidx</span><span class="p">)</span>
+            <span class="n">tmp_MapXIdx_fit</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tmp_realXidx</span><span class="p">)</span>
+
+        <span class="c1"># update object-variables with found information</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">MapYIdx_fit</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">tmp_MapYIdx_fit</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">MapXIdx_fit</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">tmp_MapXIdx_fit</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span> <span class="nf">__check4MapArea</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39; This is a separate function to keep MapXXX functions readable.</span>
+
+<span class="sd">        This function checks if the passed data fulfills some basic </span>
+<span class="sd">        requirements as e.g. self.ObsMeanArea is defnined.</span>
+<span class="sd">        This is basically to avoid trivial errors while using this class.</span>
+<span class="sd">        Because self.MapRaw() is called as part of all self.MapBestXXX() </span>
+<span class="sd">        functions, this function only checks additional requirements</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        boolean </span>
+<span class="sd">            True if check is passed, False if some errors are detected.</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c1"># are all variables defined?</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ObsMeanArea</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;self.ObsMeanArea is not defined yet, but required by function self.check4MapArea()!&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">return</span> <span class="kc">True</span>
+
+<div class="viewcode-block" id="mapper.MapBestCatchment">
+<a class="viewcode-back" href="../../mapper.html#sloth.mapper.mapper.MapBestCatchment">[docs]</a>
+    <span class="k">def</span> <span class="nf">MapBestCatchment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">search_rad</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">dx</span><span class="o">=</span><span class="mf">12500.</span><span class="p">,</span> <span class="n">dy</span><span class="o">=</span><span class="mf">12500.</span><span class="p">,</span> <span class="n">slopey</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">slopex</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39; This functions maps OBS on SimGrid by choosing that pixel which related </span>
+<span class="sd">        catchment area fits best to GRDC.</span>
+
+<span class="sd">        The best fitting catchment is found by calculating the catchment of</span>
+<span class="sd">        each pixel within a given radius around the origin pixel.</span>
+<span class="sd">        The origin pixel is hereby defined by MapRaw().</span>
+<span class="sd">        That pixel with catchment area closes to GRDC data is than set.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        search_rad : int </span>
+<span class="sd">            defining the radius around the origin pixel to search for best fitting catchment. </span>
+<span class="sd">        dy: float</span>
+<span class="sd">            defining the y-resolution of slope-grid (in [m])</span>
+<span class="sd">        dx: float</span>
+<span class="sd">            defining the x-resolution of slope-grid (in [m])</span>
+<span class="sd">        slopey: 2D ndarray</span>
+<span class="sd">            defining the ParFlow slopes in y-direction used to calculate the catchment</span>
+<span class="sd">        slopex: 2D ndarray</span>
+<span class="sd">            defining the ParFlow slopes in x-direction used to calculate the catchment</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This function sets / updates the object variables self.MapYIdx_fit, </span>
+<span class="sd">        self.MapXIdx_fit, and self.SimMeanArea directly</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="c1"># First MapRaw(), than adjust according to best fitting catchment-size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">MapRaw</span><span class="p">()</span>
+        <span class="c1">#check if all needed data are already defined</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__check4MapArea</span><span class="p">():</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;check4MapArea() failed --&gt; self.MapBestCatchment() canceled!&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="c1"># Create empty lists for results</span>
+        <span class="n">tmp_MapXIdx_fit</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">tmp_MapYIdx_fit</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">tmp_SimManArea</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># Loop over all ObsIDs stored with the object</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;MapBestCatchment ObsID: start&#39;</span><span class="p">,</span>  <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">numObsIDs</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ObsIDs</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">ObsID</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ObsIDs</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\r</span><span class="s1">MapBestCatchment ObsID: </span><span class="si">{</span><span class="n">ObsID</span><span class="si">}</span><span class="s1"> (</span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s1"> / </span><span class="si">{</span><span class="n">numObsIDs</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="c1"># Set the original pixel around which to search</span>
+            <span class="n">y</span>        <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">MapYIdx_raw</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+            <span class="n">x</span>        <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">MapXIdx_raw</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+            <span class="c1"># Set catchment area defined by GRDC to compare with</span>
+            <span class="n">meanArea</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ObsMeanArea</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+
+            <span class="c1"># Create lists for temporary results</span>
+            <span class="n">tmp_catchmentAreaList</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">tmp_catchmentXList</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">tmp_catchmentYList</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="c1"># Loop over all pixel within given search-radius around the </span>
+            <span class="c1"># origin pixel, including the original pixel.</span>
+            <span class="k">for</span> <span class="n">x_inc</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="n">search_rad</span><span class="p">,</span> <span class="n">search_rad</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">y_inc</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="n">search_rad</span><span class="p">,</span> <span class="n">search_rad</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+                    <span class="n">tmp_x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="n">x_inc</span>
+                    <span class="n">tmp_y</span> <span class="o">=</span> <span class="n">y</span> <span class="o">+</span> <span class="n">y_inc</span>
+                    <span class="c1"># find catchment for (tmp_x|tmp_y) </span>
+                    <span class="c1"># for more information on calculation of catchment see:</span>
+                    <span class="c1"># catcyNAME/toolBox.py --&gt; calc_catchment()</span>
+                    <span class="n">tmp_catchmentMask</span> <span class="o">=</span> <span class="n">toolBox</span><span class="o">.</span><span class="n">calc_catchment</span><span class="p">(</span><span class="n">slopex</span><span class="p">,</span> <span class="n">slopey</span><span class="p">,</span> <span class="n">tmp_x</span><span class="p">,</span> <span class="n">tmp_y</span><span class="p">)</span>
+                    <span class="c1"># Calculate area of catchment by multiplying with dx and dy</span>
+                    <span class="c1"># Than change units from [m^2] to [km^2] to stay compatible to GRDC</span>
+                    <span class="n">tmp_catchmentMask</span> <span class="o">*=</span> <span class="n">dx</span><span class="o">*</span><span class="n">dy</span>
+                    <span class="n">tmp_catchmentMask</span> <span class="o">*=</span> <span class="mf">1.</span><span class="o">/</span><span class="p">(</span><span class="mf">1000.</span><span class="o">*</span><span class="mf">1000.</span><span class="p">)</span>
+                    <span class="n">tmp_catchmentArea</span><span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">tmp_catchmentMask</span><span class="p">)</span>
+                    <span class="c1"># Add information for current inspected pixel in </span>
+                    <span class="c1"># temporary results list</span>
+                    <span class="n">tmp_catchmentAreaList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tmp_catchmentArea</span><span class="p">)</span>
+                    <span class="n">tmp_catchmentXList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tmp_x</span><span class="p">)</span>
+                    <span class="n">tmp_catchmentYList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tmp_y</span><span class="p">)</span>
+
+            <span class="c1"># Convert temporary results list to ndarray</span>
+            <span class="n">tmp_catchmentArea</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">tmp_catchmentAreaList</span><span class="p">)</span>
+            <span class="n">tmp_catchmentX</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">tmp_catchmentXList</span><span class="p">)</span>
+            <span class="n">tmp_catchmentY</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">tmp_catchmentYList</span><span class="p">)</span>
+            <span class="c1"># Now tmp_catchmentArea is a numpy.ndarray holding the catchment-size</span>
+            <span class="c1"># of the pixel related to X and Y values stored in tmp_catchmentX </span>
+            <span class="c1"># and tmp_catchmentY;</span>
+            <span class="c1"># X and Y are absolute pixels of passed slopex and slopey and NOT of </span>
+            <span class="c1"># a subset.</span>
+
+            <span class="c1"># Calculate difference between calculated catchment areas and GRDC data</span>
+            <span class="n">dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span> <span class="n">tmp_catchmentArea</span> <span class="o">-</span> <span class="n">meanArea</span> <span class="p">)</span>
+            <span class="c1"># Get index of best fitting catchment (min(dist)) within temporary </span>
+            <span class="c1"># result list</span>
+            <span class="n">mapped_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unravel_index</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">),</span><span class="n">dist</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+            <span class="c1"># Store information of best fitting pixel with results list </span>
+            <span class="n">tmp_best_fitting_area_x</span> <span class="o">=</span> <span class="n">tmp_catchmentX</span><span class="p">[</span><span class="n">mapped_idx</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+            <span class="n">tmp_best_fitting_area_y</span> <span class="o">=</span> <span class="n">tmp_catchmentY</span><span class="p">[</span><span class="n">mapped_idx</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+            <span class="n">tmp_best_fitting_area</span>   <span class="o">=</span> <span class="n">tmp_catchmentArea</span><span class="p">[</span><span class="n">mapped_idx</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+            <span class="n">tmp_MapYIdx_fit</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tmp_best_fitting_area_y</span><span class="p">)</span>
+            <span class="n">tmp_MapXIdx_fit</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tmp_best_fitting_area_x</span><span class="p">)</span>
+            <span class="n">tmp_SimManArea</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tmp_best_fitting_area</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;MapBestCatchment done&#39;</span><span class="p">,</span>  <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="c1"># update object-variables with found information</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">MapYIdx_fit</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">tmp_MapYIdx_fit</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">MapXIdx_fit</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">tmp_MapXIdx_fit</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">SimMeanArea</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">tmp_SimManArea</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="mapper.writeMap2File">
+<a class="viewcode-back" href="../../mapper.html#sloth.mapper.mapper.writeMap2File">[docs]</a>
+    <span class="k">def</span> <span class="nf">writeMap2File</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39; Write mapped coordinates to a given file.</span>
+
+<span class="sd">        To save mapped coordinates for later use or better comparison, </span>
+<span class="sd">        one can write / dump those to a file.</span>
+<span class="sd">        Currently this function does only write data to CSV-format.</span>
+<span class="sd">        Currently already existing files are overwritten.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        file : str </span>
+<span class="sd">            defining the file-path to which data should be written.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+
+
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file</span><span class="p">,</span><span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">outFile</span><span class="p">:</span>
+            <span class="n">writer</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">writer</span><span class="p">(</span><span class="n">outFile</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+            <span class="n">header</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;ObsID&#39;</span><span class="p">,</span> 
+                    <span class="s1">&#39;ObsLon&#39;</span><span class="p">,</span> <span class="s1">&#39;ObsLat&#39;</span><span class="p">,</span> 
+                    <span class="s1">&#39;MapXIdx_raw&#39;</span><span class="p">,</span> <span class="s1">&#39;MapYIdx_raw&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;MapXIdx_fit&#39;</span><span class="p">,</span> <span class="s1">&#39;MapYIdx_fit&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;related SimLon&#39;</span><span class="p">,</span> <span class="s1">&#39;related SimLat&#39;</span><span class="p">]</span>
+            <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span><span class="n">header</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">ObsID</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ObsIDs</span><span class="p">):</span>
+                <span class="n">row</span> <span class="o">=</span> <span class="p">[</span><span class="n">ObsID</span><span class="p">,</span> 
+                       <span class="bp">self</span><span class="o">.</span><span class="n">ObsLons</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">ObsLats</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> 
+                       <span class="bp">self</span><span class="o">.</span><span class="n">MapXIdx_raw</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">MapYIdx_raw</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span>
+                       <span class="bp">self</span><span class="o">.</span><span class="n">MapXIdx_fit</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">MapYIdx_fit</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span>
+                       <span class="c1"># NWR error? Y=X and X=Y?</span>
+                       <span class="bp">self</span><span class="o">.</span><span class="n">SimLons</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">MapYIdx_raw</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">MapXIdx_raw</span><span class="p">[</span><span class="n">idx</span><span class="p">]],</span> <span class="bp">self</span><span class="o">.</span><span class="n">SimLats</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">MapYIdx_raw</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">MapXIdx_raw</span><span class="p">[</span><span class="n">idx</span><span class="p">]]]</span>
+                       <span class="c1">#self.SimLons[self.MapXIdx_raw[idx], self.MapYIdx_raw[idx]], self.SimLats[self.MapXIdx_raw[idx], self.MapYIdx_raw[idx]]]</span>
+                <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span><span class="n">row</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Niklas WAGNER.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

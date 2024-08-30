@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>sloth.analysis &mdash; SLOTH  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            SLOTH
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">SLOTH:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../README.html">Welcome to SLOTH</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Functions:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../coordTrafo.html">coordTrafo.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../toolBox.html">toolBox.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../SanityCheck.html">SanityCheck.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../IO.html">IO.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../analysis.html">analysis.py</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Classes:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../mapper.html">mapper.py</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/README.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/ex_RotatedCoordinates.html">Rotated Coordinates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/ex_SanityCheck.html">SanityCheck</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/ex_WriteDataToNetCDF.html">How to write data in netCDF format.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/ex_intersection_calculations.html">Calculating the total subsurface storage anomalies using geopandas</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Maintenance:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../content/maintenance.html">Maintenance</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">SLOTH</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">sloth.analysis</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for sloth.analysis</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;analysis - submodule of SLOTH</span>
+
+<span class="sd">Description:</span>
+<span class="sd">analysis.py is aimed to hold standalone functions used for analysis purpose.</span>
+<span class="sd">Basically this are functions calculating some variabels.</span>
+
+<span class="sd">[TBE]</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">heat</span> <span class="k">as</span> <span class="nn">ht</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;ERROR SLOTH.analysis --&gt; Could not import heat, so heat versions of analysis functions are not available.&#39;</span><span class="p">)</span>
+<span class="kn">import</span> <span class="nn">netCDF4</span> <span class="k">as</span> <span class="nn">nc</span>
+<span class="kn">import</span> <span class="nn">datetime</span> <span class="k">as</span> <span class="nn">dt</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+
+<div class="viewcode-block" id="calc_wtd_HT">
+<a class="viewcode-back" href="../../analysis.html#sloth.analysis.calc_wtd_HT">[docs]</a>
+<span class="k">def</span> <span class="nf">calc_wtd_HT</span><span class="p">(</span><span class="n">press</span><span class="p">,</span> <span class="n">cellDepths</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the water table depth.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    press : htdarray</span>
+<span class="sd">        Array of pressure values. The dimensions depend on the scenario:</span>
+<span class="sd">        - For 3D: (z, y, x)</span>
+<span class="sd">        - For 4D: (t, z, y, x)</span>
+
+<span class="sd">    cellDepths : ndarray</span>
+<span class="sd">        Array of cell depths.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    wtd : ndarray</span>
+<span class="sd">        Array of water table depths.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The function calculates the water table depth based on the given pressure values</span>
+<span class="sd">    and cell depths. The water table depth is determined by subtracting the lower most </span>
+<span class="sd">    pressure values and cell depths from the total column depth.</span>
+
+<span class="sd">    - For 3D input, the water table depth is calculated as:</span>
+<span class="sd">        wtd = totalColumnDepth - (press[0] + cellDepths[0] * 0.5)</span>
+
+<span class="sd">    - For 4D input, assuming a time series of pressure values, the water table depth is calculated as:</span>
+<span class="sd">        wtd = totalColumnDepth - (press[:, 0, ...] + cellDepths[0] * 0.5)</span>
+
+<span class="sd">    Negative water table depths are set to 0 using `np.where()`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">totalColumnDepth</span> <span class="o">=</span> <span class="n">ht</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">cellDepths</span><span class="p">)</span>
+    <span class="n">dim</span> <span class="o">=</span> <span class="n">press</span><span class="o">.</span><span class="n">ndim</span>
+    <span class="k">if</span> <span class="n">dim</span><span class="o">==</span><span class="mi">3</span><span class="p">:</span>
+        <span class="n">wtd</span> <span class="o">=</span> <span class="n">totalColumnDepth</span> <span class="o">-</span> <span class="p">(</span><span class="n">press</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">cellDepths</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mf">0.5</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">dim</span><span class="o">==</span><span class="mi">4</span><span class="p">:</span>
+        <span class="n">wtd</span> <span class="o">=</span> <span class="n">totalColumnDepth</span> <span class="o">-</span> <span class="p">(</span><span class="n">press</span><span class="p">[:,</span><span class="mi">0</span><span class="p">,</span><span class="o">...</span><span class="p">]</span> <span class="o">+</span> <span class="n">cellDepths</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mf">0.5</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;ERROR: dim of press input is not supported --&gt; EXIT!&#39;</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+    <span class="c1"># Above could be also solved by below oneliner:</span>
+    <span class="c1"># &gt;&gt; wtd = totalColumnDepth - (press[...,0,:,:] + cellDepth[0] * 0.5)</span>
+    <span class="c1"># but maybe this is not as intuitive as the used if-clause?</span>
+    <span class="n">wtd</span> <span class="o">=</span> <span class="n">ht</span><span class="o">.</span><span class="n">where</span><span class="p">((</span><span class="n">wtd</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="n">wtd</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">wtd</span></div>
+
+
+<div class="viewcode-block" id="calc_wtd">
+<a class="viewcode-back" href="../../analysis.html#sloth.analysis.calc_wtd">[docs]</a>
+<span class="k">def</span> <span class="nf">calc_wtd</span><span class="p">(</span><span class="n">press</span><span class="p">,</span> <span class="n">cellDepths</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the water table depth.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    press : ndarray</span>
+<span class="sd">        Array of pressure values. The dimensions depend on the scenario:</span>
+<span class="sd">        - For 3D: (z, y, x)</span>
+<span class="sd">        - For 4D: (t, z, y, x)</span>
+
+<span class="sd">    cellDepths : ndarray</span>
+<span class="sd">        Array of cell depths.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    wtd : ndarray</span>
+<span class="sd">        Array of water table depths.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The function calculates the water table depth based on the given pressure values</span>
+<span class="sd">    and cell depths. The water table depth is determined by subtracting the lower most </span>
+<span class="sd">    pressure values and cell depths from the total column depth.</span>
+
+<span class="sd">    - For 3D input, the water table depth is calculated as:</span>
+<span class="sd">        wtd = totalColumnDepth - (press[0] + cellDepths[0] * 0.5)</span>
+
+<span class="sd">    - For 4D input, assuming a time series of pressure values, the water table depth is calculated as:</span>
+<span class="sd">        wtd = totalColumnDepth - (press[:, 0, ...] + cellDepths[0] * 0.5)</span>
+
+<span class="sd">    Negative water table depths are set to 0 using `np.where()`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">totalColumnDepth</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">cellDepths</span><span class="p">)</span>
+    <span class="n">dim</span> <span class="o">=</span> <span class="n">press</span><span class="o">.</span><span class="n">ndim</span>
+    <span class="k">if</span> <span class="n">dim</span><span class="o">==</span><span class="mi">3</span><span class="p">:</span>
+        <span class="n">wtd</span> <span class="o">=</span> <span class="n">totalColumnDepth</span> <span class="o">-</span> <span class="p">(</span><span class="n">press</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">cellDepths</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mf">0.5</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">dim</span><span class="o">==</span><span class="mi">4</span><span class="p">:</span>
+        <span class="n">wtd</span> <span class="o">=</span> <span class="n">totalColumnDepth</span> <span class="o">-</span> <span class="p">(</span><span class="n">press</span><span class="p">[:,</span><span class="mi">0</span><span class="p">,</span><span class="o">...</span><span class="p">]</span> <span class="o">+</span> <span class="n">cellDepths</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mf">0.5</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;ERROR: dim of press input is not supported --&gt; EXIT!&#39;</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+    <span class="c1"># Above could be also solved by below oneliner:</span>
+    <span class="c1"># &gt;&gt; wtd = totalColumnDepth - (press[...,0,:,:] + cellDepth[0] * 0.5)</span>
+    <span class="c1"># but maybe this is not as intuitive as the used if-clause?</span>
+    <span class="n">wtd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">((</span><span class="n">wtd</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="n">wtd</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">wtd</span></div>
+
+
+<div class="viewcode-block" id="get_3Dgroundwaterbody_mask_HT">
+<a class="viewcode-back" href="../../analysis.html#sloth.analysis.get_3Dgroundwaterbody_mask_HT">[docs]</a>
+<span class="k">def</span> <span class="nf">get_3Dgroundwaterbody_mask_HT</span><span class="p">(</span><span class="n">satur</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate a 3D mask of the groundwater body.</span>
+
+<span class="sd">    The groundwater body refers to the volume of a soil column that is continuously</span>
+<span class="sd">    fully saturated, starting from the very bottom of the model domain (bedrock).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    satur : htdarray</span>
+<span class="sd">        Input array representing the saturation level of the soil column.</span>
+<span class="sd">        Shape: (nz, ny, nx)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    gwb_mask : ndarray</span>
+<span class="sd">        Numpy array of the same shape as the &#39;satur&#39; input, where each pixel</span>
+<span class="sd">        belonging to the groundwater body is assigned a value of 1, and 0 otherwise.</span>
+<span class="sd">        Shape: (nz, ny, nx)</span>
+
+<span class="sd">    wtd_z_index : ndarray</span>
+<span class="sd">        Numpy array of the same 2D shape as the &#39;satur&#39; input (without the z dimension).</span>
+<span class="sd">        It holds the index of the first unsaturated layer, counted from the bottom/bedrock</span>
+<span class="sd">        to the top/surface, for each soil column. If the index has a value of N+1, where N</span>
+<span class="sd">        is the number of layers in the model, the entire column is saturated.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">nz</span><span class="p">,</span> <span class="n">ny</span><span class="p">,</span> <span class="n">nx</span> <span class="o">=</span> <span class="n">satur</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">gwb</span>        <span class="o">=</span> <span class="n">ht</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nz</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">ny</span><span class="p">,</span> <span class="n">nx</span><span class="p">))</span>
+    <span class="n">gwb_mask</span>   <span class="o">=</span> <span class="n">ht</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nz</span><span class="p">,</span> <span class="n">ny</span><span class="p">,</span> <span class="n">nx</span><span class="p">))</span>
+
+    <span class="c1"># set unsaturated pixel to 0 and saturated pixel to 1</span>
+    <span class="c1"># add &#39;zero&#39; level on top ( np.zeros((nz+1, ny, nx)) )</span>
+    <span class="c1"># to guarantee finding a min with np.argmin()</span>
+    <span class="n">gwb</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">ht</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">satur</span><span class="o">&gt;=</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="c1"># get index of first unsaturated cell in columne, countet from model bottom</span>
+    <span class="c1"># this index corrospond to first cell outsid the groundwaterbody</span>
+    <span class="n">wtd_z_index</span> <span class="o">=</span> <span class="n">ht</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">gwb</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">z</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nz</span><span class="p">):</span>
+        <span class="c1"># with `z&lt;wtd_z_index` we do get fully saturated cells only, NOT </span>
+        <span class="c1"># including the first unsaturated layer (as we want to!)</span>
+        <span class="n">gwb_mask</span><span class="p">[</span><span class="n">z</span><span class="p">]</span> <span class="o">=</span> <span class="n">ht</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">z</span><span class="o">&lt;</span><span class="n">wtd_z_index</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">gwb_mask</span><span class="p">,</span> <span class="n">wtd_z_index</span></div>
+
+<div class="viewcode-block" id="get_3Dgroundwaterbody_mask">
+<a class="viewcode-back" href="../../analysis.html#sloth.analysis.get_3Dgroundwaterbody_mask">[docs]</a>
+<span class="k">def</span> <span class="nf">get_3Dgroundwaterbody_mask</span><span class="p">(</span><span class="n">satur</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate a 3D mask of the groundwater body.</span>
+
+<span class="sd">    The groundwater body refers to the volume of a soil column that is continuously</span>
+<span class="sd">    fully saturated, starting from the very bottom of the model domain (bedrock).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    satur : ndarray</span>
+<span class="sd">        Input array representing the saturation level of the soil column.</span>
+<span class="sd">        Shape: (nz, ny, nx)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    gwb_mask : ndarray</span>
+<span class="sd">        Numpy array of the same shape as the &#39;satur&#39; input, where each pixel</span>
+<span class="sd">        belonging to the groundwater body is assigned a value of 1, and 0 otherwise.</span>
+<span class="sd">        Shape: (nz, ny, nx)</span>
+
+<span class="sd">    wtd_z_index : ndarray</span>
+<span class="sd">        Numpy array of the same 2D shape as the &#39;satur&#39; input (without the z dimension).</span>
+<span class="sd">        It holds the index of the first unsaturated layer, counted from the bottom/bedrock</span>
+<span class="sd">        to the top/surface, for each soil column. If the index has a value of N+1, where N</span>
+<span class="sd">        is the number of layers in the model, the entire column is saturated.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">nz</span><span class="p">,</span> <span class="n">ny</span><span class="p">,</span> <span class="n">nx</span> <span class="o">=</span> <span class="n">satur</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">gwb</span>        <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nz</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">ny</span><span class="p">,</span> <span class="n">nx</span><span class="p">))</span>
+    <span class="n">gwb_mask</span>   <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nz</span><span class="p">,</span> <span class="n">ny</span><span class="p">,</span> <span class="n">nx</span><span class="p">))</span>
+
+    <span class="c1"># set unsaturated pixel to 0 and saturated pixel to 1</span>
+    <span class="c1"># add &#39;zero&#39; level on top ( np.zeros((nz+1, ny, nx)) )</span>
+    <span class="c1"># to guarantee finding a min with np.argmin()</span>
+    <span class="n">gwb</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">satur</span><span class="o">&gt;=</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="c1"># get index of first unsaturated cell in columne, countet from model bottom</span>
+    <span class="c1"># this index corrospond to first cell outsid the groundwaterbody</span>
+    <span class="n">wtd_z_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">gwb</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">z</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nz</span><span class="p">):</span>
+        <span class="c1"># with `z&lt;wtd_z_index` we do get fully saturated cells only, NOT </span>
+        <span class="c1"># including the first unsaturated layer (as we want to!)</span>
+        <span class="n">gwb_mask</span><span class="p">[</span><span class="n">z</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">z</span><span class="o">&lt;</span><span class="n">wtd_z_index</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">gwb_mask</span><span class="p">,</span> <span class="n">wtd_z_index</span></div>
+
+
+<div class="viewcode-block" id="vanGenuchten">
+<a class="viewcode-back" href="../../analysis.html#sloth.analysis.vanGenuchten">[docs]</a>
+<span class="k">def</span> <span class="nf">vanGenuchten</span><span class="p">(</span><span class="n">refP</span><span class="p">,</span> <span class="n">sSat</span><span class="p">,</span> <span class="n">sRes</span><span class="p">,</span> <span class="n">nVanG</span><span class="p">,</span> <span class="n">aVanG</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the degree of saturation as a function of the pressure head.</span>
+
+<span class="sd">    The degree of saturation is calculated as a function of the pressure head</span>
+<span class="sd">    according to the M. Th. van Genuchten equation.</span>
+
+<span class="sd">    Reference:</span>
+<span class="sd">    M. Th. van Genuchten. &quot;A Closed‐form Equation for Predicting the Hydraulic Conductivity</span>
+<span class="sd">    of Unsaturated Soils.&quot; Soil Science Society of America Journal, 1980.</span>
+<span class="sd">    DOI: https://doi.org/10.2136/sssaj1980.03615995004400050002x</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    refP : ndarray</span>
+<span class="sd">        Pressure head. [L]</span>
+
+<span class="sd">    sSat : float</span>
+<span class="sd">        Relative saturated water content. [-]</span>
+
+<span class="sd">    sRes : float</span>
+<span class="sd">        Relative residual saturation. [-]</span>
+
+<span class="sd">    nVanG : float</span>
+<span class="sd">        Non-linearity coefficient of the soil. [-]</span>
+
+<span class="sd">    aVanG : float</span>
+<span class="sd">        Air entry value of the soil. [L^-1]</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    vanG : ndarray</span>
+<span class="sd">        Degree of saturation.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    This function calculates the degree of saturation as a function of the pressure head</span>
+<span class="sd">    using the van Genuchten equation. The van Genuchten equation relates the degree of</span>
+<span class="sd">    saturation to the pressure head and soil-specific parameters.</span>
+
+<span class="sd">    The equation is given by:</span>
+
+<span class="sd">        vanG = ((sSat - sRes) / (1 + (aVanG * np.absolute(refP)) ** nVanG) ** mVanG) + sRes</span>
+
+<span class="sd">    Where:</span>
+<span class="sd">    - sSat is the relative saturated water content,</span>
+<span class="sd">    - sRes is the relative residual saturation,</span>
+<span class="sd">    - nVanG is the non-linearity coefficient of the soil,</span>
+<span class="sd">    - aVanG is the air entry value of the soil.</span>
+
+<span class="sd">    The coefficient mVanG is calculated as mVanG = 1 - (1 / nVanG).</span>
+
+<span class="sd">    To avoid unsaturated values where water is ponding, the output vanG is adjusted to 1</span>
+<span class="sd">    wherever refP is greater than or equal to 0.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">mVanG</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">nVanG</span><span class="p">)</span>
+
+    <span class="n">vanG</span> <span class="o">=</span> <span class="p">(</span> <span class="p">(</span><span class="n">sSat</span> <span class="o">-</span> <span class="n">sRes</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span> <span class="mi">1</span> <span class="o">+</span> <span class="p">(</span><span class="n">aVanG</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">absolute</span><span class="p">(</span><span class="n">refP</span><span class="p">))</span><span class="o">**</span><span class="p">(</span><span class="n">nVanG</span><span class="p">)</span> <span class="p">)</span><span class="o">**</span><span class="n">mVanG</span> <span class="p">)</span> <span class="o">+</span> <span class="n">sRes</span>
+
+    <span class="n">vanG</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">refP</span><span class="o">&gt;=</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="n">vanG</span><span class="p">)</span> <span class="c1"># avoid unsaturated values where water is ponding</span>
+
+    <span class="k">return</span> <span class="n">vanG</span></div>
+
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Niklas WAGNER.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>mapper.py &mdash; SLOTH  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Examples" href="examples/README.html" />
+    <link rel="prev" title="analysis.py" href="analysis.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            SLOTH
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">SLOTH:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="README.html">Welcome to SLOTH</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Functions:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="coordTrafo.html">coordTrafo.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="toolBox.html">toolBox.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="SanityCheck.html">SanityCheck.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="IO.html">IO.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="analysis.html">analysis.py</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Classes:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">mapper.py</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#sloth.mapper.mapper"><code class="docutils literal notranslate"><span class="pre">mapper</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#sloth.mapper.mapper.MapBestCatchment"><code class="docutils literal notranslate"><span class="pre">mapper.MapBestCatchment()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#sloth.mapper.mapper.MapBestQ"><code class="docutils literal notranslate"><span class="pre">mapper.MapBestQ()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#sloth.mapper.mapper.MapHighQ"><code class="docutils literal notranslate"><span class="pre">mapper.MapHighQ()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#sloth.mapper.mapper.MapRaw"><code class="docutils literal notranslate"><span class="pre">mapper.MapRaw()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#sloth.mapper.mapper.spher_dist"><code class="docutils literal notranslate"><span class="pre">mapper.spher_dist()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#sloth.mapper.mapper.writeMap2File"><code class="docutils literal notranslate"><span class="pre">mapper.writeMap2File()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="examples/README.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/ex_RotatedCoordinates.html">Rotated Coordinates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/ex_SanityCheck.html">SanityCheck</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/ex_WriteDataToNetCDF.html">How to write data in netCDF format.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/ex_intersection_calculations.html">Calculating the total subsurface storage anomalies using geopandas</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Maintenance:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="content/maintenance.html">Maintenance</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">SLOTH</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">mapper.py</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/mapper.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-sloth.mapper">
+<span id="mapper-py"></span><h1>mapper.py<a class="headerlink" href="#module-sloth.mapper" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="sloth.mapper.mapper">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">sloth.mapper.</span></span><span class="sig-name descname"><span class="pre">mapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">SimLons</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">SimLats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ObsLons</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ObsLats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ObsIDs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">SimMeanQ</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ObsMeanQ</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">SimMeanArea</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ObsMeanArea</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sloth/mapper.html#mapper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sloth.mapper.mapper" title="Link to this definition"></a></dt>
+<dd><p><strong>TBE</strong></p>
+<p>Due to several reasons (e.g. coarse resolutions) the river corridors
+within TSMP (as all other models) does not have to match the real corridor
+for all pixels along the river.
+[…]</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="sloth.mapper.mapper.MapBestCatchment">
+<span class="sig-name descname"><span class="pre">MapBestCatchment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">search_rad</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">12500.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">12500.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slopey</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slopex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sloth/mapper.html#mapper.MapBestCatchment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sloth.mapper.mapper.MapBestCatchment" title="Link to this definition"></a></dt>
+<dd><p>This functions maps OBS on SimGrid by choosing that pixel which related
+catchment area fits best to GRDC.</p>
+<p>The best fitting catchment is found by calculating the catchment of
+each pixel within a given radius around the origin pixel.
+The origin pixel is hereby defined by MapRaw().
+That pixel with catchment area closes to GRDC data is than set.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>search_rad</strong> (<em>int</em>) – defining the radius around the origin pixel to search for best fitting catchment.</p></li>
+<li><p><strong>dy</strong> (<em>float</em>) – defining the y-resolution of slope-grid (in [m])</p></li>
+<li><p><strong>dx</strong> (<em>float</em>) – defining the x-resolution of slope-grid (in [m])</p></li>
+<li><p><strong>slopey</strong> (<em>2D ndarray</em>) – defining the ParFlow slopes in y-direction used to calculate the catchment</p></li>
+<li><p><strong>slopex</strong> (<em>2D ndarray</em>) – defining the ParFlow slopes in x-direction used to calculate the catchment</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This function sets / updates the object variables self.MapYIdx_fit,
+self.MapXIdx_fit, and self.SimMeanArea directly</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sloth.mapper.mapper.MapBestQ">
+<span class="sig-name descname"><span class="pre">MapBestQ</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">search_rad</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sloth/mapper.html#mapper.MapBestQ"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sloth.mapper.mapper.MapBestQ" title="Link to this definition"></a></dt>
+<dd><p>This functions maps OBS on SimGrid by choosing that pixel with best
+fitting discharge (Q) within given radius.</p>
+<p>The best fitting Q is found by calculating the discharge of
+each pixel within a given radius around the origin pixel.
+The origin pixel is hereby defined by MapRaw().
+That pixel with Q closes to GRDC data is than set.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>search_rad</strong> (<em>int</em>) – defining the radius around the origin pixel to search for best fitting Q.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This function sets / updates the object variables self.MapYIdx_fit,
+and self.MapXIdx_fit directly</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sloth.mapper.mapper.MapHighQ">
+<span class="sig-name descname"><span class="pre">MapHighQ</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">search_rad</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sloth/mapper.html#mapper.MapHighQ"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sloth.mapper.mapper.MapHighQ" title="Link to this definition"></a></dt>
+<dd><p>This functions maps OBS on SimGrid by choosing that pixel with highest
+discharge (Q) within given radius.</p>
+<p>The highest discharge (Q) is simply found by applying np.argmax() to
+the subset (search_rad around origin pixel) of SimMeanQ.
+The origin pixel is hereby defined by MapRaw()
+SimMeanQ is part of the objects-variables</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>search_rad</strong> (<em>int</em>) – defining the radius around the origin pixel to search for highest Q.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This function sets / updates the object variables self.MapYIdx_fit,
+and self.MapXIdx_fit directly</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sloth.mapper.mapper.MapRaw">
+<span class="sig-name descname"><span class="pre">MapRaw</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sloth/mapper.html#mapper.MapRaw"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sloth.mapper.mapper.MapRaw" title="Link to this definition"></a></dt>
+<dd><p>This functions straight forward maps OBS on SimGrid.</p>
+<p>This function maps OBS data according to its Lat/Lon values
+to SimGrid, by calculating the ‘real’ distance between OBS location
+and all points in SimGrid. The point with the smallest distance is
+choose as the correct location of OBS on SimGrid.
+The ‘real’ distance is hereby the distance in [m] between OBS and SimGrind
+calculated on a sphere.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This function sets / updates the object variables self.MapYIdx_fit,
+and self.MapXIdx_fit directly</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sloth.mapper.mapper.spher_dist">
+<span class="sig-name descname"><span class="pre">spher_dist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lon1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lat1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lon2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lat2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Rearth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6373</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sloth/mapper.html#mapper.spher_dist"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sloth.mapper.mapper.spher_dist" title="Link to this definition"></a></dt>
+<dd><p>calculate the spherical / haversine distance</p>
+<p>Source: <a class="reference external" href="https://www.kompf.de/gps/distcalc.html">https://www.kompf.de/gps/distcalc.html</a>
+This function is supposed to proper handle different shaped coords
+latX and lonX is supposed to be passed in rad</p>
+<p>return 2D ndarray</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sloth.mapper.mapper.writeMap2File">
+<span class="sig-name descname"><span class="pre">writeMap2File</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sloth/mapper.html#mapper.writeMap2File"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sloth.mapper.mapper.writeMap2File" title="Link to this definition"></a></dt>
+<dd><p>Write mapped coordinates to a given file.</p>
+<p>To save mapped coordinates for later use or better comparison,
+one can write / dump those to a file.
+Currently this function does only write data to CSV-format.
+Currently already existing files are overwritten.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>file</strong> (<em>str</em>) – defining the file-path to which data should be written.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="analysis.html" class="btn btn-neutral float-left" title="analysis.py" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="examples/README.html" class="btn btn-neutral float-right" title="Examples" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Niklas WAGNER.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

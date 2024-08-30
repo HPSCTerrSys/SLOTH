@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>toolBox.py &mdash; SLOTH  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="SanityCheck.py" href="SanityCheck.html" />
+    <link rel="prev" title="coordTrafo.py" href="coordTrafo.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            SLOTH
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">SLOTH:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="README.html">Welcome to SLOTH</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Functions:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="coordTrafo.html">coordTrafo.py</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">toolBox.py</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#sloth.toolBox.calc_catchment"><code class="docutils literal notranslate"><span class="pre">calc_catchment()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sloth.toolBox.fill"><code class="docutils literal notranslate"><span class="pre">fill()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sloth.toolBox.find_nearest_Index_2D"><code class="docutils literal notranslate"><span class="pre">find_nearest_Index_2D()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sloth.toolBox.get_intervalSlice"><code class="docutils literal notranslate"><span class="pre">get_intervalSlice()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sloth.toolBox.get_prudenceMask"><code class="docutils literal notranslate"><span class="pre">get_prudenceMask()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sloth.toolBox.intersection_calculations"><code class="docutils literal notranslate"><span class="pre">intersection_calculations()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sloth.toolBox.mapDataRange_lin"><code class="docutils literal notranslate"><span class="pre">mapDataRange_lin()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sloth.toolBox.plusOneMonth"><code class="docutils literal notranslate"><span class="pre">plusOneMonth()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sloth.toolBox.spher_dist_v1"><code class="docutils literal notranslate"><span class="pre">spher_dist_v1()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sloth.toolBox.stampLLSM"><code class="docutils literal notranslate"><span class="pre">stampLLSM()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sloth.toolBox.trunc"><code class="docutils literal notranslate"><span class="pre">trunc()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="SanityCheck.html">SanityCheck.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="IO.html">IO.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="analysis.html">analysis.py</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Classes:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="mapper.html">mapper.py</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="examples/README.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/ex_RotatedCoordinates.html">Rotated Coordinates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/ex_SanityCheck.html">SanityCheck</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/ex_WriteDataToNetCDF.html">How to write data in netCDF format.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/ex_intersection_calculations.html">Calculating the total subsurface storage anomalies using geopandas</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Maintenance:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="content/maintenance.html">Maintenance</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">SLOTH</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">toolBox.py</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/toolBox.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-sloth.toolBox">
+<span id="toolbox-py"></span><h1>toolBox.py<a class="headerlink" href="#module-sloth.toolBox" title="Link to this heading"></a></h1>
+<p>toolBox - submodule of SLOTH</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="sloth.toolBox.calc_catchment">
+<span class="sig-prename descclassname"><span class="pre">sloth.toolBox.</span></span><span class="sig-name descname"><span class="pre">calc_catchment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slopex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slopey</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sloth/toolBox.html#calc_catchment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sloth.toolBox.calc_catchment" title="Link to this definition"></a></dt>
+<dd><p>Calculate the catchment area associated with a given outlet pixel
+using x- and y-slope data.</p>
+<p>This function implements a simple yet efficient algorithm to determine the
+catchment area by starting with a list of pixels that initially contains
+only the outlet pixel(s). It iteratively processes the pixels in the list,
+marking them as part of the catchment and identifying the surrounding pixels
+that drain into the current pixel and are not already included in the
+catchment. Foun pixels are added to the list and the algorithm continues
+until all pixels belonging to the catchment area are discovered.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>slopex</strong> (<em>ndarray</em>) – 2D slopes in x-direction</p></li>
+<li><p><strong>slopey</strong> (<em>ndarray</em>) – 2D slopes in y-direction</p></li>
+<li><p><strong>x</strong> (<em>int</em>) – index in x-direction to calulate catchment from</p></li>
+<li><p><strong>y</strong> (<em>int</em>) – index in y-direction to calulate catchment from</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>catchment</strong> – 2D ndarray of the same size as slopex/y. 0 = not part of catchment; 1 = part of catchment</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sloth.toolBox.fill">
+<span class="sig-prename descclassname"><span class="pre">sloth.toolBox.</span></span><span class="sig-name descname"><span class="pre">fill</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">invalid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transkargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sloth/toolBox.html#fill"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sloth.toolBox.fill" title="Link to this definition"></a></dt>
+<dd><p>Fill invalid data points with nearest neighbor interpolation.</p>
+<p>This function replaces invalid data points in the input array (<cite>data</cite>) with the
+value of the nearest valid data point. Invalid data points are indicated by the
+<cite>invalid</cite> array or, if not provided, by NaN (Not a Number) values in <cite>data</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>ndarray</em>) – An array containing the data to be filled.</p></li>
+<li><p><strong>invalid</strong> (<em>ndarray</em><em>, </em><em>optional</em>) – A binary array of the same shape as <cite>data</cite>. Data values are replaced where
+<cite>invalid</cite> is True. If not provided, invalid data points are identified using
+<cite>np.isnan(data)</cite> (default).</p></li>
+<li><p><strong>transkargs</strong> (<em>dict</em><em>, </em><em>optional</em>) – Additional arguments to pass to the <cite>distance_transform_edt()</cite> function.
+Default is an empty dictionary.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A filled ndarray, where invalid data points have been replaced by the value
+of the nearest valid data point.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This function uses nearest neighbor interpolation to fill invalid data points in
+the input array. It calculates the Euclidean distance transform of the <cite>invalid</cite>
+array to find the indices of the nearest valid data points. The original <cite>data</cite>
+array is then updated with the values from the nearest valid data points.</p>
+<p>If the shapes of <cite>data</cite> and <cite>invalid</cite> are not equal, an error is raised, as filling
+is not possible.</p>
+<p>See also: <a class="reference external" href="https://stackoverflow.com/questions/5551286/filling-gaps-in-a-numpy-array">https://stackoverflow.com/questions/5551286/filling-gaps-in-a-numpy-array</a></p>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fill</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="go">array([1., 2., 4., 4., 4.])</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">invalid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fill</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">invalid</span><span class="p">)</span>
+<span class="go">array([1., 2., 4., 4., 4.])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sloth.toolBox.find_nearest_Index_2D">
+<span class="sig-prename descclassname"><span class="pre">sloth.toolBox.</span></span><span class="sig-name descname"><span class="pre">find_nearest_Index_2D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">point</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coord2D</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sloth/toolBox.html#find_nearest_Index_2D"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sloth.toolBox.find_nearest_Index_2D" title="Link to this definition"></a></dt>
+<dd><p>Find the nearest index in a 2D array.</p>
+<p>Given a 2D array <cite>coord2D</cite> and a specific <cite>point</cite> value, this function returns
+the index of the 2D array that holds the closest values to the <cite>point</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>point</strong> (<em>scalar</em>) – The value for which to find the nearest index in the 2D array.</p></li>
+<li><p><strong>coord2D</strong> (<em>ndarray</em>) – The 2D array in which to search for the nearest index.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The index in the first and second dimensions of <cite>coord2D</cite> that holds the
+closest values to the <cite>point</cite>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(int, int)</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This function calculates the absolute differences between <cite>coord2D</cite> and <cite>point</cite>
+using <cite>np.abs()</cite>. It then determines the index of the minimum value in the
+differences array using <cite>np.argmin()</cite>. The resulting flattened index is converted
+into a tuple of indices representing the original shape of <cite>coord2D</cite> using
+<cite>np.unravel_index()</cite>.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span> <span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">find_nearest_Index_2D</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">arr</span><span class="p">)</span>
+<span class="go">(1, 1)</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.7</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">find_nearest_Index_2D</span><span class="p">(</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">arr</span><span class="p">)</span>
+<span class="go">(0, 1)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sloth.toolBox.get_intervalSlice">
+<span class="sig-prename descclassname"><span class="pre">sloth.toolBox.</span></span><span class="sig-name descname"><span class="pre">get_intervalSlice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dates</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sliceInterval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'month'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sloth/toolBox.html#get_intervalSlice"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sloth.toolBox.get_intervalSlice" title="Link to this definition"></a></dt>
+<dd><p>This functions calculates interval slices of a given time-series</p>
+<p>This function calculates interval slices of a given time-series,
+aiming to mimic pythons default slice notation <cite>array[start:stop:step]</cite>
+to also enable multi dimensional slicing.
+The calculation takes the models dumpintervall into account, wherefore
+this function is working for (nearly) every time-resolution.
+The calculation is based on datetime-objects and therefore really
+calculates the slice of individual interval, even if the time-series
+does not start or end at the first or last of a given interval.</p>
+<p>Use case:
+You got a time-series of hourly data points and want to calculate the
+monthly mean. This functions returns the slices needed to divide your
+data into monthly peaces.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dates</strong> (<em>NDarray</em>) – the time-series as datetime-object.</p></li>
+<li><p><strong>sliceInterval</strong> (<em>str</em>) – defining the interval. Supported are: ‘day’, ‘month’</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>Slices</strong> – A list with length of found intervals with related slices</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This function assumes:
+i) The passed time-series covers at least on intervall!
+ii) At least hourly steps / dumpIntervals!
+iii) No seconds in dates - model output is at least on full minutes!</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sloth.toolBox.get_prudenceMask">
+<span class="sig-prename descclassname"><span class="pre">sloth.toolBox.</span></span><span class="sig-name descname"><span class="pre">get_prudenceMask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lat2D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lon2D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prudName</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sloth/toolBox.html#get_prudenceMask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sloth.toolBox.get_prudenceMask" title="Link to this definition"></a></dt>
+<dd><p>Return a Prudence mask based on latitude and longitude values.</p>
+<p>This function generates a boolean mask array where True represents masked areas
+and False represents non-masked areas. The mask is determined based on a set of
+latitude and longitude values and the name of the Prudence region.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lat2D</strong> (<em>ndarray</em>) – 2D array containing latitude information for each pixel.</p></li>
+<li><p><strong>lon2D</strong> (<em>ndarray</em>) – 2D array containing longitude information for each pixel.</p></li>
+<li><p><strong>prudName</strong> (<em>str</em>) – Short name of the Prudence region.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>prudMask</strong> – Boolean ndarray of the same shape as <cite>lat2D</cite>, indicating masked and
+non-masked areas.
+True = masked; False = not masked.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The Prudence mask is created based on specific latitude and longitude ranges
+for each Prudence region. The function checks the <cite>prudName</cite> parameter and
+generates the corresponding mask using NumPy’s <cite>np.where()</cite> function.</p>
+<p>The available Prudence region names and their corresponding latitude and
+longitude ranges are as follows (True is masked, Fals is not masked):</p>
+<ul class="simple">
+<li><p>‘BI’: Latitude: &lt;50.0 or &gt;59.0, Longitude: &lt;-10.0 or &gt;2.0</p></li>
+<li><p>‘IP’: Latitude: &lt;36.0 or &gt;44.0, Longitude: &lt;-10.0 or &gt;3.0</p></li>
+<li><p>‘FR’: Latitude: &lt;44.0 or &gt;50.0, Longitude: &lt;-5.0 or &gt;5.0</p></li>
+<li><p>‘ME’: Latitude: &lt;48.0 or &gt;55.0, Longitude: &lt;2.0 or &gt;16.0</p></li>
+<li><p>‘SC’: Latitude: &lt;55.0 or &gt;70.0, Longitude: &lt;5.0 or &gt;30.0</p></li>
+<li><p>‘AL’: Latitude: &lt;44.0 or &gt;48.0, Longitude: &lt;5.0 or &gt;15.0</p></li>
+<li><p>‘MD’: Latitude: &lt;36.0 or &gt;44.0, Longitude: &lt;3.0 or &gt;25.0</p></li>
+<li><p>‘EA’: Latitude: &lt;44.0 or &gt;55.0, Longitude: &lt;16.0 or &gt;30.0</p></li>
+</ul>
+<p>If an unsupported Prudence region name is provided, an error message is printed,
+and the program exits.</p>
+<p>For reference see also: <a class="reference external" href="http://prudence.dmi.dk/public/publications/PSICC/Christensen&amp;Christensen.pdf">http://prudence.dmi.dk/public/publications/PSICC/Christensen&amp;Christensen.pdf</a> p.38</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sloth.toolBox.intersection_calculations">
+<span class="sig-prename descclassname"><span class="pre">sloth.toolBox.</span></span><span class="sig-name descname"><span class="pre">intersection_calculations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">corners</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">area_of_interest</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Name_area</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crs_utm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nr_yr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nr_entries</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_dir</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sloth/toolBox.html#intersection_calculations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sloth.toolBox.intersection_calculations" title="Link to this definition"></a></dt>
+<dd><p>Calculate spatial mean values for a shapefile in interest.</p>
+<p>This function calculates spatial mean values (example for a specific
+region or province) taking into account how much (ratio) of the
+gridpoint is actually being intersected inside our region of interest.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df_data</strong> (<em>dataframe</em>) – dataframe containing infromation about each gridpoint</p></li>
+<li><p><strong>corners</strong> (<em>dataframe</em><em> (</em><em>can also be a nectdf</em><em> or </em><em>any other data type</em><em>)</em>) – containing infromation on the four longitudes and latitudes
+that surrounds each gridpoint in the source dataframe</p></li>
+<li><p><strong>area_of_interest</strong> (<em>a shapefile</em><em> or </em><em>geodataframe</em>) – shapefile of the area of interest</p></li>
+<li><p><strong>Name_area</strong> (<em>the field name in the shapefile</em><em>, </em><em>that the dissolve will be based on</em>)</p></li>
+<li><p><strong>crs_utm</strong> (<em>projected coordinate reference system</em><em> (</em><em>utm</em><em>)</em>)</p></li>
+<li><p><strong>nr_yr</strong> (<em>variable</em>) – number of years of interest</p></li>
+<li><p><strong>nr_entries</strong> (<em>variable</em>) – number of hours/days/or months etc..</p></li>
+<li><p><strong>save_dir</strong> (<em>path</em>) – path for saving the output</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sloth.toolBox.mapDataRange_lin">
+<span class="sig-prename descclassname"><span class="pre">sloth.toolBox.</span></span><span class="sig-name descname"><span class="pre">mapDataRange_lin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cutMinMax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sloth/toolBox.html#mapDataRange_lin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sloth.toolBox.mapDataRange_lin" title="Link to this definition"></a></dt>
+<dd><p>Map a source data range linearly to a target data range.</p>
+<p>Perform a linear mapping of a source data range (X) to a target data range (Y). The
+function calculates the mapping using the formula: y = (y_max - y_min) / (x_max - x_min) * (x - x_min) + y_min.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>ndarray</em>) – Source data range to remap.</p></li>
+<li><p><strong>y_min</strong> (<em>scalar</em><em>, </em><em>optional</em>) – Minimum value of the target data range (default is 0).</p></li>
+<li><p><strong>y_max</strong> (<em>scalar</em><em>, </em><em>optional</em>) – Maximum value of the target data range (default is 1).</p></li>
+<li><p><strong>x_min</strong> (<em>scalar</em><em>, </em><em>optional</em>) – Minimum value of the source data range. If not provided, it is calculated based on X.</p></li>
+<li><p><strong>x_max</strong> (<em>scalar</em><em>, </em><em>optional</em>) – Maximum value of the source data range. If not provided, it is calculated based on X.</p></li>
+<li><p><strong>cutMinMax</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, cut the mapped values outside the target data range to the minimum and maximum values.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The target data range after linear mapping.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This function is useful for mapping a source data range to a different target data range. It can be
+used for various purposes, such as normalizing data ranges to facilitate comparison with other ranges.
+An intermediat step is used by first transform both (X and Y) into data
+ranges starting from zero (X’ and Y’), as those data range can be easily
+mapped with</p>
+<ol class="lowerroman simple">
+<li><p>y’ = y’_max / x’_max * x’</p></li>
+<li><p>y’ = y - y_min   AND   x’ = x - x_min</p></li>
+<li><p>y = (y_max-y_min) / (x_max-x_min) * (x-x_min) + y_min</p></li>
+</ol>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mapped</span> <span class="o">=</span> <span class="n">mapDataRange_lin</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y_min</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">y_max</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">mapped</span><span class="p">)</span>
+<span class="go">[10. 12. 14. 16. 18. 20.]</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">100</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">300</span><span class="p">,</span> <span class="mi">400</span><span class="p">,</span> <span class="mi">500</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mapped</span> <span class="o">=</span> <span class="n">mapDataRange_lin</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y_min</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">y_max</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">x_min</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">x_max</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">mapped</span><span class="p">)</span>
+<span class="go">[-1.  -0.5  0.   0.5  1. ]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sloth.toolBox.plusOneMonth">
+<span class="sig-prename descclassname"><span class="pre">sloth.toolBox.</span></span><span class="sig-name descname"><span class="pre">plusOneMonth</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">currDate</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sloth/toolBox.html#plusOneMonth"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sloth.toolBox.plusOneMonth" title="Link to this definition"></a></dt>
+<dd><p>Return the passed date incremented by one month.</p>
+<p>This function provides a simple way to calculate a date that is one month ahead
+of the given <cite>currDate</cite>. Unlike the bash command-line tool <cite>date</cite>, which can
+handle this calculation easily, Python’s <cite>datetime</cite> objects are based on hours
+or seconds, requiring special treatment for adding one month due to varying
+month lengths. This function serves as a wrapper to handle this task in a clean
+manner, facilitating usage in other code snippets.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>currDate</strong> (<em>datetime</em>) – An arbitrary date.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The passed date incremented by one month.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>datetime</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This function determines the number of days in the month of <cite>currDate</cite> using
+<cite>monthrange()</cite> from the <cite>calendar</cite> module. It then returns <cite>currDate</cite> incremented
+by a timedelta calculated as <cite>24 * num_days</cite> hours. This ensures that the returned
+date correctly reflects one month ahead while accounting for varying month lengths.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">datetime</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">currDate</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2023</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plusOneMonth</span><span class="p">(</span><span class="n">currDate</span><span class="p">)</span>
+<span class="go">datetime.datetime(2023, 6, 15, 0, 0)</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">currDate</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2023</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">31</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plusOneMonth</span><span class="p">(</span><span class="n">currDate</span><span class="p">)</span>
+<span class="go">datetime.datetime(2024, 1, 31, 0, 0)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sloth.toolBox.spher_dist_v1">
+<span class="sig-prename descclassname"><span class="pre">sloth.toolBox.</span></span><span class="sig-name descname"><span class="pre">spher_dist_v1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lon1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lat1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lon2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lat2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Rearth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6373</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sloth/toolBox.html#spher_dist_v1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sloth.toolBox.spher_dist_v1" title="Link to this definition"></a></dt>
+<dd><p>calculate the spherical / haversine distance</p>
+<p>This function calculates the real distance (in [km]) between two points on
+earth given in lat/lon coordinates.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lon1</strong> (<em>ndarray</em>) – Longitude value in [rad] of first point in [rad]. Could be any dim</p></li>
+<li><p><strong>lat1</strong> (<em>ndarray</em>) – Latitude value in [rad] of first point in [rad]. Could be any dim</p></li>
+<li><p><strong>lon2</strong> (<em>ndarray</em>) – Longitude value in [rad] of second point in [rad]. Could be any dim</p></li>
+<li><p><strong>lat2</strong> (<em>ndarray</em>) – Latitude value in [rad] of second point in [rad]. Could be any dim</p></li>
+<li><p><strong>Rearth</strong> (<em>int</em><em> or </em><em>float</em>) – The earth radius in [km].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The distance is returned in [km]</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Source: <a class="reference external" href="https://www.kompf.de/gps/distcalc.html">https://www.kompf.de/gps/distcalc.html</a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sloth.toolBox.stampLLSM">
+<span class="sig-prename descclassname"><span class="pre">sloth.toolBox.</span></span><span class="sig-name descname"><span class="pre">stampLLSM</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">invalid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">LLSM</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">LLSMThreshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sloth/toolBox.html#stampLLSM"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sloth.toolBox.stampLLSM" title="Link to this definition"></a></dt>
+<dd><p>stamps a LLSM to passed data</p>
+<p>Some times its needed to force different datasets to use the same
+Land-Lake-Sea-Mask (LLSM). One example is combining different data sets to
+force a model with. If the datasets are taken fomr different sources, most
+propably the used LLSM is different too. This, for exmple, could lead to the
+situation along the coastline that one dataset is indicating water (ocean)
+while the other is indicating land. This inconsistency has to be fixe,
+especially within the realm of coupled models.</p>
+<p>To achive this, this function is</p>
+<ol class="lowerroman simple">
+<li><p>masking invalid pixels within the passed data set</p></li>
+<li><p>interpolate remaining data over the maske regions</p></li>
+<li><p>set pixel to water value according to a passed LLSM</p></li>
+</ol>
+<p>This guaranthees each land pixel is holding land informtion and each
+water pixel is marked as water.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>ndarray</em>) – A 2D nd array holding the datset to stamp the LLSM</p></li>
+<li><p><strong>invalid</strong> (<em>scalar</em>) – A scalar witht the value indicating invalid pixel</p></li>
+<li><p><strong>LLSM</strong> (<em>ndarray</em>) – A ndarray of the same shape as data holding the LLSM
+(Land=2 Lake=1 Sea=0)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A (MASKED!) ndarray of the same shape as data, with stamped LLSM</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sloth.toolBox.trunc">
+<span class="sig-prename descclassname"><span class="pre">sloth.toolBox.</span></span><span class="sig-name descname"><span class="pre">trunc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sloth/toolBox.html#trunc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sloth.toolBox.trunc" title="Link to this definition"></a></dt>
+<dd><p>Truncate a passed float value or floating ndarray.</p>
+<p>This function truncates a given float value or floating ndarray by a
+specified truncation precision (decimal digits).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>values</strong> (<em>ndarray</em>) – A ndarray of any dimension (including scalar) containing float values to be truncated.</p></li>
+<li><p><strong>decs</strong> (<em>int</em><em>, </em><em>optional</em>) – An integer value defining the truncation precision. It specifies the number of decimal places to keep (default is 0).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A ndarray of the same type as the input, with the specified number of decimal places truncated from the original values.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">2.12345</span><span class="p">,</span> <span class="mf">3.45678</span><span class="p">,</span> <span class="mf">4.56789</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">trunc</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">decs</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="go">array([2.123, 3.456, 4.567])</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">value</span> <span class="o">=</span> <span class="mf">2.98765</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">trunc</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">decs</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="go">2.98</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="coordTrafo.html" class="btn btn-neutral float-left" title="coordTrafo.py" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="SanityCheck.html" class="btn btn-neutral float-right" title="SanityCheck.py" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Niklas WAGNER.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

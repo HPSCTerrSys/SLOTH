@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SanityCheck.py &mdash; SLOTH  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="IO.py" href="IO.html" />
+    <link rel="prev" title="toolBox.py" href="toolBox.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            SLOTH
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">SLOTH:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="README.html">Welcome to SLOTH</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Functions:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="coordTrafo.html">coordTrafo.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="toolBox.html">toolBox.py</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">SanityCheck.py</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#sloth.SanityCheck.get_PlotMinMaxMid_Percentil"><code class="docutils literal notranslate"><span class="pre">get_PlotMinMaxMid_Percentil()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sloth.SanityCheck.plot_SanityCheck"><code class="docutils literal notranslate"><span class="pre">plot_SanityCheck()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="IO.html">IO.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="analysis.html">analysis.py</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Classes:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="mapper.html">mapper.py</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="examples/README.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/ex_RotatedCoordinates.html">Rotated Coordinates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/ex_SanityCheck.html">SanityCheck</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/ex_WriteDataToNetCDF.html">How to write data in netCDF format.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/ex_intersection_calculations.html">Calculating the total subsurface storage anomalies using geopandas</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Maintenance:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="content/maintenance.html">Maintenance</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">SLOTH</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">SanityCheck.py</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/SanityCheck.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-sloth.SanityCheck">
+<span id="sanitycheck-py"></span><h1>SanityCheck.py<a class="headerlink" href="#module-sloth.SanityCheck" title="Link to this heading"></a></h1>
+<p>SanityCheck.py is a script aimed at quickly validating the validity of data by
+providing simple statistical information.</p>
+<p>Often, it is necessary to inspect data, such as model output, to determine if
+the results are reasonable or not. Instead of elaborate plots, the script
+focuses on presenting relevant statistics to avoid confusion while conveying
+as much information about the data as possible.</p>
+<p>The script can handle various types of data and automatically adjusts the
+colorbar according to upper and lower percentiles to account for outliers. This
+prevents outliers from distorting the colorbar or histogram. Therefore it is
+important to check the values on on each colorbar, as they may vary from plot
+to plot.</p>
+<p>One use case for this script is to run it automatically after each individual
+simulation in a long-term climate simulation. This allows for easy verification
+of the simulation results’ reasonableness, detecting problems like time shifts
+or instability.</p>
+<p>Another use case is to run the script manually on specific data sets by passing
+them as command line arguments.</p>
+<p>For examples of how to use this script, refer to the ‘examples/’ directory.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="sloth.SanityCheck.get_PlotMinMaxMid_Percentil">
+<span class="sig-prename descclassname"><span class="pre">sloth.SanityCheck.</span></span><span class="sig-name descname"><span class="pre">get_PlotMinMaxMid_Percentil</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lower</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">95</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sloth/SanityCheck.html#get_PlotMinMaxMid_Percentil"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sloth.SanityCheck.get_PlotMinMaxMid_Percentil" title="Link to this definition"></a></dt>
+<dd><p>Calculate the minimum, maximum, and midpoint values based on percentiles of the input data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>numpy.ma.MaskedArray</em>) – Input data array.</p></li>
+<li><p><strong>lower</strong> (<em>int</em><em>, </em><em>optional</em>) – Lower percentile value. Default is 5.</p></li>
+<li><p><strong>upper</strong> (<em>int</em><em>, </em><em>optional</em>) – Upper percentile value. Default is 95.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A tuple containing the minimum, maximum, and midpoint values.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy.ma</span> <span class="k">as</span> <span class="nn">ma</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">ma</span><span class="o">.</span><span class="n">masked_array</span><span class="p">([</span><span class="mf">1.2</span><span class="p">,</span> <span class="mf">3.4</span><span class="p">,</span> <span class="mf">5.6</span><span class="p">,</span> <span class="mf">7.8</span><span class="p">,</span> <span class="mf">9.0</span><span class="p">],</span> <span class="n">mask</span><span class="o">=</span><span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">min_val</span><span class="p">,</span> <span class="n">max_val</span><span class="p">,</span> <span class="n">mid_val</span> <span class="o">=</span> <span class="n">get_PlotMinMaxMid_Percentil</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="mi">90</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Minimum value:&quot;</span><span class="p">,</span> <span class="n">min_val</span><span class="p">)</span>
+<span class="go">Minimum value: 1.86</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Maximum value:&quot;</span><span class="p">,</span> <span class="n">max_val</span><span class="p">)</span>
+<span class="go">Maximum value: 8.64</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Midpoint value:&quot;</span><span class="p">,</span> <span class="n">mid_val</span><span class="p">)</span>
+<span class="go">Midpoint value: 5.25</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sloth.SanityCheck.plot_SanityCheck">
+<span class="sig-prename descclassname"><span class="pre">sloth.SanityCheck.</span></span><span class="sig-name descname"><span class="pre">plot_SanityCheck</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kind</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'./SanityCheck_3D.pdf'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fig_title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lowerP</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upperP</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">98</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixValueRange</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interactive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmapName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Spectral'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sloth/SanityCheck.html#plot_SanityCheck"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sloth.SanityCheck.plot_SanityCheck" title="Link to this definition"></a></dt>
+<dd><p>Plot a sanity check for given data.</p>
+<p>The Sanity Plot is a plot consisting of 4 sub-plots, trying to visualise
+some important statistics in a compact way, aimed to determine if the data
+set inspected is plausible or not (sanity).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>numpy.ma.MaskedArray</em>) – 3D array of data.</p></li>
+<li><p><strong>kind</strong> (<em>{'sum'</em><em>, </em><em>'mean'}</em><em>, </em><em>optional</em>) – Calculation type for the data statistics. Default is ‘mean’.</p></li>
+<li><p><strong>figname</strong> (<em>str</em><em>, </em><em>optional</em>) – File name to save the plot. Default is ‘./SanityCheck_3D.pdf’.</p></li>
+<li><p><strong>fig_title</strong> (<em>str</em><em>, </em><em>optional</em>) – Title of the plot.</p></li>
+<li><p><strong>lowerP</strong> (<em>int</em><em>, </em><em>optional</em>) – Lower percentile value for plot limits. Default is 2.</p></li>
+<li><p><strong>upperP</strong> (<em>int</em><em>, </em><em>optional</em>) – Upper percentile value for plot limits. Default is 98.</p></li>
+<li><p><strong>fixValueRange</strong> (<em>list</em>) – A list of values to define a fix value range.</p></li>
+<li><p><strong>interactive</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, display the plot interactively. If False, save the plot to
+‘figname’. Default is False.</p></li>
+<li><p><strong>cmapName</strong> (<em>str</em><em>, </em><em>optional</em>) – Name of the colormap. Default is ‘Spectral’.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><p>The ‘data’ input must be a 3D numpy masked array (t, y, x).</p></li>
+<li><p>The ‘kind’ parameter specifies whether to calculate the sum or mean of the data.</p></li>
+<li><p>The function generates a plot with subplots for the minimum, maximum, kind (sum or mean), and histogram of the data.</p></li>
+<li><p>The colormap normalization is determined based on the percentiles of the data.</p></li>
+<li><p>The plot can be displayed interactively or saved to a file.</p></li>
+<li><p>If the ‘interactive’ parameter is set to True, the plot is displayed using plt.show(). If False, the plot is saved to the file specified by ‘figname’.</p></li>
+</ul>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="toolBox.html" class="btn btn-neutral float-left" title="toolBox.py" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="IO.html" class="btn btn-neutral float-right" title="IO.py" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Niklas WAGNER.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
